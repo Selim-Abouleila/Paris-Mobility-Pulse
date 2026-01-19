@@ -6,9 +6,6 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 
 ![Pipeline architecture](docs/images/pipeline.png)
 
-**Flow (MVP):**
-Cloud Scheduler → Cloud Run Collector → Pub/Sub topic (`pmp-events`) → Cloud Run BigQuery Writer → BigQuery (`pmp_raw.velib_station_status_raw`)
-
 ## What’s implemented (Step 1–2)
 - Cloud Run collector (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub.
 - Cloud Run writer (`pmp-bq-writer`) receives Pub/Sub push messages and inserts into BigQuery raw table.
