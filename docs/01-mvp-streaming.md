@@ -88,3 +88,6 @@ FROM `paris-mobility-pulse.pmp_raw.velib_station_status_raw`
 ORDER BY ingest_ts DESC
 LIMIT 20;
 ```
+
+![BigQuery raw query result](images/bigquery_raw_query.png)
+
