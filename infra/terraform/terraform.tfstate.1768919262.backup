@@ -1,0 +1,1397 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 44,
+  "lineage": "2ccb3a7c-5ff8-8831-d9c9-3327e7fe606f",
+  "outputs": {},
+  "resources": [
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "analyticshub_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/analyticshub.googleapis.com",
+            "project": "19684349165",
+            "service": "analyticshub.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "artifactregistry_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/artifactregistry.googleapis.com",
+            "project": "19684349165",
+            "service": "artifactregistry.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigquery_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigquery.googleapis.com",
+            "project": "19684349165",
+            "service": "bigquery.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigqueryconnection_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigqueryconnection.googleapis.com",
+            "project": "19684349165",
+            "service": "bigqueryconnection.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigquerydatapolicy_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigquerydatapolicy.googleapis.com",
+            "project": "19684349165",
+            "service": "bigquerydatapolicy.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigquerydatatransfer_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigquerydatatransfer.googleapis.com",
+            "project": "19684349165",
+            "service": "bigquerydatatransfer.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigquerymigration_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigquerymigration.googleapis.com",
+            "project": "19684349165",
+            "service": "bigquerymigration.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigqueryreservation_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigqueryreservation.googleapis.com",
+            "project": "19684349165",
+            "service": "bigqueryreservation.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "bigquerystorage_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/bigquerystorage.googleapis.com",
+            "project": "19684349165",
+            "service": "bigquerystorage.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "cloudapis_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/cloudapis.googleapis.com",
+            "project": "19684349165",
+            "service": "cloudapis.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "cloudasset_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/cloudasset.googleapis.com",
+            "project": "19684349165",
+            "service": "cloudasset.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "cloudbuild_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/cloudbuild.googleapis.com",
+            "project": "19684349165",
+            "service": "cloudbuild.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "cloudscheduler_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/cloudscheduler.googleapis.com",
+            "project": "19684349165",
+            "service": "cloudscheduler.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "cloudtrace_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/cloudtrace.googleapis.com",
+            "project": "19684349165",
+            "service": "cloudtrace.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "containerregistry_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/containerregistry.googleapis.com",
+            "project": "19684349165",
+            "service": "containerregistry.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "dataform_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/dataform.googleapis.com",
+            "project": "19684349165",
+            "service": "dataform.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "dataplex_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/dataplex.googleapis.com",
+            "project": "19684349165",
+            "service": "dataplex.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "datastore_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/datastore.googleapis.com",
+            "project": "19684349165",
+            "service": "datastore.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "iam_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/iam.googleapis.com",
+            "project": "19684349165",
+            "service": "iam.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "iamcredentials_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/iamcredentials.googleapis.com",
+            "project": "19684349165",
+            "service": "iamcredentials.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "logging_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/logging.googleapis.com",
+            "project": "19684349165",
+            "service": "logging.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "monitoring_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/monitoring.googleapis.com",
+            "project": "19684349165",
+            "service": "monitoring.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "pubsub_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/pubsub.googleapis.com",
+            "project": "19684349165",
+            "service": "pubsub.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "run_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/run.googleapis.com",
+            "project": "19684349165",
+            "service": "run.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "servicemanagement_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/servicemanagement.googleapis.com",
+            "project": "19684349165",
+            "service": "servicemanagement.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "serviceusage_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/serviceusage.googleapis.com",
+            "project": "19684349165",
+            "service": "serviceusage.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "sql_component_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/sql-component.googleapis.com",
+            "project": "19684349165",
+            "service": "sql-component.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "storage_api_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/storage-api.googleapis.com",
+            "project": "19684349165",
+            "service": "storage-api.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "storage_component_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/storage-component.googleapis.com",
+            "project": "19684349165",
+            "service": "storage-component.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-19684349165-Service",
+      "mode": "managed",
+      "type": "google_project_service",
+      "name": "storage_googleapis_com",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "disable_dependent_services": null,
+            "disable_on_destroy": null,
+            "id": "19684349165/storage.googleapis.com",
+            "project": "19684349165",
+            "service": "storage.googleapis.com",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInJlYWQiOjYwMDAwMDAwMDAwMCwidXBkYXRlIjoxMjAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIwIn0="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-_excluded-RunService-europe-west9",
+      "mode": "managed",
+      "type": "google_cloud_run_v2_service",
+      "name": "pmp_velib_collector",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "annotations": {},
+            "binary_authorization": [],
+            "build_config": [
+              {
+                "base_image": "",
+                "enable_automatic_updates": false,
+                "environment_variables": {},
+                "function_target": "",
+                "image_uri": "europe-west9-docker.pkg.dev/paris-mobility-pulse/cloud-run-source-deploy/pmp-velib-collector",
+                "name": "projects/19684349165/locations/europe-west9/builds/d66d6eec-b446-4c87-b922-641eb34768f2",
+                "service_account": "",
+                "source_location": "gs://run-sources-paris-mobility-pulse-europe-west9/services/pmp-velib-collector/1768820867.555385-df57c5d79782435d92d3193d58fd3a41.zip#1768820867684600",
+                "worker_pool": ""
+              }
+            ],
+            "client": "gcloud",
+            "client_version": "551.0.0",
+            "conditions": [
+              {
+                "execution_reason": "",
+                "last_transition_time": "2026-01-19T11:08:34.342953Z",
+                "message": "",
+                "reason": "",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_SUCCEEDED",
+                "type": "RoutesReady"
+              },
+              {
+                "execution_reason": "",
+                "last_transition_time": "2026-01-19T11:08:30.672216Z",
+                "message": "",
+                "reason": "",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_SUCCEEDED",
+                "type": "ConfigurationsReady"
+              }
+            ],
+            "create_time": "2026-01-19T11:08:27.594087Z",
+            "creator": "selimabouleila@gmail.com",
+            "custom_audiences": [],
+            "default_uri_disabled": false,
+            "delete_time": "",
+            "deletion_protection": true,
+            "description": "",
+            "effective_annotations": {},
+            "effective_labels": {},
+            "etag": "\"CKuhuMsGENiYpJsC/cHJvamVjdHMvcGFyaXMtbW9iaWxpdHktcHVsc2UvbG9jYXRpb25zL2V1cm9wZS13ZXN0OS9zZXJ2aWNlcy9wbXAtdmVsaWItY29sbGVjdG9y\"",
+            "expire_time": "",
+            "generation": "1",
+            "id": "projects/paris-mobility-pulse/locations/europe-west9/services/pmp-velib-collector",
+            "ingress": "INGRESS_TRAFFIC_ALL",
+            "invoker_iam_disabled": false,
+            "labels": {},
+            "last_modifier": "selimabouleila@gmail.com",
+            "latest_created_revision": "projects/paris-mobility-pulse/locations/europe-west9/services/pmp-velib-collector/revisions/pmp-velib-collector-00001-6f7",
+            "latest_ready_revision": "projects/paris-mobility-pulse/locations/europe-west9/services/pmp-velib-collector/revisions/pmp-velib-collector-00001-6f7",
+            "launch_stage": "GA",
+            "location": "europe-west9",
+            "multi_region_settings": [],
+            "name": "pmp-velib-collector",
+            "observed_generation": "1",
+            "project": "paris-mobility-pulse",
+            "reconciling": false,
+            "scaling": [
+              {
+                "manual_instance_count": 0,
+                "max_instance_count": 3,
+                "min_instance_count": 0,
+                "scaling_mode": ""
+              }
+            ],
+            "template": [
+              {
+                "annotations": {},
+                "containers": [
+                  {
+                    "args": [],
+                    "base_image_uri": "",
+                    "build_info": [],
+                    "command": [],
+                    "depends_on": [],
+                    "env": [
+                      {
+                        "name": "EVENT_TYPE",
+                        "value": "station_status_snapshot",
+                        "value_source": []
+                      },
+                      {
+                        "name": "FEED_URL",
+                        "value": "https://velib-metropole-opendata.smovengo.cloud/opendata/Velib_Metropole/station_status.json",
+                        "value_source": []
+                      },
+                      {
+                        "name": "SOURCE",
+                        "value": "velib",
+                        "value_source": []
+                      },
+                      {
+                        "name": "TOPIC_ID",
+                        "value": "pmp-events",
+                        "value_source": []
+                      }
+                    ],
+                    "image": "europe-west9-docker.pkg.dev/paris-mobility-pulse/cloud-run-source-deploy/pmp-velib-collector@sha256:476f413d4717ad0d153deb34080575ddc42628658afd6a9339f0a5d6a13b621d",
+                    "liveness_probe": [],
+                    "name": "",
+                    "ports": [
+                      {
+                        "container_port": 8080,
+                        "name": "http1"
+                      }
+                    ],
+                    "resources": [
+                      {
+                        "cpu_idle": true,
+                        "limits": {
+                          "cpu": "1000m",
+                          "memory": "512Mi"
+                        },
+                        "startup_cpu_boost": true
+                      }
+                    ],
+                    "startup_probe": [
+                      {
+                        "failure_threshold": 1,
+                        "grpc": [],
+                        "http_get": [],
+                        "initial_delay_seconds": 0,
+                        "period_seconds": 240,
+                        "tcp_socket": [
+                          {
+                            "port": 8080
+                          }
+                        ],
+                        "timeout_seconds": 240
+                      }
+                    ],
+                    "volume_mounts": [],
+                    "working_dir": ""
+                  }
+                ],
+                "encryption_key": "",
+                "execution_environment": "",
+                "gpu_zonal_redundancy_disabled": false,
+                "health_check_disabled": false,
+                "labels": {},
+                "max_instance_request_concurrency": 80,
+                "node_selector": [],
+                "revision": "",
+                "scaling": [],
+                "service_account": "pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+                "session_affinity": false,
+                "timeout": "300s",
+                "volumes": [],
+                "vpc_access": []
+              }
+            ],
+            "terminal_condition": [
+              {
+                "execution_reason": "",
+                "last_transition_time": "2026-01-19T11:08:34.383462Z",
+                "message": "",
+                "reason": "",
+                "revision_reason": "",
+                "severity": "",
+                "state": "CONDITION_SUCCEEDED",
+                "type": "Ready"
+              }
+            ],
+            "terraform_labels": {},
+            "timeouts": null,
+            "traffic": [
+              {
+                "percent": 100,
+                "revision": "",
+                "tag": "",
+                "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+              }
+            ],
+            "traffic_statuses": [
+              {
+                "percent": 100,
+                "revision": "",
+                "tag": "",
+                "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
+                "uri": ""
+              }
+            ],
+            "uid": "3b7a85a4-9464-4633-9b39-ae8254bfa5ef",
+            "update_time": "2026-01-19T11:08:27.594087Z",
+            "uri": "https://pmp-velib-collector-2cyaolkqiq-od.a.run.app",
+            "urls": [
+              "https://pmp-velib-collector-19684349165.europe-west9.run.app",
+              "https://pmp-velib-collector-2cyaolkqiq-od.a.run.app"
+            ]
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-paris-mobility-pulse-BigQueryDataset-europe-west9",
+      "mode": "managed",
+      "type": "google_bigquery_dataset",
+      "name": "pmp_raw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access": [
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "",
+                "user_by_email": "selimabouleila@gmail.com",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "OWNER",
+                "routine": [],
+                "special_group": "projectOwners",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "READER",
+                "routine": [],
+                "special_group": "projectReaders",
+                "user_by_email": "",
+                "view": []
+              },
+              {
+                "condition": [],
+                "dataset": [],
+                "domain": "",
+                "group_by_email": "",
+                "iam_member": "",
+                "role": "WRITER",
+                "routine": [],
+                "special_group": "projectWriters",
+                "user_by_email": "",
+                "view": []
+              }
+            ],
+            "creation_time": 1768816607924,
+            "dataset_id": "pmp_raw",
+            "default_collation": "",
+            "default_encryption_configuration": [],
+            "default_partition_expiration_ms": 0,
+            "default_table_expiration_ms": 0,
+            "delete_contents_on_destroy": false,
+            "description": "",
+            "effective_labels": {},
+            "etag": "xmjrDGLBpw8pILGcIEu4bA==",
+            "external_catalog_dataset_options": [],
+            "external_dataset_reference": [],
+            "friendly_name": "",
+            "id": "projects/paris-mobility-pulse/datasets/pmp_raw",
+            "is_case_insensitive": false,
+            "labels": {},
+            "last_modified_time": 1768816607924,
+            "location": "europe-west9",
+            "max_time_travel_hours": "168",
+            "project": "paris-mobility-pulse",
+            "resource_tags": {},
+            "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/paris-mobility-pulse/datasets/pmp_raw",
+            "storage_billing_model": "",
+            "terraform_labels": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-ArtifactRegistryRepository-europe-west9",
+      "mode": "managed",
+      "type": "google_artifact_registry_repository",
+      "name": "cloud_run_source_deploy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "cleanup_policies": [],
+            "cleanup_policy_dry_run": false,
+            "create_time": "2026-01-19T10:26:08.336498Z",
+            "description": "Cloud Run Source Deployments",
+            "docker_config": [],
+            "effective_labels": {},
+            "format": "DOCKER",
+            "id": "projects/paris-mobility-pulse/locations/europe-west9/repositories/cloud-run-source-deploy",
+            "kms_key_name": "",
+            "labels": {},
+            "location": "europe-west9",
+            "maven_config": [],
+            "mode": "STANDARD_REPOSITORY",
+            "name": "cloud-run-source-deploy",
+            "project": "paris-mobility-pulse",
+            "registry_uri": "europe-west9-docker.pkg.dev/paris-mobility-pulse/cloud-run-source-deploy",
+            "remote_repository_config": [],
+            "repository_id": "cloud-run-source-deploy",
+            "terraform_labels": {},
+            "timeouts": null,
+            "update_time": "2026-01-19T13:10:55.770862Z",
+            "virtual_repository_config": [],
+            "vulnerability_scanning_config": [
+              {
+                "enablement_config": "",
+                "enablement_state": "SCANNING_DISABLED",
+                "enablement_state_reason": "API containerscanning.googleapis.com is not enabled."
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-BigQueryTable",
+      "mode": "managed",
+      "type": "google_bigquery_table",
+      "name": "velib_station_status_raw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "biglake_configuration": [],
+            "clustering": [
+              "source",
+              "event_type",
+              "key"
+            ],
+            "creation_time": 1768818030968,
+            "dataset_id": "pmp_raw",
+            "deletion_protection": true,
+            "description": "",
+            "effective_labels": {},
+            "encryption_configuration": [],
+            "etag": "Xl8SX7BxoKFSSwcpPjO0Iw==",
+            "expiration_time": 0,
+            "external_catalog_table_options": [],
+            "external_data_configuration": [],
+            "friendly_name": "",
+            "generated_schema_columns": "",
+            "id": "projects/paris-mobility-pulse/datasets/pmp_raw/tables/velib_station_status_raw",
+            "ignore_auto_generated_schema": null,
+            "ignore_schema_changes": null,
+            "labels": {},
+            "last_modified_time": 1768834446403,
+            "location": "europe-west9",
+            "materialized_view": [],
+            "max_staleness": "",
+            "num_bytes": 15582911,
+            "num_long_term_bytes": 0,
+            "num_rows": 112,
+            "project": "paris-mobility-pulse",
+            "range_partitioning": [],
+            "require_partition_filter": false,
+            "resource_tags": {},
+            "schema": "[{\"mode\":\"REQUIRED\",\"name\":\"ingest_ts\",\"type\":\"TIMESTAMP\"},{\"mode\":\"NULLABLE\",\"name\":\"event_ts\",\"type\":\"TIMESTAMP\"},{\"mode\":\"REQUIRED\",\"name\":\"source\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"event_type\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"key\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"payload\",\"type\":\"JSON\"}]",
+            "schema_foreign_type_info": [],
+            "self_link": "https://bigquery.googleapis.com/bigquery/v2/projects/paris-mobility-pulse/datasets/pmp_raw/tables/velib_station_status_raw",
+            "table_constraints": [],
+            "table_id": "velib_station_status_raw",
+            "table_metadata_view": null,
+            "table_replication_info": [],
+            "terraform_labels": {},
+            "time_partitioning": [
+              {
+                "expiration_ms": 0,
+                "field": "ingest_ts",
+                "require_partition_filter": false,
+                "type": "DAY"
+              }
+            ],
+            "type": "TABLE",
+            "view": []
+          },
+          "sensitive_attributes": [],
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-IAMServiceAccount",
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "pmp_bq_writer_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "pmp-bq-writer-sa",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "PMP BigQuery Writer",
+            "email": "pmp-bq-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "id": "projects/paris-mobility-pulse/serviceAccounts/pmp-bq-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "member": "serviceAccount:pmp-bq-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "name": "projects/paris-mobility-pulse/serviceAccounts/pmp-bq-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "project": "paris-mobility-pulse",
+            "timeouts": null,
+            "unique_id": "102385589782770594632"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-IAMServiceAccount",
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "pmp_collector_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "pmp-collector-sa",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "PMP Cloud Run Collector",
+            "email": "pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "id": "projects/paris-mobility-pulse/serviceAccounts/pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "member": "serviceAccount:pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "name": "projects/paris-mobility-pulse/serviceAccounts/pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "project": "paris-mobility-pulse",
+            "timeouts": null,
+            "unique_id": "117942285365503109429"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-IAMServiceAccount",
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "pmp_pubsub_push_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "pmp-pubsub-push-sa",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "PMP PubSub Push Invoker",
+            "email": "pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "id": "projects/paris-mobility-pulse/serviceAccounts/pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "member": "serviceAccount:pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "name": "projects/paris-mobility-pulse/serviceAccounts/pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "project": "paris-mobility-pulse",
+            "timeouts": null,
+            "unique_id": "110009372492297514751"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-IAMServiceAccount",
+      "mode": "managed",
+      "type": "google_service_account",
+      "name": "pmp_scheduler_sa",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "pmp-scheduler-sa",
+            "create_ignore_already_exists": null,
+            "description": "",
+            "disabled": false,
+            "display_name": "PMP Scheduler Invoker",
+            "email": "pmp-scheduler-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "id": "projects/paris-mobility-pulse/serviceAccounts/pmp-scheduler-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "member": "serviceAccount:pmp-scheduler-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "name": "projects/paris-mobility-pulse/serviceAccounts/pmp-scheduler-sa@paris-mobility-pulse.iam.gserviceaccount.com",
+            "project": "paris-mobility-pulse",
+            "timeouts": null,
+            "unique_id": "106784091819133890490"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-PubSubSubscription",
+      "mode": "managed",
+      "type": "google_pubsub_subscription",
+      "name": "pmp_events_sub",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ack_deadline_seconds": 10,
+            "bigquery_config": [],
+            "cloud_storage_config": [],
+            "dead_letter_policy": [],
+            "effective_labels": {},
+            "enable_exactly_once_delivery": false,
+            "enable_message_ordering": false,
+            "expiration_policy": [
+              {
+                "ttl": "2678400s"
+              }
+            ],
+            "filter": "",
+            "id": "projects/paris-mobility-pulse/subscriptions/pmp-events-sub",
+            "labels": {},
+            "message_retention_duration": "604800s",
+            "message_transforms": [],
+            "name": "pmp-events-sub",
+            "project": "paris-mobility-pulse",
+            "push_config": [],
+            "retain_acked_messages": false,
+            "retry_policy": [],
+            "tags": null,
+            "terraform_labels": {},
+            "timeouts": null,
+            "topic": "projects/paris-mobility-pulse/topics/pmp-events"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-PubSubSubscription",
+      "mode": "managed",
+      "type": "google_pubsub_subscription",
+      "name": "pmp_events_to_bq_sub",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "ack_deadline_seconds": 10,
+            "bigquery_config": [],
+            "cloud_storage_config": [],
+            "dead_letter_policy": [],
+            "effective_labels": {},
+            "enable_exactly_once_delivery": false,
+            "enable_message_ordering": false,
+            "expiration_policy": [
+              {
+                "ttl": "2678400s"
+              }
+            ],
+            "filter": "",
+            "id": "projects/paris-mobility-pulse/subscriptions/pmp-events-to-bq-sub",
+            "labels": {},
+            "message_retention_duration": "604800s",
+            "message_transforms": [],
+            "name": "pmp-events-to-bq-sub",
+            "project": "paris-mobility-pulse",
+            "push_config": [
+              {
+                "attributes": {},
+                "no_wrapper": [],
+                "oidc_token": [
+                  {
+                    "audience": "https://pmp-bq-writer-2cyaolkqiq-od.a.run.app",
+                    "service_account_email": "pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com"
+                  }
+                ],
+                "push_endpoint": "https://pmp-bq-writer-2cyaolkqiq-od.a.run.app/pubsub"
+              }
+            ],
+            "retain_acked_messages": false,
+            "retry_policy": [],
+            "tags": null,
+            "terraform_labels": {},
+            "timeouts": null,
+            "topic": "projects/paris-mobility-pulse/topics/pmp-events"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-PubSubTopic",
+      "mode": "managed",
+      "type": "google_pubsub_topic",
+      "name": "pmp_events",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "effective_labels": {},
+            "id": "projects/paris-mobility-pulse/topics/pmp-events",
+            "ingestion_data_source_settings": [],
+            "kms_key_name": "",
+            "labels": {},
+            "message_retention_duration": "",
+            "message_storage_policy": [],
+            "message_transforms": [],
+            "name": "pmp-events",
+            "project": "paris-mobility-pulse",
+            "schema_settings": [],
+            "tags": null,
+            "terraform_labels": {},
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9"
+        }
+      ]
+    },
+    {
+      "module": "module.gcloud-export-projects-paris-mobility-pulse-StorageBucket-EUROPE-WEST9",
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "run_sources_paris_mobility_pulse_europe_west9",
+      "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
+      "instances": [
+        {
+          "schema_version": 4,
+          "attributes": {
+            "autoclass": [],
+            "cors": [
+              {
+                "max_age_seconds": 0,
+                "method": [
+                  "GET"
+                ],
+                "origin": [
+                  "https://*.cloud.google.com",
+                  "https://*.corp.google.com",
+                  "https://*.corp.google.com:*",
+                  "https://*.cloud.google",
+                  "https://*.byoid.goog"
+                ],
+                "response_header": []
+              }
+            ],
+            "custom_placement_config": [],
+            "default_event_based_hold": false,
+            "effective_labels": {},
+            "enable_object_retention": false,
+            "encryption": [],
+            "force_destroy": false,
+            "hierarchical_namespace": [
+              {
+                "enabled": false
+              }
+            ],
+            "id": "run-sources-paris-mobility-pulse-europe-west9",
+            "ip_filter": [],
+            "labels": {},
+            "lifecycle_rule": [],
+            "location": "EUROPE-WEST9",
+            "logging": [],
+            "name": "run-sources-paris-mobility-pulse-europe-west9",
+            "project": "paris-mobility-pulse",
+            "project_number": 19684349165,
+            "public_access_prevention": "inherited",
+            "requester_pays": false,
+            "retention_policy": [],
+            "rpo": null,
+            "self_link": "https://www.googleapis.com/storage/v1/b/run-sources-paris-mobility-pulse-europe-west9",
+            "soft_delete_policy": [
+              {
+                "effective_time": "2026-01-19T10:26:12.363Z",
+                "retention_duration_seconds": 604800
+              }
+            ],
+            "storage_class": "STANDARD",
+            "terraform_labels": {},
+            "time_created": "2026-01-19T10:26:12.363Z",
+            "timeouts": null,
+            "uniform_bucket_level_access": true,
+            "updated": "2026-01-19T10:26:12.363Z",
+            "url": "gs://run-sources-paris-mobility-pulse-europe-west9",
+            "versioning": [],
+            "website": []
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsInJlYWQiOjI0MDAwMDAwMDAwMCwidXBkYXRlIjoyNDAwMDAwMDAwMDB9LCJzY2hlbWFfdmVyc2lvbiI6IjQifQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
