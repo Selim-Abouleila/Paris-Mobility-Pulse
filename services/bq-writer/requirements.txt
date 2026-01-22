@@ -1,0 +1,4 @@
+Flask==3.*
+gunicorn==22.*
+google-cloud-bigquery==3.*
+google-auth==2.*
