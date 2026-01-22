@@ -1,1 +1,4 @@
 {"ingest_ts":"2026-01-19T13:00:00Z","event_ts":"2026-01-19T13:00:00Z","source":"test","event_type":"auto_test","key":"auto:1","payload":{"ok":true}}
+{"ingest_ts":"2026-01-19T13:00:01Z","source":"test","event_type":"missing_event_ts","key":"auto:2","payload":{"x":1}}
+{"ingest_ts":"2026-01-19T13:00:02Z","event_ts":"","source":"test","event_type":"empty_event_ts","key":"auto:3","payload":{"x":2}}
+{"ingest_ts":"2026-01-19T13:00:03Z","event_ts":"2026-01-19T13:00:03Z","source":"test","event_type":"payload_as_string","key":"auto:4","payload":"{\"a\": 1}"}
