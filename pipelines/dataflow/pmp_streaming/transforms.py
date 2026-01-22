@@ -34,7 +34,9 @@ def normalize_event(evt: Dict[str, Any]) -> Dict[str, Any]:
         raise ValueError("Missing ingest_ts")
 
     # If event_ts missing, default to ingest_ts (common ingestion pattern)
-    evt.setdefault("event_ts", ingest_ts)
+    event_ts = evt.get("event_ts")
+    if not event_ts:  # catches None and ""
+        evt["event_ts"] = ingest_ts
 
     for k in ["source", "event_type", "key"]:
         if not evt.get(k):
