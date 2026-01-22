@@ -38,6 +38,7 @@ def normalize_event(evt: Dict[str, Any]) -> Dict[str, Any]:
     if not event_ts:  # catches None and ""
         evt["event_ts"] = ingest_ts
 
+
     for k in ["source", "event_type", "key"]:
         if not evt.get(k):
             raise ValueError(f"Missing {k}")
