@@ -30,3 +30,34 @@ resource "google_bigquery_table" "velib_station_status" {
 
   clustering = ["station_id"]
 }
+
+# Marts Dataset
+resource "google_bigquery_dataset" "pmp_marts" {
+  dataset_id = "pmp_marts"
+  location   = "EU"
+}
+
+# Latest State View (Marts Layer)
+resource "google_bigquery_table" "velib_latest_state" {
+  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id   = "velib_latest_state"
+
+  view {
+    query = <<-SQL
+      SELECT * EXCEPT(rn)
+      FROM (
+        SELECT
+          *,
+          ROW_NUMBER() OVER (
+            PARTITION BY station_id
+            ORDER BY event_ts DESC, ingest_ts DESC
+          ) AS rn
+        FROM `paris-mobility-pulse.pmp_curated.velib_station_status`
+      )
+      WHERE rn = 1
+    SQL
+    use_legacy_sql = false
+  }
+
+  depends_on = [google_bigquery_table.velib_station_status]
+}

@@ -21,3 +21,11 @@ output "pubsub_subscription" {
 output "service_account_email" {
   value = google_service_account.dataflow_sa.email
 }
+
+output "marts_dataset" {
+  value = google_bigquery_dataset.pmp_marts.dataset_id
+}
+
+output "velib_latest_state_view" {
+  value = google_bigquery_table.velib_latest_state.table_id
+}

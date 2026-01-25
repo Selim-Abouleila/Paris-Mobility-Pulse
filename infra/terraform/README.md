@@ -10,8 +10,10 @@ This Terraform configuration manages the following resources:
 *   **Pub/Sub Subscription**: `pmp-events-dataflow-sub` (pull subscription) attached to the existing `pmp-events` topic.
     *   *Note: The `pmp-events` topic is pre-existing and not managed here; only the subscription is managed.*
 *   **BigQuery**:
-    *   Dataset: `pmp_curated`
-    *   Table: `velib_station_status` (partitioned by day, clustered by station_id)
+    *   Curated Dataset: `pmp_curated`
+        *   Table: `velib_station_status` (partitioned by day, clustered by station_id)
+    *   Marts Dataset: `pmp_marts`
+        *   View: `velib_latest_state` (latest status per station)
 *   **IAM & Service Accounts**:
     *   Service Account: `pmp-dataflow-sa` (Dataflow Worker)
     *   Roles: Dataflow Worker, Pub/Sub Subscriber/Viewer, BigQuery Data Editor, Storage Object Admin (bucket-scoped).
@@ -97,6 +99,16 @@ Since some resources were created manually before Terraform, you must import the
     terraform import google_service_account.dataflow_sa projects/paris-mobility-pulse/serviceAccounts/pmp-dataflow-sa@paris-mobility-pulse.iam.gserviceaccount.com
     ```
 
+6.  **BigQuery Marts Dataset**
+    ```bash
+    terraform import google_bigquery_dataset.pmp_marts projects/paris-mobility-pulse/datasets/pmp_marts
+    ```
+
+7.  **BigQuery Latest State View**
+    ```bash
+    terraform import google_bigquery_table.velib_latest_state projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_latest_state
+    ```
+
 ## Validation After Apply
 
 Verify the resources were correctly configured:
@@ -107,6 +119,9 @@ gsutil ls -b gs://pmp-dataflow-paris-mobility-pulse
 
 # Check BigQuery Table partitions/clustering
 bq show --format=prettyjson paris-mobility-pulse:pmp_curated.velib_station_status
+
+# Check BigQuery Marts View
+bq show --format=prettyjson paris-mobility-pulse:pmp_marts.velib_latest_state
 
 # Check Pub/Sub Subscription
 gcloud pubsub subscriptions describe pmp-events-dataflow-sub --project=paris-mobility-pulse
@@ -133,8 +148,9 @@ terraform output
 ## Phase 1 vs Future
 
 *   **Phase 1 (Current)**:
-    *   **Scope**: Storage, Pub/Sub Subscription, BigQuery Dataset/Table, IAM, and API enablement.
+    *   **Scope**: Storage, Pub/Sub Subscription, BigQuery Datasets (Curated + Marts), IAM, and API enablement.
     *   **Pipeline**: Supports one streaming pipeline (Vélib status) that writes to one curated BigQuery table.
+    *   **Marts**: `velib_latest_state` view provides the latest status per station for downstream consumption.
 
 *   **Future**:
     *   **Sources**: Ingestion of multiple APIs (e.g., Station Information for static data).
