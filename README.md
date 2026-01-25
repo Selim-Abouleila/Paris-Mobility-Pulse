@@ -122,6 +122,16 @@ gcloud dataflow jobs cancel JOB_ID --project="$PROJECT_ID" --region="$REGION"
 **Console:**
 Dataflow → Jobs → Select job → **Stop / Cancel**.
 
+## Documentation
+
+Detailed guides for each component:
+- [00 - Bootstrap](docs/00-bootstrap.md) - Initial project setup
+- [01 - MVP Pipeline](docs/01-mvp-pipeline.md) - Cloud Run ingestion setup
+- [02 - Ops & Troubleshooting](docs/02-ops-troubleshooting.md) - Operational procedures
+- [03 - Terraform IAC](docs/03-terraform-iac.md) - Infrastructure as Code setup
+- [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
+- [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
+
 ## Next milestone
 
 - Add Dataflow for validation/dedup/windowed aggregates + DLQ.
