@@ -30,7 +30,19 @@ ORDER BY ingest_ts DESC
 LIMIT 20;
 ```
 
-## Cost control
+## Operations (Demo Mode)
+
+The project includes a control script to safely start/stop the pipeline and manage costs. This is the **most practical way** to run the pipeline for demos.
+
+```bash
+./scripts/pmpctl.sh status   # Show current state
+./scripts/pmpctl.sh up       # Start ingestion + Dataflow
+./scripts/pmpctl.sh collect  # Trigger collectors once
+./scripts/pmpctl.sh down     # Stop all cost-generating resources
+```
+See [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for details.
+
+## Cost control (Manual)
 
 Pause ingestion when not demoing:
 
@@ -132,6 +144,7 @@ Detailed guides for each component:
 - [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
 - [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
 - [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
+- [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
 
 ## Next milestone
 
