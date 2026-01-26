@@ -15,3 +15,9 @@ variable "zone" {
   type        = string
   default     = "europe-west9-a"
 }
+
+variable "scheduler_location" {
+  description = "Location for Cloud Scheduler jobs (regional service)"
+  type        = string
+  default     = "europe-west1"
+}

@@ -61,3 +61,30 @@ resource "google_bigquery_table" "velib_latest_state" {
 
   depends_on = [google_bigquery_table.velib_station_status]
 }
+
+# Station Information Table (Curated)
+resource "google_bigquery_table" "velib_station_information" {
+  dataset_id = google_bigquery_dataset.pmp_curated.dataset_id
+  table_id   = "velib_station_information"
+
+  schema = jsonencode([
+    { name = "ingest_ts", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "event_ts", type = "TIMESTAMP", mode = "NULLABLE" },
+    { name = "station_id", type = "STRING", mode = "REQUIRED" },
+    { name = "station_code", type = "STRING", mode = "NULLABLE" },
+    { name = "name", type = "STRING", mode = "NULLABLE" },
+    { name = "lat", type = "FLOAT64", mode = "NULLABLE" },
+    { name = "lon", type = "FLOAT64", mode = "NULLABLE" },
+    { name = "capacity", type = "INT64", mode = "NULLABLE" },
+    { name = "address", type = "STRING", mode = "NULLABLE" },
+    { name = "post_code", type = "STRING", mode = "NULLABLE" },
+    { name = "raw_station_json", type = "STRING", mode = "NULLABLE" }
+  ])
+
+  time_partitioning {
+    type  = "DAY"
+    field = "ingest_ts"
+  }
+
+  clustering = ["station_id"]
+}

@@ -131,6 +131,7 @@ Detailed guides for each component:
 - [03 - Terraform IAC](docs/03-terraform-iac.md) - Infrastructure as Code setup
 - [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
 - [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
+- [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
 
 ## Next milestone
 
