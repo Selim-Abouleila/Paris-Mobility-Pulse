@@ -10,6 +10,8 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 - Cloud Run collector (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub (Publish/Subscribe).
 - Cloud Run writer (`pmp-bq-writer`) receives Pub/Sub (Publish/Subscribe) push messages and inserts into BigQuery raw table.
 - Dataflow (Google Cloud Dataflow) streaming (Apache Beam) reads from `pmp-events-dataflow-sub`, validates + dedups, and writes curated rows to `pmp_curated.velib_station_status`.
+- BigQuery Marts layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
+- Looker Studio Dashboard for real-time visualization and trends.
 
 ## Key GCP resources
 - Project: `paris-mobility-pulse`
@@ -166,4 +168,3 @@ Detailed guides for each component:
 ## Next milestone
 
 - Add Dataflow for validation/dedup/windowed aggregates + DLQ.
-- Create curated tables (latest state + aggregates) for Looker Studio.
