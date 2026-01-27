@@ -56,6 +56,12 @@ Resume:
 gcloud scheduler jobs resume velib-poll-every-minute --project=paris-mobility-pulse --location=europe-west1
 ```
 
+## Budget Alert (Cost Guardrail)
+
+A monthly budget alert is configured at **$40/month** to provide a safety guardrail for demo activities and prevent accidental spend. This budget alert complements the project's operational stop controls; see [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for instructions on pausing or stopping cost-generating resources.
+
+![Budget alert screenshot](images/budget_alert.png)
+
 ## Dataflow: Pub/Sub → Curated BigQuery (Streaming)
 
 Run the Apache Beam pipeline on DataflowRunner to write curated rows to BigQuery.
