@@ -30,6 +30,16 @@ ORDER BY ingest_ts DESC
 LIMIT 20;
 ```
 
+## Dashboards
+
+**Vélib Dashboard v1** visualizes real-time station status and hourly availability trends using Looker Studio.
+
+[**View Dashboard**](https://lookerstudio.google.com/reporting/40ae9759-385b-4b7f-9248-325390e3c5df)
+
+![Vélib Dashboard v1](images/pmp_velib_dash_1.png)
+
+See [08 - Vélib Dashboard](./docs/08-velib-dashboard.md) for details on data sources and metrics.
+
 ## Operations (Demo Mode)
 
 The project includes a control script to safely start/stop the pipeline and manage costs. This is the **most practical way** to run the pipeline for demos.
