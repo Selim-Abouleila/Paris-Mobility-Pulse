@@ -151,6 +151,7 @@ Detailed guides for each component:
 - [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
 - [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
 - [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
+- [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
 
 ## Next milestone
 
