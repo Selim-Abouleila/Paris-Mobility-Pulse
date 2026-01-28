@@ -28,22 +28,22 @@ The dashboard connects to BigQuery views managed by the project's Terraform conf
 | Object Name | Layer | Source | Purpose |
 | :--- | :--- | :--- | :--- |
 | `velib_station_status` | **Curated** | Dataflow | Cleaned, deduplicated streaming status updates. |
-| `velib_totals_hourly_aggregate` | **Marts (Base)** | Curated | Heavy hourly aggregation (avg/peak bikes, empty stations). |
-| `velib_totals_hourly` | **Marts (Dash)** | Marts (Base) | Wrapper for Looker Studio; adds Paris-local DATETIME and coverage ratios. |
+| `velib_totals_hourly` | **Marts (Base)** | Curated | Aggregated trends (Materialized View). |
+| `velib_totals_hourly_paris` | **Marts (Dash)** | Marts (Base) | Wrapper for Looker Studio; adds Paris-local DATETIME and coverage ratios. |
 | `velib_latest_state` | **Marts (Live)** | Curated | Latest snapshot per station (windowing logic). |
 
 ### Design Rationale: Mirroring Materialized Views
 
 We implement the hourly trends using a **two-layer "Virtualized" approach** instead of a single massive query:
 
-1.  **The Base Aggregate (`_aggregate`)**: Performs the heavy lifting (time truncation, snapshot-level math). It is designed to be easily swappable for a BigQuery **Materialized View** as data volume scales, ensuring high-performance pre-computing.
-2.  **The Consumer Wrapper (`velib_totals_hourly`)**: Handles Looker-specific requirements like the `hour_paris` (DATETIME) conversion and joining with `velib_station_information`. This keeps the "heavy" logic isolated from "presentation" logic, reducing query maintenance overhead.
+1.  **The Base Aggregate (`velib_totals_hourly`)**: Performs the heavy lifting (time truncation, snapshot-level math) as a **Materialized View**, ensuring high-performance pre-computing.
+2.  **The Consumer Wrapper (`velib_totals_hourly_paris`)**: Handles Looker-specific requirements like the `hour_paris` (DATETIME) conversion and joining with `velib_station_information`. This keeps the "heavy" logic isolated from "presentation" logic, reducing query maintenance overhead.
 
 ## Dashboard Sections
 
 *   **Live Snapshot**: KPI cards showing total available mechanical bikes, e-bikes, docks, and stations reporting.
 *   **Station Map**: Geospatial view of all stations, color-coded by availability.
-*   **Hourly Availability Trends**: Time-series charts driven by `velib_totals_hourly` showing:
+*   **Hourly Availability Trends**: Time-series charts driven by `velib_totals_hourly_paris` showing:
     *   `avg_total_bikes_available`
     *   `peak_total_bikes_available`
     *   `min_total_bikes_available`
@@ -53,7 +53,7 @@ We implement the hourly trends using a **two-layer "Virtualized" approach** inst
 ### Timezone Note
 
 The BigQuery source data stores timestamps in UTC. To ensure charts display correctly in the dashboard:
-*   We output an **`hour_paris`** (DATETIME) field in the `velib_totals_hourly` view.
+*   We output an **`hour_paris`** (DATETIME) field in the `velib_totals_hourly_paris` view.
 *   This pre-converts UTC timestamps to **Europe/Paris** time, simplifying Looker Studio's time handling.
 
 ## How to Run (End-to-End)

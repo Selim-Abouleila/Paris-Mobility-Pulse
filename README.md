@@ -32,8 +32,14 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
         - `pmp-events-to-bq-sub`: Push subscription for MVP (Cloud Run).
         - `pmp-velib-station-info-to-bq-sub`: Push subscription for Station Info (Cloud Run).
 - **Dataflow**: `pmp-velib-curated` (Streaming ETL).
-- **Cloud Run**: Ingestion services (`pmp-velib-collector`, `pmp-bq-writer`).
-- **Cloud Scheduler**: `velib-poll-every-minute` (Europe-west1).
+- **Cloud Run**:
+    - `pmp-velib-collector`: Polls real-time station status.
+    - `pmp-bq-writer`: Ingests JSON events into BigQuery.
+    - `pmp-velib-station-info-collector`: Polls static station metadata (Daily).
+    - `pmp-velib-station-info-writer`: Ingests metadata into BigQuery.
+- **Cloud Scheduler**:
+    - `velib-poll-every-minute` (Every minute): Triggers status collection.
+    - `pmp-velib-station-info-daily` (Daily at 03:10): Triggers daily metadata refresh.
 
 ## Dashboards
 
