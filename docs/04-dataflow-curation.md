@@ -21,12 +21,32 @@ The **Phase 1** Dataflow job is a streaming pipeline that performs the following
 
 ### Why a Curated Table?
 
-The raw ingestion table (`pmp_raw`) stores the entire API response as a large JSON blob. While good for audit/replay, it is difficult to query for analytics.
 The **curated table** provides a schema-defined, station-grain view, enabling efficient dashboards (Looker Studio), aggregation, and geospatial mapping without complex JSON extraction queries.
 
 ---
 
-## 2. Prerequisites
+## 2. Why Dataflow (and when not to use it)
+
+### Why we used Dataflow here
+*   **Streaming from Pub/Sub**: Native integration/template for streaming sources.
+*   **Curated station-level rows**: Converting nested JSON to flat rows for the dashboard.
+*   **Foundation for future**: The pipeline structure allows adding **validation**, **deduplication**, **windowed aggregations**, and **late data handling** later.
+*   **"Portfolio / certification alignment"**: Demonstrates standard Google Cloud Data Engineer patterns.
+
+### What simpler alternatives would work
+*   **Cloud Run writer**: Could Flatten JSON directly in Python code before inserting to `pmp_curated`.
+*   **BigQuery SQL**: Could use SQL Views or Materialized Views over the `pmp_raw` JSON payload.
+
+### Tradeoffs
+*   **Dataflow Pros**: Scalability, stateful streaming management, precise event-time windowing, reliability patterns (DLQ).
+*   **Dataflow Cons**: Operational overhead and **cost** while running (streaming workers are always on).
+
+### Project direction
+Future pipelines may **avoid Dataflow** to reduce cost/complexity, using BigQuery SQL + Cloud Run writers, unless streaming transforms require Dataflow's specific capabilities. This budget discipline is reflected in our operations approach (using `pmpctl.sh` to stop resources) and budget alerts.
+
+---
+
+## 3. Prerequisites
 
 Before running the pipeline, verify your environment:
 
@@ -56,7 +76,7 @@ Before running the pipeline, verify your environment:
 
 ---
 
-## 3. Run the Pipeline
+## 4. Run the Pipeline
 
 Use the following command to launch the Dataflow job on Google Cloud.
 
@@ -91,7 +111,7 @@ python3 -m pipelines.dataflow.pmp_streaming.main \
 
 ---
 
-## 4. Verification Steps
+## 5. Verification Steps
 
 ### 1. List Running Jobs
 Verify the job is in `Running` state:
@@ -119,7 +139,7 @@ bq query --use_legacy_sql=false --nouse_cache \
 
 ---
 
-## 5. Stop the Pipeline (Cost Control)
+## 6. Stop the Pipeline (Cost Control)
 
 This is a **streaming** job. It will run (and incur costs) until manually cancelled.
 
@@ -140,7 +160,7 @@ This is a **streaming** job. It will run (and incur costs) until manually cancel
 
 ---
 
-## 6. Context: Phase 1 & Future Expansion
+## 7. Context: Phase 1 & Future Expansion
 
 This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery".
 
@@ -155,7 +175,7 @@ Currently, the focus is on establishing a stable streaming writer creating clean
 
 ---
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |

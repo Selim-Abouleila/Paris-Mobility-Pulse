@@ -76,6 +76,16 @@ A monthly budget alert is configured at **$40/month** to provide a safety guardr
 
 ## Dataflow: Pub/Sub → Curated BigQuery (Streaming)
 
+### Disclaimer: Dataflow is optional for this MVP
+
+This curated table could have been produced without Dataflow by **Cloud Run writer directly flattening to pmp_curated** or **BigQuery SQL (views/materialized views) over pmp_raw**.
+
+Dataflow was chosen because it demonstrates **"Professional Data Engineer" streaming patterns** and sets up safeguards for future complexity (dedup, windowing, DLQ, replay).
+
+**Cost note**: Streaming Dataflow jobs have ongoing cost, so for future pipelines we prefer non-Dataflow approaches unless needed.
+
+See [docs/04-dataflow-curation.md](docs/04-dataflow-curation.md) for the full rationale and tradeoffs.
+
 Run the Apache Beam pipeline on DataflowRunner to write curated rows to BigQuery.
 
 ### Prerequisites
