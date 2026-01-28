@@ -14,14 +14,26 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 - Looker Studio Dashboard for real-time visualization and trends.
 
 ## Key GCP resources
-- Project: `paris-mobility-pulse`
-- Dataflow: `pmp-velib-curated`
-- Region (Cloud Run): `europe-west9`
-- Pub/Sub topic: `pmp-events`
-- Push subscription: `pmp-events-to-bq-sub`
-- BigQuery dataset: `pmp_raw`
-- BigQuery table: `velib_station_status_raw`
-- Scheduler job: `velib-poll-every-minute` (location: `europe-west1`)
+- **BigQuery**:
+    - **Raw Layer** (`pmp_raw`): Landing zone for JSON payloads.
+    - **Curated Layer** (`pmp_curated`):
+        - `velib_station_status`: History of station updates.
+        - `velib_station_information`: Static metadata (names, capacity).
+    - **Marts Layer** (`pmp_marts`):
+        - `velib_latest_state`: Real-time snapshot (View).
+        - `velib_latest_state_enriched`: Latest state + metadata (View).
+        - `velib_totals_hourly`: Aggregated trends for dashboarding (Materialized View).
+        - `velib_totals_hourly_paris`: Timezone-adjusted wrapper (View).
+- **Pub/Sub**:
+    - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata).
+    - **Subscriptions**:
+        - `pmp-events-dataflow-sub`: Streaming pull for Dataflow.
+        - `pmp-events-sub`: Debugging/Audit.
+        - `pmp-events-to-bq-sub`: Push subscription for MVP (Cloud Run).
+        - `pmp-velib-station-info-to-bq-sub`: Push subscription for Station Info (Cloud Run).
+- **Dataflow**: `pmp-velib-curated` (Streaming ETL).
+- **Cloud Run**: Ingestion services (`pmp-velib-collector`, `pmp-bq-writer`).
+- **Cloud Scheduler**: `velib-poll-every-minute` (Europe-west1).
 
 ## Dashboards
 
