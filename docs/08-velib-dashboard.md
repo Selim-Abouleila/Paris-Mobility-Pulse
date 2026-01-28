@@ -42,7 +42,7 @@ We implement the hourly trends using a **two-layer "Virtualized" approach** inst
 ## Dashboard Sections
 
 *   **Live Snapshot**: KPI cards showing total available mechanical bikes, e-bikes, docks, and stations reporting.
-*   **Station Map**: Geospatial view of all stations, color-coded by availability.
+*   **Station Map**: Geospatial view of all stations
 *   **Hourly Availability Trends**: Time-series charts driven by `velib_totals_hourly_paris` showing:
     *   `avg_total_bikes_available`
     *   `peak_total_bikes_available`

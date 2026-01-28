@@ -1,4 +1,4 @@
-# Dataflow Curation Pipeline (Phase 1)
+# Dataflow Curation Pipeline
 
 This document details the configuration and execution of the **Dataflow Curation Pipeline** (Streaming) for the Paris Mobility Pulse project.
 

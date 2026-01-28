@@ -187,3 +187,18 @@ Detailed guides for each component:
 ## Next milestone
 
 - Add Dataflow for validation/dedup/windowed aggregates + DLQ.
+
+## Development
+
+To maintain code quality, please run the following commands before pushing:
+
+### Installation
+```bash
+make install
+```
+
+### Formatting
+```bash
+make fmt    # Format code (ruff + terraform)
+make check  # Check formatting and linting
+```

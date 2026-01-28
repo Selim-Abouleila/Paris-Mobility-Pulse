@@ -1,4 +1,4 @@
-# BigQuery Marts Layer (Step 4A)
+# BigQuery Marts Layer
 
 This document explains the **Marts Layer** for Paris Mobility Pulse: why it exists, what it contains, and how to manage it with Terraform.
 
