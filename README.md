@@ -6,7 +6,7 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 
 ![Pipeline architecture](docs/images/pipeline.png)
 
-## What’s implemented (Step 1–2)
+## What’s implemented
 - Cloud Run collector (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub (Publish/Subscribe).
 - Cloud Run writer (`pmp-bq-writer`) receives Pub/Sub (Publish/Subscribe) push messages and inserts into BigQuery raw table.
 - Dataflow (Google Cloud Dataflow) streaming (Apache Beam) reads from `pmp-events-dataflow-sub`, validates + dedups, and writes curated rows to `pmp_curated.velib_station_status`.
@@ -15,22 +15,13 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 
 ## Key GCP resources
 - Project: `paris-mobility-pulse`
+- Dataflow: `pmp-velib-curated`
 - Region (Cloud Run): `europe-west9`
 - Pub/Sub topic: `pmp-events`
 - Push subscription: `pmp-events-to-bq-sub`
 - BigQuery dataset: `pmp_raw`
 - BigQuery table: `velib_station_status_raw`
 - Scheduler job: `velib-poll-every-minute` (location: `europe-west1`)
-
-## Quick validation
-Check latest rows:
-
-```sql
-SELECT ingest_ts, event_ts, source, event_type, key
-FROM `paris-mobility-pulse.pmp_raw.velib_station_status_raw`
-ORDER BY ingest_ts DESC
-LIMIT 20;
-```
 
 ## Dashboards
 

@@ -6,26 +6,55 @@
 
 ![Vélib Dashboard v1](../images/pmp_velib_dash_1.png)
 
-## Data Sources
+### Dashboard Preview (v1)
 
-The dashboard connects to BigQuery views managed by the project's Terraform configuration:
+![Vélib Trends & Dynamics (Hourly)](../images/pmp_velib_dash_2.png)
 
-1.  **`pmp_marts.velib_latest_state`**:
-    *   Provides the most recent status (bikes, docks) for every station.
-    *   Used for the "Live Snapshot" KPIs and Map.
-    *   One row per station.
+## Analysis: Real-World Patterns
 
-2.  **Hourly Aggregates** (Planned/Optional):
-    *   Trend charts currently derive insights from the raw/curated history or ad-hoc queries.
-    *   Dedicated materialized views for hourly stats (`pmp_marts.velib_totals_hourly`) are planned for the next iteration to improve performance.
+The "Vélib Trends & Dynamics" charts (captured in `pmp_velib_dash_2.png`) provide a textbook visualization of Paris's daily rhythm. The data is highly congruent with actual urban mobility patterns:
+
+*   **The Morning Commute (8 AM - 9 AM)**: You can see a sharp, synchronous dip in "Average Total Bikes" as thousands of Parisians unlock bikes simultaneously to reach offices and schools. This is mirrored by a surge in "Empty-Station Pressure" as popular destination hubs (like Saint-Lazare or La Défense) reach capacity or origin stations run dry.
+*   **The Midday Plateau**: Availability stabilizes between 10 AM and 4 PM as bikes are redistributed or parked.
+*   **The Evening Rush (5 PM - 7 PM)**: A second distinct "V-shape" dip occurs during the return commute. The pressure on empty stations spikes again, showing the system-wide strain during peak transition hours.
+*   **Nightly Reset**: The curve gradually rises after 11 PM as maintenance teams and natural redistribution return bikes to the network, preparing for the next morning's cycle.
+
+## Data Sources & Lineage
+
+The dashboard connects to BigQuery views managed by the project's Terraform configuration. We use a multi-layer strategy to balance query performance and presentation logic:
+
+### Data Lineage Table
+
+| Object Name | Layer | Source | Purpose |
+| :--- | :--- | :--- | :--- |
+| `velib_station_status` | **Curated** | Dataflow | Cleaned, deduplicated streaming status updates. |
+| `velib_totals_hourly_aggregate` | **Marts (Base)** | Curated | Heavy hourly aggregation (avg/peak bikes, empty stations). |
+| `velib_totals_hourly` | **Marts (Dash)** | Marts (Base) | Wrapper for Looker Studio; adds Paris-local DATETIME and coverage ratios. |
+| `velib_latest_state` | **Marts (Live)** | Curated | Latest snapshot per station (windowing logic). |
+
+### Design Rationale: Mirroring Materialized Views
+
+We implement the hourly trends using a **two-layer "Virtualized" approach** instead of a single massive query:
+
+1.  **The Base Aggregate (`_aggregate`)**: Performs the heavy lifting (time truncation, snapshot-level math). It is designed to be easily swappable for a BigQuery **Materialized View** as data volume scales, ensuring high-performance pre-computing.
+2.  **The Consumer Wrapper (`velib_totals_hourly`)**: Handles Looker-specific requirements like the `hour_paris` (DATETIME) conversion and joining with `velib_station_information`. This keeps the "heavy" logic isolated from "presentation" logic, reducing query maintenance overhead.
 
 ## Dashboard Sections
 
 *   **Live Snapshot**: KPI cards showing total available mechanical bikes, e-bikes, docks, and stations reporting.
 *   **Station Map**: Geospatial view of all stations, color-coded by availability.
-*   **Hourly Availability Trends**: Time-series charts showing average, peak, and minimum bike availability over the last 24 hours.
-*   **Empty Stations Trends**: Count of stations with 0 bikes available over time.
-*   **Data Coverage**: Metrics on the ratio of stations reporting data.
+*   **Hourly Availability Trends**: Time-series charts driven by `velib_totals_hourly` showing:
+    *   `avg_total_bikes_available`
+    *   `peak_total_bikes_available`
+    *   `min_total_bikes_available`
+*   **Empty Stations Trends**: Count of stations with 0 bikes available over time (`avg_empty_stations`, `peak_empty_stations`).
+*   **Data Coverage**: Metrics on the ratio of stations reporting data (`avg_stations_reporting` / `total_stations_known`).
+
+### Timezone Note
+
+The BigQuery source data stores timestamps in UTC. To ensure charts display correctly in the dashboard:
+*   We output an **`hour_paris`** (DATETIME) field in the `velib_totals_hourly` view.
+*   This pre-converts UTC timestamps to **Europe/Paris** time, simplifying Looker Studio's time handling.
 
 ## How to Run (End-to-End)
 
@@ -49,12 +78,12 @@ When finished, stop cost-generating resources:
 
 ## Known Limitations
 
-*   **Early Data**: Charts may appear sparse or flat if the pipeline has just started.
-*   **Latency**: Data freshness depends on Looker Studio's cache settings (usually 15 min) and the Dataflow pipeline's write frequency.
-*   **Cost**: Continuous streaming (Dataflow) incurs costs. Use the demo controls to pause operations when not viewing the dashboard.
+*   **Freshness**: Data follows the pipeline's end-to-end latency (Collector -> Pub/Sub -> Dataflow -> BigQuery). Looker Studio's cache typically adds ~15 minutes of delay.
+*   **Historical Depth**: Trend charts rely on the duration for which the pipeline has been active. Short-term runs may show incomplete daily cycles.
+*   **Cost Management**: Continuous streaming incurs ongoing GCP costs. The dashboard data flow is managed via `pmpctl.sh` to ensure visibility during demos while maintaining fiscal responsibility.
 
 ## Next Improvements
 
-*   **Station Information**: Integrate `velib_station_information` for static metadata (names, capacity).
-*   **Enriched Geo-Views**: Use `velib_latest_state_enriched` for better map filtering.
-*   **Seasonality**: Add daily and weekly aggregation views for long-term trend analysis.
+*   **Dimension Enrichment**: Joining with `velib_station_information` to aggregate metrics by Paris Arrondissement.
+*   **Materialized View Optimization**: Shifting from standard views to Materialized Views for the hourly aggregate to further reduce query costs.
+*   **Seasonal Baseline**: Adding year-over-year or month-over-month comparisons as the data lake grows.
