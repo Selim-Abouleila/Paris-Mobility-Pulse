@@ -118,11 +118,21 @@ Since some resources were created manually before Terraform, you must import the
     terraform import google_bigquery_table.velib_latest_state projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_latest_state
     ```
 
+8.  **BigQuery Hourly Aggregate (Base View)**
+    ```bash
+    terraform import google_bigquery_table.velib_totals_hourly_mv projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_totals_hourly_aggregate
+    ```
+
+9.  **BigQuery Hourly Dashboard View**
+    ```bash
+    terraform import google_bigquery_table.velib_totals_hourly projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_totals_hourly
+    ```
+
 ### Station Information Pipeline (Phase 1B)
 
 If you have already deployed the station information pipeline manually, import these resources:
 
-8.  **Station Info Pub/Sub Topic**
+10. **Station Info Pub/Sub Topic**
     ```bash
     terraform import google_pubsub_topic.station_info_topic projects/paris-mobility-pulse/topics/pmp-velib-station-info
     ```

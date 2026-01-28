@@ -88,3 +88,67 @@ resource "google_bigquery_table" "velib_station_information" {
 
   clustering = ["station_id"]
 }
+
+# Hourly Aggregates Base View (Virtual Materialized View Logic)
+resource "google_bigquery_table" "velib_totals_hourly_mv" {
+  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id   = "velib_totals_hourly_aggregate"
+
+  view {
+    query = <<-SQL
+      WITH snapshots AS (
+        SELECT
+          ingest_ts,
+          TIMESTAMP_TRUNC(COALESCE(event_ts, ingest_ts), HOUR, "Europe/Paris") as hour_ts_paris,
+          COUNT(DISTINCT station_id) as stations_reporting,
+          SUM(num_bikes_available) as total_bikes,
+          SUM(num_docks_available) as total_docks,
+          COUNTIF(num_bikes_available = 0) as empty_stations
+        FROM `paris-mobility-pulse.pmp_curated.velib_station_status`
+        GROUP BY 1, 2
+      )
+      SELECT
+        hour_ts_paris,
+        AVG(total_bikes) as avg_total_bikes_available,
+        MAX(total_bikes) as peak_total_bikes_available,
+        MIN(total_bikes) as min_total_bikes_available,
+        AVG(total_docks) as avg_total_docks_available,
+        AVG(stations_reporting) as avg_stations_reporting,
+        AVG(empty_stations) as avg_empty_stations,
+        MAX(empty_stations) as peak_empty_stations,
+        COUNT(*) as snapshot_samples
+      FROM snapshots
+      GROUP BY 1
+    SQL
+    use_legacy_sql = false
+  }
+
+  depends_on = [google_bigquery_table.velib_station_status]
+}
+
+# Hourly Dashboard View (Looker Wrapper)
+resource "google_bigquery_table" "velib_totals_hourly" {
+  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id   = "velib_totals_hourly"
+
+  view {
+    query = <<-SQL
+      SELECT
+        base.*,
+        DATETIME(base.hour_ts_paris, "Europe/Paris") as hour_paris,
+        info.total_stations_known,
+        SAFE_DIVIDE(base.avg_stations_reporting, info.total_stations_known) as avg_coverage_ratio
+      FROM `paris-mobility-pulse.pmp_marts.velib_totals_hourly_aggregate` base
+      CROSS JOIN (
+        SELECT COUNT(DISTINCT station_id) as total_stations_known
+        FROM `paris-mobility-pulse.pmp_curated.velib_station_information`
+      ) info
+    SQL
+    use_legacy_sql = false
+  }
+
+  depends_on = [
+    google_bigquery_table.velib_totals_hourly_mv,
+    google_bigquery_table.velib_station_information
+  ]
+}
