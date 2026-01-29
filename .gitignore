@@ -4,3 +4,16 @@
 **/terraform.tfstate
 **/terraform.tfstate.backup
 **/*.tfvars
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
