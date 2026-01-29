@@ -18,6 +18,7 @@ BQ_TABLE = os.environ["BQ_TABLE"]
 bq = bigquery.Client()
 TABLE_ID = f"{PROJECT_ID}.{BQ_DATASET}.{BQ_TABLE}"
 
+
 def norm_ts(ts):
     if ts is None:
         return None
@@ -26,9 +27,11 @@ def norm_ts(ts):
         return ts[:-6] + "Z"
     return ts
 
+
 @app.get("/healthz")
 def healthz():
     return "ok", 200
+
 
 @app.post("/pubsub")
 def pubsub_push():
@@ -60,7 +63,9 @@ def pubsub_push():
         "source": event.get("source"),
         "event_type": event.get("event_type"),
         "key": event.get("key"),
-        "payload": json.dumps(payload_val, ensure_ascii=False) if isinstance(payload_val, (dict, list)) else payload_val,
+        "payload": json.dumps(payload_val, ensure_ascii=False)
+        if isinstance(payload_val, (dict, list))
+        else payload_val,
     }
 
     # Use message_id as insertId to reduce duplicates on retries

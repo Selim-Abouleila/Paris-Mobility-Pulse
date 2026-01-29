@@ -21,9 +21,11 @@ EVENT_TYPE = os.environ.get("EVENT_TYPE", "station_status_snapshot")
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
+
 @app.get("/healthz")
 def healthz():
     return "ok", 200
+
 
 @app.get("/collect")
 def collect():
@@ -37,7 +39,9 @@ def collect():
     event_ts = None
     if isinstance(data, dict) and "last_updated" in data:
         try:
-            event_ts = datetime.fromtimestamp(data["last_updated"], tz=timezone.utc).isoformat()
+            event_ts = datetime.fromtimestamp(
+                data["last_updated"], tz=timezone.utc
+            ).isoformat()
         except Exception:
             event_ts = None
 

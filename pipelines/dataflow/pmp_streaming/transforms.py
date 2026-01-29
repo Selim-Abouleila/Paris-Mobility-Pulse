@@ -3,6 +3,7 @@ from typing import Any, Dict, Union
 
 REQUIRED_FIELDS = ["ingest_ts", "event_ts", "source", "event_type", "key", "payload"]
 
+
 def parse_event(raw: Union[str, bytes, Dict[str, Any]]) -> Dict[str, Any]:
     """
     Parse a single event from JSON string/bytes or dict.
@@ -24,6 +25,7 @@ def parse_event(raw: Union[str, bytes, Dict[str, Any]]) -> Dict[str, Any]:
         raise ValueError("Parsed event is not a JSON object")
     return obj
 
+
 def normalize_event(evt: Dict[str, Any]) -> Dict[str, Any]:
     """
     Ensure required fields exist; safe defaults for early development.
@@ -37,7 +39,6 @@ def normalize_event(evt: Dict[str, Any]) -> Dict[str, Any]:
     event_ts = evt.get("event_ts")
     if not event_ts:  # catches None and ""
         evt["event_ts"] = ingest_ts
-
 
     for k in ["source", "event_type", "key"]:
         if not evt.get(k):

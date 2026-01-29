@@ -11,21 +11,23 @@ bq = bigquery.Client()
 
 # Full table id: project.dataset.table
 BQ_TABLE = os.environ.get(
-    "BQ_TABLE",
-    "paris-mobility-pulse.pmp_curated.velib_station_information"
+    "BQ_TABLE", "paris-mobility-pulse.pmp_curated.velib_station_information"
 )
+
 
 def _now_iso():
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
 
 @app.get("/healthz")
 def healthz():
     return ("ok", 200)
 
+
 @app.post("/pubsub")
 def pubsub():
     envelope = request.get_json(silent=True) or {}
-    msg = (envelope.get("message") or {})
+    msg = envelope.get("message") or {}
     data_b64 = msg.get("data")
 
     if not data_b64:
@@ -56,19 +58,23 @@ def pubsub():
         if station_id is None or str(station_id).strip() == "":
             continue
 
-        rows.append({
-            "ingest_ts": ingest_ts,
-            "event_ts": event_ts,
-            "station_id": str(station_id),
-            "station_code": str(s.get("stationCode") or s.get("station_code") or ""),
-            "name": s.get("name"),
-            "lat": s.get("lat"),
-            "lon": s.get("lon"),
-            "capacity": s.get("capacity"),
-            "address": s.get("address"),
-            "post_code": s.get("post_code") or s.get("postCode"),
-            "raw_station_json": json.dumps(s, ensure_ascii=False),
-        })
+        rows.append(
+            {
+                "ingest_ts": ingest_ts,
+                "event_ts": event_ts,
+                "station_id": str(station_id),
+                "station_code": str(
+                    s.get("stationCode") or s.get("station_code") or ""
+                ),
+                "name": s.get("name"),
+                "lat": s.get("lat"),
+                "lon": s.get("lon"),
+                "capacity": s.get("capacity"),
+                "address": s.get("address"),
+                "post_code": s.get("post_code") or s.get("postCode"),
+                "raw_station_json": json.dumps(s, ensure_ascii=False),
+            }
+        )
 
     if not rows:
         return ("", 204)

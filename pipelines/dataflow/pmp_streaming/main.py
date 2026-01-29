@@ -16,13 +16,19 @@ def _to_int(v):
     except Exception:
         return None
 
+
 def _epoch_to_rfc3339(sec):
     if sec is None:
         return None
     try:
-        return datetime.fromtimestamp(int(sec), tz=timezone.utc).isoformat().replace("+00:00", "Z")
+        return (
+            datetime.fromtimestamp(int(sec), tz=timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
     except Exception:
         return None
+
 
 def _extract_bike_types(st):
     mech = None
@@ -50,6 +56,7 @@ def _extract_bike_types(st):
 
     return mech, ebike
 
+
 def velib_snapshot_to_station_rows(evt):
     """
     Takes one envelope event whose payload is the full station_status snapshot,
@@ -73,7 +80,11 @@ def velib_snapshot_to_station_rows(evt):
         if station_id is None:
             continue
 
-        station_code = st.get("stationCode") or st.get("station_code") or st.get("stationCode".lower())
+        station_code = (
+            st.get("stationCode")
+            or st.get("station_code")
+            or st.get("stationCode".lower())
+        )
 
         num_bikes = st.get("num_bikes_available")
         if num_bikes is None:
@@ -101,20 +112,42 @@ def velib_snapshot_to_station_rows(evt):
             "raw_station_json": json.dumps(st, ensure_ascii=False),
         }
 
-def run(argv=None) -> None:
-    parser = argparse.ArgumentParser(description="PMP Dataflow (Beam) pipeline - SAFE skeleton")
-    parser.add_argument("--runner", default="DirectRunner", help="DirectRunner (default) or DataflowRunner")
-    parser.add_argument("--allow_dataflow_runner", action="store_true",
-                        help="Safety switch. Required to run DataflowRunner.")
-    parser.add_argument("--local_input", default="samples/events.jsonl",
-                        help="Local newline-delimited JSON input file (safe mode).")
-    parser.add_argument("--local_output", default="/tmp/pmp_dataflow_out/out",
-                        help="Local output prefix (safe mode).")
 
-    parser.add_argument("--input_subscription", default="",
-                        help="Pub/Sub subscription to read from. Example: projects/<project>/subscriptions/<sub>")
-    parser.add_argument("--output_bq_table", default="",
-                        help="BigQuery table spec: <project>:<dataset>.<table> (curated output).")
+def run(argv=None) -> None:
+    parser = argparse.ArgumentParser(
+        description="PMP Dataflow (Beam) pipeline - SAFE skeleton"
+    )
+    parser.add_argument(
+        "--runner",
+        default="DirectRunner",
+        help="DirectRunner (default) or DataflowRunner",
+    )
+    parser.add_argument(
+        "--allow_dataflow_runner",
+        action="store_true",
+        help="Safety switch. Required to run DataflowRunner.",
+    )
+    parser.add_argument(
+        "--local_input",
+        default="samples/events.jsonl",
+        help="Local newline-delimited JSON input file (safe mode).",
+    )
+    parser.add_argument(
+        "--local_output",
+        default="/tmp/pmp_dataflow_out/out",
+        help="Local output prefix (safe mode).",
+    )
+
+    parser.add_argument(
+        "--input_subscription",
+        default="",
+        help="Pub/Sub subscription to read from. Example: projects/<project>/subscriptions/<sub>",
+    )
+    parser.add_argument(
+        "--output_bq_table",
+        default="",
+        help="BigQuery table spec: <project>:<dataset>.<table> (curated output).",
+    )
 
     args, beam_args = parser.parse_known_args(argv)
 
@@ -137,7 +170,8 @@ def run(argv=None) -> None:
         if args.input_subscription:
             lines = (
                 p
-                | "ReadPubSub" >> beam.io.ReadFromPubSub(subscription=args.input_subscription)
+                | "ReadPubSub"
+                >> beam.io.ReadFromPubSub(subscription=args.input_subscription)
                 | "BytesToStr" >> beam.Map(lambda b: b.decode("utf-8"))
             )
         else:
@@ -149,7 +183,9 @@ def run(argv=None) -> None:
             | "NormalizeEvent" >> beam.Map(normalize_event)
         )
 
-        station_rows = events | "VelibSnapshotToStations" >> beam.FlatMap(velib_snapshot_to_station_rows)
+        station_rows = events | "VelibSnapshotToStations" >> beam.FlatMap(
+            velib_snapshot_to_station_rows
+        )
 
         if args.output_bq_table:
             station_rows | "WriteCuratedBQ" >> beam.io.WriteToBigQuery(
@@ -167,12 +203,14 @@ def run(argv=None) -> None:
             (
                 station_rows
                 | "ToNDJSON" >> beam.Map(json.dumps)
-                | "WriteLocal" >> beam.io.WriteToText(
+                | "WriteLocal"
+                >> beam.io.WriteToText(
                     args.local_output,
                     file_name_suffix=".jsonl",
-                    shard_name_template="-SS-of-NN"
+                    shard_name_template="-SS-of-NN",
                 )
             )
+
 
 if __name__ == "__main__":
     run()
