@@ -7,7 +7,7 @@ resource "google_storage_bucket" "dataflow_bucket" {
 
   lifecycle_rule {
     condition {
-      age = 7
+      age            = 7
       matches_prefix = ["temp/", "staging/"]
     }
     action {

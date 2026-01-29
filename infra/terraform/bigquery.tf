@@ -43,7 +43,7 @@ resource "google_bigquery_table" "velib_latest_state" {
   table_id   = "velib_latest_state"
 
   view {
-    query = <<-SQL
+    query          = <<-SQL
       SELECT * EXCEPT(rn)
       FROM (
         SELECT
@@ -95,7 +95,7 @@ resource "google_bigquery_table" "velib_totals_hourly_mv" {
   table_id   = "velib_totals_hourly_aggregate"
 
   view {
-    query = <<-SQL
+    query          = <<-SQL
       WITH snapshots AS (
         SELECT
           ingest_ts,
@@ -132,7 +132,7 @@ resource "google_bigquery_table" "velib_totals_hourly" {
   table_id   = "velib_totals_hourly"
 
   view {
-    query = <<-SQL
+    query          = <<-SQL
       SELECT
         base.*,
         DATETIME(base.hour_ts_paris, "Europe/Paris") as hour_paris,

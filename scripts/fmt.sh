@@ -1,13 +1,11 @@
-#!/bin/bash
-# Helper script to format the codebase
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Running Ruff format..."
 ruff format .
+ruff check .
 
-echo "Running Terraform format..."
-if command -v terraform &> /dev/null
-then
-    terraform fmt -recursive infra/terraform
+if command -v terraform >/dev/null 2>&1; then
+  (cd infra && terraform fmt -recursive)
 else
-    echo "Warning: terraform command not found. Skipping terraform formatting."
+  echo "terraform not installed; skipping terraform fmt"
 fi
