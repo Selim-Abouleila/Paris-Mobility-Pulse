@@ -187,7 +187,7 @@ Detailed guides for each component:
 - [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
 - [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
 - [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
-- [09 - Reliability: DLQ + Replay](docs/09 - Reliability: DLQ + Replay.md) - Dead Letter Queue and Replay strategy
+- [09 - Reliability: DLQ + Replay](docs/09 - Reliability - DLQ + Replay.md) - Dead Letter Queue and Replay strategy
 
 ## Next milestone
 
