@@ -15,6 +15,15 @@ BQ_TABLE = os.environ.get(
 )
 
 
+def _is_true(v: str) -> bool:
+    if not v:
+        return False
+    return str(v).lower() in ("true", "1", "yes")
+
+
+DLQ_TEST_ENABLED = _is_true(os.getenv("DLQ_TEST_ENABLED", "false"))
+
+
 def _now_iso():
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
@@ -28,6 +37,15 @@ def healthz():
 def pubsub():
     envelope = request.get_json(silent=True) or {}
     msg = envelope.get("message") or {}
+    attrs = msg.get("attributes") or {}
+    message_id = msg.get("messageId")
+
+    if DLQ_TEST_ENABLED and _is_true(attrs.get("dlq_test", "")):
+        app.logger.warning(
+            "DLQ test forced failure messageId=%s attrs=%s", message_id, attrs
+        )
+        return ("DLQ test forced failure", 500)
+
     data_b64 = msg.get("data")
 
     if not data_b64:

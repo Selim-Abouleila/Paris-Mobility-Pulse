@@ -19,6 +19,8 @@ The **Phase 1** Dataflow job is a streaming pipeline that performs the following
     *   *Mode*: Append-only (streaming inserts).
     *   *Partitioning*: By `ingest_ts`.
 
+![Dataflow Job Step Summary](../images/dataflow_table.png)
+
 ### Why a Curated Table?
 
 The **curated table** provides a schema-defined, station-grain view, enabling efficient dashboards (Looker Studio), aggregation, and geospatial mapping without complex JSON extraction queries.
