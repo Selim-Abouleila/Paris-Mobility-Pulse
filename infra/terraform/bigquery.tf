@@ -37,6 +37,38 @@ resource "google_bigquery_dataset" "pmp_marts" {
   location   = "EU"
 }
 
+# Ops Dataset (DLQ)
+resource "google_bigquery_dataset" "pmp_ops" {
+  dataset_id = "pmp_ops"
+  location   = "europe-west9"
+}
+
+# DLQ Table
+resource "google_bigquery_table" "velib_dlq_raw" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id   = "velib_station_info_push_dlq"
+
+  schema = file("dlq_table_schema.json")
+
+  time_partitioning {
+    type  = "DAY"
+    field = "publish_time"
+  }
+}
+
+# IAM for Pub/Sub Service Agent to write to DLQ Dataset
+resource "google_bigquery_dataset_iam_member" "pubsub_sa_dlq_editor" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
+
+resource "google_bigquery_dataset_iam_member" "pubsub_sa_dlq_viewer" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  role       = "roles/bigquery.metadataViewer"
+  member     = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
+
 # Latest State View (Marts Layer)
 resource "google_bigquery_table" "velib_latest_state" {
   dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
