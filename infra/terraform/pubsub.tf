@@ -12,14 +12,47 @@ resource "google_pubsub_subscription" "dataflow_sub" {
   expiration_policy {
     ttl = "" # Never expire
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Station Information Topic
 resource "google_pubsub_topic" "station_info_topic" {
   name = "pmp-velib-station-info"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
-# Station Information Push Subscription
+# DLQ Topic
+resource "google_pubsub_topic" "station_info_dlq_topic" {
+  name = "pmp-velib-station-info-push-dlq"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# DLQ Hold Subscription
+resource "google_pubsub_subscription" "station_info_dlq_sub" {
+  name  = "pmp-velib-station-info-push-dlq-hold-sub"
+  topic = google_pubsub_topic.station_info_dlq_topic.name
+
+  message_retention_duration = "604800s" # 7 days (7 * 24 * 60 * 60)
+
+  expiration_policy {
+    ttl = "" # Never expire
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# Station Information Push Subscription (Source)
 resource "google_pubsub_subscription" "station_info_push_sub" {
   name  = "pmp-velib-station-info-to-bq-sub"
   topic = google_pubsub_topic.station_info_topic.name
@@ -27,15 +60,40 @@ resource "google_pubsub_subscription" "station_info_push_sub" {
   ack_deadline_seconds = 60
 
   push_config {
-    push_endpoint = "${google_cloud_run_v2_service.station_info_writer.uri}/pubsub"
+    push_endpoint = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app/pubsub"
 
     oidc_token {
       service_account_email = data.google_service_account.pubsub_push_sa.email
-      audience              = google_cloud_run_v2_service.station_info_writer.uri
+      audience              = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app"
     }
+  }
+
+  dead_letter_policy {
+    dead_letter_topic     = google_pubsub_topic.station_info_dlq_topic.id
+    max_delivery_attempts = 5
   }
 
   expiration_policy {
     ttl = "" # Never expire
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# DLQ Topic IAM: Publisher (Service Agent)
+resource "google_pubsub_topic_iam_member" "dlq_publisher_sa" {
+  project = var.project_id
+  topic   = google_pubsub_topic.station_info_dlq_topic.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
+
+# Source Subscription IAM: Subscriber (Service Agent)
+resource "google_pubsub_subscription_iam_member" "source_subscriber_sa" {
+  project      = var.project_id
+  subscription = google_pubsub_subscription.station_info_push_sub.name
+  role         = "roles/pubsub.subscriber"
+  member       = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
