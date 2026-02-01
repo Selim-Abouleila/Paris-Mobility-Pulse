@@ -58,8 +58,8 @@ resource "google_pubsub_subscription" "station_info_dlq_bq_sub" {
   topic = google_pubsub_topic.station_info_dlq_topic.name
 
   bigquery_config {
-    table          = "${var.project_id}.${google_bigquery_table.velib_dlq_raw.dataset_id}.${google_bigquery_table.velib_dlq_raw.table_id}"
-    write_metadata = true
+    table               = "${var.project_id}.${google_bigquery_table.velib_dlq_raw.dataset_id}.${google_bigquery_table.velib_dlq_raw.table_id}"
+    write_metadata      = true
     drop_unknown_fields = false
   }
 

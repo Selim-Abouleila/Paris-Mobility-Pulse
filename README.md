@@ -24,13 +24,17 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
         - `velib_latest_state_enriched`: Latest state + metadata (View).
         - `velib_totals_hourly`: Aggregated trends for dashboarding (Materialized View).
         - `velib_totals_hourly_paris`: Timezone-adjusted wrapper (View).
+    - **Ops Layer** (`pmp_ops`):
+        - `velib_station_info_push_dlq`: Dead-letter queue messages for replay/audit.
 - **Pub/Sub**:
-    - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata).
+    - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata), `pmp-velib-station-info-push-dlq` (Dead Letter Queue).
     - **Subscriptions**:
         - `pmp-events-dataflow-sub`: Streaming pull for Dataflow.
         - `pmp-events-sub`: Debugging/Audit.
         - `pmp-events-to-bq-sub`: Push subscription for MVP (Cloud Run).
         - `pmp-velib-station-info-to-bq-sub`: Push subscription for Station Info (Cloud Run).
+        - `pmp-velib-station-info-push-dlq-hold-sub`: 7-day retention for replay.
+        - `pmp-velib-station-info-push-dlq-to-bq-sub`: Export to BigQuery (`pmp_ops`).
 - **Dataflow**: `pmp-velib-curated` (Streaming ETL).
 - **Cloud Run**:
     - `pmp-velib-collector`: Polls real-time station status.
@@ -183,6 +187,7 @@ Detailed guides for each component:
 - [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
 - [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
 - [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
+- [09 - Reliability: DLQ + Replay](docs/09 - Reliability: DLQ + Replay.md) - Dead Letter Queue and Replay strategy
 
 ## Next milestone
 
