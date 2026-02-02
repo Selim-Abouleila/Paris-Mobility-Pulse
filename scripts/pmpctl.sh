@@ -21,6 +21,8 @@ INPUT_SUB="${INPUT_SUB:-projects/${PROJECT_ID}/subscriptions/pmp-events-dataflow
 OUT_TABLE="${OUT_TABLE:-${PROJECT_ID}:pmp_curated.velib_station_status}"
 DLQ_BQ_TABLE="${DLQ_BQ_TABLE-${PROJECT_ID}:pmp_ops.velib_station_status_curated_dlq}"
 DATAFLOW_SA="${DATAFLOW_SA:-pmp-dataflow-sa@${PROJECT_ID}.iam.gserviceaccount.com}"
+WORKER_ZONE="${WORKER_ZONE:-}"                 # empty means let Dataflow choose
+WORKER_MACHINE_TYPE="${WORKER_MACHINE_TYPE:-}" # empty means default
 
 # Scheduler jobs that control ingestion (add more later as you create them)
 SCHED_JOBS=(
@@ -148,6 +150,15 @@ dataflow_start_streaming_job() {
   echo "  log:      $log_file"
   echo "  (this submits the job and keeps a local process running; we run it in background)"
 
+  local worker_args=()
+  if [[ -n "${WORKER_ZONE}" ]]; then
+    worker_args+=(--worker_zone "$WORKER_ZONE")
+  fi
+  if [[ -n "${WORKER_MACHINE_TYPE}" ]]; then
+    worker_args+=(--worker_machine_type "$WORKER_MACHINE_TYPE")
+  fi
+
+
   (
     cd "$REPO_ROOT"
     nohup python3 -m pipelines.dataflow.pmp_streaming.main \
@@ -155,6 +166,7 @@ dataflow_start_streaming_job() {
       --allow_dataflow_runner \
       --project "$PROJECT_ID" \
       --region "$REGION" \
+      "${worker_args[@]}" \
       --temp_location "$BUCKET/temp" \
       --staging_location "$BUCKET/staging" \
       --job_name "$job_name" \
@@ -209,6 +221,8 @@ status() {
   echo "REGION=$REGION"
   echo "SCHED_LOCATION=$SCHED_LOCATION"
   echo "DLQ_BQ_TABLE=$DLQ_BQ_TABLE"
+  echo "WORKER_ZONE=$WORKER_ZONE"
+  echo "WORKER_MACHINE_TYPE=$WORKER_MACHINE_TYPE"
   echo
 
   echo "==> Scheduler job states:"
@@ -247,7 +261,7 @@ Commands:
   status          Show scheduler states + running Dataflow jobs
 
 Env overrides:
-  PROJECT_ID REGION SCHED_LOCATION BUCKET INPUT_SUB OUT_TABLE DATAFLOW_SA DLQ_BQ_TABLE
+  PROJECT_ID REGION SCHED_LOCATION BUCKET INPUT_SUB OUT_TABLE DATAFLOW_SA DLQ_BQ_TABLE WORKER_ZONE WORKER_MACHINE_TYPE
 EOF
 }
 
