@@ -2,6 +2,7 @@
 """
 Test script to verify DLQ functionality by publishing messages that should fail.
 """
+
 import json
 from datetime import datetime, timezone
 
@@ -25,20 +26,20 @@ def publish_message(msg_dict, description):
 def test_parse_error():
     """Test 1: Invalid JSON - should fail at parse stage"""
     print("\n🧪 Test 1: Parse/Normalize Error (missing required fields)")
-    
+
     # Missing required fields like 'payload', 'event_type'
     bad_msg = {
         "ingest_ts": datetime.now(timezone.utc).isoformat(),
         # Missing: event_ts, source, event_type, key, payload
     }
-    
+
     publish_message(bad_msg, "PARSE ERROR (missing required fields)")
 
 
 def test_transformation_error():
     """Test 2: Invalid payload structure - should fail at transformation"""
     print("\n🧪 Test 2: Transformation Error (stations not a list)")
-    
+
     bad_msg = {
         "ingest_ts": datetime.now(timezone.utc).isoformat(),
         "event_ts": datetime.now(timezone.utc).isoformat(),
@@ -49,16 +50,16 @@ def test_transformation_error():
             "data": {
                 "stations": "NOT_A_LIST"  # Should be a list, not a string
             }
-        }
+        },
     }
-    
+
     publish_message(bad_msg, "TRANSFORM ERROR (stations not a list)")
 
 
 def test_bq_schema_error():
     """Test 3: Schema mismatch - should fail at BigQuery insert"""
     print("\n🧪 Test 3: BigQuery Insert Error (invalid station data)")
-    
+
     bad_msg = {
         "ingest_ts": datetime.now(timezone.utc).isoformat(),
         "event_ts": datetime.now(timezone.utc).isoformat(),
@@ -76,16 +77,16 @@ def test_bq_schema_error():
                     }
                 ]
             }
-        }
+        },
     }
-    
+
     publish_message(bad_msg, "BQ INSERT ERROR (schema mismatch)")
 
 
 def test_valid_message():
     """Test 4: Valid message - should succeed"""
     print("\n✅ Test 4: Valid Message (should write to curated table)")
-    
+
     good_msg = {
         "ingest_ts": datetime.now(timezone.utc).isoformat(),
         "event_ts": datetime.now(timezone.utc).isoformat(),
@@ -107,31 +108,31 @@ def test_valid_message():
                     }
                 ]
             }
-        }
+        },
     }
-    
+
     publish_message(good_msg, "VALID MESSAGE (should succeed)")
 
 
 if __name__ == "__main__":
-    print("="*60)
+    print("=" * 60)
     print("DLQ Test Script - Publishing Test Messages")
-    print("="*60)
-    
+    print("=" * 60)
+
     print(f"\nProject: {PROJECT_ID}")
     print(f"Topic: {TOPIC_ID}")
     print(f"Topic Path: {topic_path}")
-    
+
     # Run all tests
     test_parse_error()
     test_transformation_error()
     test_bq_schema_error()
     test_valid_message()
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("✅ All test messages published!")
-    print("="*60)
-    
+    print("=" * 60)
+
     print("\n📊 Check DLQ table in ~1-2 minutes:")
     print("""
 bq query --use_legacy_sql=false '
@@ -145,7 +146,7 @@ FROM `paris-mobility-pulse.pmp_ops.velib_station_status_curated_dlq`
 ORDER BY dlq_ts DESC
 LIMIT 10'
 """)
-    
+
     print("\n📊 Check curated table for valid message:")
     print("""
 bq query --use_legacy_sql=false '
