@@ -131,8 +131,12 @@ class ParseNormalizeWithDlq(beam.DoFn):
             self.dlq_count.inc()
             now_ts = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
             # truncate raw line to 200k chars to avoid BQ row limit issues
-            truncated_raw = raw_line[:200000] if isinstance(raw_line, str) else str(raw_line)[:200000]
-            
+            truncated_raw = (
+                raw_line[:200000]
+                if isinstance(raw_line, str)
+                else str(raw_line)[:200000]
+            )
+
             error_record = {
                 "dlq_ts": now_ts,
                 "stage": "parse_normalize",
@@ -176,10 +180,10 @@ class VelibSnapshotToStationsWithDlq(beam.DoFn):
         except Exception as e:
             self.dlq_count.inc()
             now_ts = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-            
+
             # Prepare contextual info
             raw_dump = json.dumps(evt, default=str)[:200000]
-            
+
             # "event_meta = json.dumps({...})"
             meta = {
                 "source": evt.get("source"),
@@ -188,7 +192,7 @@ class VelibSnapshotToStationsWithDlq(beam.DoFn):
                 "ingest_ts": evt.get("ingest_ts"),
                 "event_ts": evt.get("event_ts"),
             }
-            
+
             error_record = {
                 "dlq_ts": now_ts,
                 "stage": "snapshot_to_station_rows",
@@ -307,18 +311,16 @@ def run(argv=None) -> None:
 
         # 1. Parse & Normalize with DLQ
         # Result is a PCollectionTuple with 'ok' (main) and 'dlq' (side output)
-        parse_results = (
-            lines
-            | "ParseNormalizeWithDlq" >> beam.ParDo(ParseNormalizeWithDlq()).with_outputs("dlq", main="ok")
-        )
+        parse_results = lines | "ParseNormalizeWithDlq" >> beam.ParDo(
+            ParseNormalizeWithDlq()
+        ).with_outputs("dlq", main="ok")
         events = parse_results["ok"]
         parse_dlq = parse_results["dlq"]
 
         # 2. Transform to Station Rows with DLQ
-        snapshot_results = (
-            events 
-            | "VelibSnapshotToStationsWithDlq" >> beam.ParDo(VelibSnapshotToStationsWithDlq()).with_outputs("dlq", main="ok")
-        )
+        snapshot_results = events | "VelibSnapshotToStationsWithDlq" >> beam.ParDo(
+            VelibSnapshotToStationsWithDlq()
+        ).with_outputs("dlq", main="ok")
         station_rows = snapshot_results["ok"]
         snapshot_dlq = snapshot_results["dlq"]
 
@@ -328,8 +330,9 @@ def run(argv=None) -> None:
 
         if args.output_bq_table:
             bq_write_result = (
-                station_rows 
-                | "WriteCuratedBQ" >> beam.io.WriteToBigQuery(
+                station_rows
+                | "WriteCuratedBQ"
+                >> beam.io.WriteToBigQuery(
                     table=args.output_bq_table,
                     schema=(
                         "ingest_ts:TIMESTAMP,event_ts:TIMESTAMP,station_id:STRING,station_code:STRING,"
@@ -343,18 +346,16 @@ def run(argv=None) -> None:
                     insert_retry_strategy=RetryStrategy.RETRY_ON_TRANSIENT_ERROR,
                 )
             )
-            
+
             # Capture BQ insert failures
             # failed_rows_with_errors returns (destination, row_dict, errors_list)
-            
+
             bq_errors_dlq = (
                 bq_write_result.failed_rows_with_errors
                 | "FormatBQFailures" >> beam.ParDo(FormatBQFailures())
             )
-            
-            dlq_collections.append(bq_errors_dlq)
-            
 
+            dlq_collections.append(bq_errors_dlq)
 
         else:
             # Local write fallback (no BQ failure capture relevant here really, but keeping safe behavior)
@@ -371,14 +372,12 @@ def run(argv=None) -> None:
 
         # 4. Write DLQ to BQ (if configured)
         if args.dlq_bq_table:
-            all_dlq = (
-                dlq_collections 
-                | "FlattenDLQ" >> beam.Flatten()
-            )
-            
+            all_dlq = dlq_collections | "FlattenDLQ" >> beam.Flatten()
+
             (
                 all_dlq
-                | "WriteDLQ" >> beam.io.WriteToBigQuery(
+                | "WriteDLQ"
+                >> beam.io.WriteToBigQuery(
                     table=args.dlq_bq_table,
                     schema=(
                         "dlq_ts:TIMESTAMP,stage:STRING,error_type:STRING,error_message:STRING,"
@@ -390,6 +389,7 @@ def run(argv=None) -> None:
                     insert_retry_strategy=RetryStrategy.RETRY_ON_TRANSIENT_ERROR,
                 )
             )
+
 
 if __name__ == "__main__":
     run()
