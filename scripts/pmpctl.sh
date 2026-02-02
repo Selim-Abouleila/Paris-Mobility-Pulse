@@ -19,6 +19,7 @@ BUCKET="${BUCKET:-gs://pmp-dataflow-${PROJECT_ID}}"
 # Dataflow input subscription + output table (from your README)
 INPUT_SUB="${INPUT_SUB:-projects/${PROJECT_ID}/subscriptions/pmp-events-dataflow-sub}"
 OUT_TABLE="${OUT_TABLE:-${PROJECT_ID}:pmp_curated.velib_station_status}"
+DLQ_BQ_TABLE="${DLQ_BQ_TABLE-${PROJECT_ID}:pmp_ops.velib_station_status_curated_dlq}"
 DATAFLOW_SA="${DATAFLOW_SA:-pmp-dataflow-sa@${PROJECT_ID}.iam.gserviceaccount.com}"
 
 # Scheduler jobs that control ingestion (add more later as you create them)
@@ -161,6 +162,7 @@ dataflow_start_streaming_job() {
       --streaming \
       --input_subscription "$INPUT_SUB" \
       --output_bq_table "$OUT_TABLE" \
+      ${DLQ_BQ_TABLE:+--dlq_bq_table=$DLQ_BQ_TABLE} \
       --setup_file ./setup.py \
       --requirements_file pipelines/dataflow/pmp_streaming/requirements.txt \
       --num_workers 1 \
@@ -206,6 +208,7 @@ status() {
   echo "PROJECT_ID=$PROJECT_ID"
   echo "REGION=$REGION"
   echo "SCHED_LOCATION=$SCHED_LOCATION"
+  echo "DLQ_BQ_TABLE=$DLQ_BQ_TABLE"
   echo
 
   echo "==> Scheduler job states:"
@@ -244,7 +247,7 @@ Commands:
   status          Show scheduler states + running Dataflow jobs
 
 Env overrides:
-  PROJECT_ID REGION SCHED_LOCATION BUCKET INPUT_SUB OUT_TABLE DATAFLOW_SA
+  PROJECT_ID REGION SCHED_LOCATION BUCKET INPUT_SUB OUT_TABLE DATAFLOW_SA DLQ_BQ_TABLE
 EOF
 }
 

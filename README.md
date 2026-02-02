@@ -120,6 +120,7 @@ REGION="europe-west9"
 BUCKET="gs://pmp-dataflow-${PROJECT_ID}"
 INPUT_SUB="projects/${PROJECT_ID}/subscriptions/pmp-events-dataflow-sub"
 OUT_TABLE="${PROJECT_ID}:pmp_curated.velib_station_status"
+DLQ_TABLE="${PROJECT_ID}:pmp_ops.velib_station_status_curated_dlq"
 
 python3 -m pipelines.dataflow.pmp_streaming.main \
   --runner DataflowRunner \
@@ -133,6 +134,7 @@ python3 -m pipelines.dataflow.pmp_streaming.main \
   --streaming \
   --input_subscription "$INPUT_SUB" \
   --output_bq_table "$OUT_TABLE" \
+  --dlq_bq_table "$DLQ_TABLE" \
   --setup_file ./setup.py \
   --requirements_file pipelines/dataflow/pmp_streaming/requirements.txt \
   --num_workers 1 \
