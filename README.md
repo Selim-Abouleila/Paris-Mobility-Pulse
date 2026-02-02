@@ -7,11 +7,12 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 ![Pipeline architecture](docs/images/pipeline.png)
 
 ## What’s implemented
-- Cloud Run collector (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub (Publish/Subscribe).
-- Cloud Run writer (`pmp-bq-writer`) receives Pub/Sub (Publish/Subscribe) push messages and inserts into BigQuery raw table.
-- Dataflow (Google Cloud Dataflow) streaming (Apache Beam) reads from `pmp-events-dataflow-sub`, validates + dedups, and writes curated rows to `pmp_curated.velib_station_status`.
-- BigQuery Marts layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
-- Looker Studio Dashboard for real-time visualization and trends.
+- **Cloud Run collector** (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub.
+- **Cloud Run writer** (`pmp-bq-writer`) receives Pub/Sub push messages and inserts into BigQuery raw table.
+- **Dataflow Streaming** (`pmp-velib-curated`) reads from Pub/Sub, validates formats, and writes curated rows to `pmp_curated.velib_station_status`.
+- **Reliability (DLQ)**: Robust Dead Letter Queue (DLQ) implementations for both Metadata (Pub/Sub Push) and Status (Dataflow) paths.
+- **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
+- **Looker Studio Dashboard** for real-time visualization and trends.
 
 ## Key GCP resources
 - **BigQuery**:
@@ -25,7 +26,8 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
         - `velib_totals_hourly`: Aggregated trends for dashboarding (Materialized View).
         - `velib_totals_hourly_paris`: Timezone-adjusted wrapper (View).
     - **Ops Layer** (`pmp_ops`):
-        - `velib_station_info_push_dlq`: Dead-letter queue messages for replay/audit.
+        - `velib_station_info_push_dlq`: Pub/Sub Push delivery failures (Metadata).
+        - `velib_station_status_curated_dlq`: Dataflow transformation/validation failures (Status).
 - **Pub/Sub**:
     - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata), `pmp-velib-station-info-push-dlq` (Dead Letter Queue).
     - **Subscriptions**:
@@ -177,6 +179,27 @@ gcloud dataflow jobs cancel JOB_ID --project="$PROJECT_ID" --region="$REGION"
 **Console:**
 Dataflow → Jobs → Select job → **Stop / Cancel**.
 
+## Reliability & Error Handling
+
+To ensure production-grade stability, the pipeline implements multi-layered Dead Letter Queue (DLQ) patterns to capture, audit, and replay failures:
+
+### 1. Dataflow Streaming DLQ (Internal)
+Captures failures inside the `pmp-velib-curated` pipeline using side-outputs. Errors are branched out at three critical stages:
+- **Parse**: Detects JSON malformations or missing required envelope fields.
+- **Mapping**: Catches business logic violations (e.g., when the `stations` payload is not a list).
+- **BigQuery Insert**: Handles schema drift or transient data type mismatches on write.
+- **Destination Table**: `pmp_ops.velib_station_status_curated_dlq`
+- **Reference**: [04 - Dataflow Curation](docs/04-dataflow-curation.md)
+
+### 2. Pub/Sub Push DLQ (Infrastructure)
+Captures delivery failures for the `station-info` metadata path. If the Cloud Run writer returns a 5xx error or times out, Pub/Sub forwards the message to a dedicated DLQ topic after 5 attempts.
+- **Persistence**: Messages are stored in both a **7-day Hold Subscription** (for easy local replay) and a **BigQuery Audit table**.
+- **Destination Table**: `pmp_ops.velib_station_info_push_dlq`
+- **Reference**: [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md)
+
+> [!TIP]
+> Use the `scripts/test_dlq.py` utility to end-to-end verify these error paths by injecting deliberate failures into the pipeline.
+
 ## Documentation
 
 Detailed guides for each component:
@@ -193,7 +216,8 @@ Detailed guides for each component:
 
 ## Next milestone
 
-- Add Dataflow for validation/dedup/windowed aggregates + DLQ.
+- Add automated Replay worker for the DLQ.
+- Implement windowed aggregations in Dataflow.
 
 ## Development
 

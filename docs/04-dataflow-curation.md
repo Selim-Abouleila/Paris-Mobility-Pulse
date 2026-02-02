@@ -162,22 +162,74 @@ This is a **streaming** job. It will run (and incur costs) until manually cancel
 
 ---
 
-## 7. Context: Phase 1 & Future Expansion
+## 7. Dead Letter Queue (DLQ)
 
-This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery".
+The pipeline implements a robust Dead Letter Queue (DLQ) mechanism to capture and log failures at multiple stages (parsing, transformation, and BigQuery insertion).
+
+### DLQ Architecture
+
+The DLQ captures errors at three critical points:
+
+1.  **Parse/Normalize Stage** (`ParseNormalizeWithDlq`): Catches JSON parsing errors and missing required envelope fields.
+2.  **Transformation Stage** (`VelibSnapshotToStationsWithDlq`): Validates the `event_type` and ensures the payload structure is correct.
+3.  **BigQuery Insert Stage** (`FormatBQFailures`): Captures rows that fail BigQuery's schema validation or insertion constraints.
+
+### Dataflow Graph with DLQ
+
+![Dataflow DLQ Graph](../images/dataflow_dlq_graph.png)
+
+### DLQ Table Schema
+
+Error records are written to `paris-mobility-pulse.pmp_ops.velib_station_status_curated_dlq`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `dlq_ts` | TIMESTAMP | When the error was captured. |
+| `stage` | STRING | Pipeline stage where the error occurred. |
+| `error_type` | STRING | Exception or error category. |
+| `error_message`| STRING | Detailed error description. |
+| `raw` | STRING | Original input data (truncated if necessary). |
+| `event_meta` | STRING | Metadata about the event (source, type, key). |
+| `row_json` | STRING | The JSON row that failed BQ insertion. |
+| `bq_errors` | STRING | Specific error messages from BigQuery. |
+
+### Verification
+
+You can verify that errors are being correctly routed to the DLQ table using the following query:
+
+```sql
+SELECT
+  dlq_ts,
+  stage,
+  error_type,
+  SUBSTR(error_message, 1, 100) as error_msg
+FROM `paris-mobility-pulse.pmp_ops.velib_station_status_curated_dlq`
+ORDER BY dlq_ts DESC
+LIMIT 10
+```
+
+**Verification Results:**
+
+![DLQ Query Verification](../images/dlq_query_verification.png)
+
+---
+
+## 8. Context: Phase 1 & Future Expansion
+
+This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery" with integrated error handling.
 
 **Future Roadmap**
 In later milestones, the Dataflow logic will be expanded to support:
 *   **Windowed Aggregations**: Calculating rolling averages or activity metrics over time windows.
 *   **Join & Enrichment**: Joining status stream with `station_information` (slowly changing dimension) to add `lat/lon` and names to the stream.
-*   **Dead Letter Queues (DLQ)**: Routing malformed messages or schema validation failures to a separate storage bucket/table.
-*   **Multiple Outputs**: Using Beam Side Outputs or Tagged Outputs to write to different tables (e.g., Raw, Curated, Aggregated) from a single pass.
+*   **DLQ Replay**: Automated or manual replay of fixed DLQ records back into the pipeline.
+*   **Multiple Outputs**: Using Beam Side Outputs to write to different tables from a single pass.
 
-Currently, the focus is on establishing a stable streaming writer creating clean, queryable rows.
+Currently, the focus is on a stable, error-aware streaming writer.
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |
