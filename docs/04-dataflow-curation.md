@@ -176,7 +176,7 @@ The DLQ captures errors at three critical points:
 
 ### Dataflow Graph with DLQ
 
-![Dataflow DLQ Graph](../images/dataflow_dlq_graph.png)
+![Dataflow DLQ Graph](../images/dataflow_DLQ_graph.png)
 
 ### DLQ Table Schema
 

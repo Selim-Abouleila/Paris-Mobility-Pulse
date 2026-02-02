@@ -36,7 +36,7 @@ graph TD
 ### B. Dataflow Curated DLQ (Pipeline-Internal)
 Errors are diverted within the Beam graph using Tagged Outputs, ensuring the main pipeline continues processing healthy records.
 
-![Dataflow DLQ Graph](../images/dataflow_dlq_graph.png)
+![Dataflow DLQ Graph](../images/dataflow_DLQ_graph.png)
 
 ---
 
