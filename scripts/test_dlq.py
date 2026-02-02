@@ -3,7 +3,6 @@
 Test script to verify DLQ functionality by publishing messages that should fail.
 """
 import json
-import sys
 from datetime import datetime, timezone
 
 from google.cloud import pubsub_v1
