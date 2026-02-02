@@ -83,6 +83,22 @@ resource "google_project_iam_member" "writer_bq_editor" {
   member  = "serviceAccount:${google_service_account.station_info_writer_sa.email}"
 }
 
+# Dataflow SA: Dataset-level permissions for DLQ table (pmp_ops)
+# Note: Dataflow SA already has project-level bigquery.dataEditor
+# Adding dataset-specific permissions for clarity and least-privilege
+resource "google_bigquery_dataset_iam_member" "dataflow_sa_pmp_ops_dataeditor" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.dataflow_sa.email}"
+}
+
+resource "google_bigquery_dataset_iam_member" "dataflow_sa_pmp_ops_metadataviewer" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  role       = "roles/bigquery.metadataViewer"
+  member     = "serviceAccount:${google_service_account.dataflow_sa.email}"
+}
+
+
 # Push SA: Cloud Run Invoker on Writer service
 resource "google_cloud_run_v2_service_iam_member" "push_sa_invoke_writer" {
   project  = var.project_id

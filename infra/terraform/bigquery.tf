@@ -43,7 +43,7 @@ resource "google_bigquery_dataset" "pmp_ops" {
   location   = "europe-west9"
 }
 
-# DLQ Table
+# DLQ Table (Pub/Sub Station Info)
 resource "google_bigquery_table" "velib_dlq_raw" {
   dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
   table_id   = "velib_station_info_push_dlq"
@@ -55,6 +55,35 @@ resource "google_bigquery_table" "velib_dlq_raw" {
     field = "publish_time"
   }
 }
+
+# DLQ Table (Dataflow Curated)
+resource "google_bigquery_table" "velib_station_status_curated_dlq" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id   = "velib_station_status_curated_dlq"
+
+  schema = jsonencode([
+    { name = "dlq_ts", type = "TIMESTAMP", mode = "NULLABLE" },
+    { name = "stage", type = "STRING", mode = "NULLABLE" },
+    { name = "error_type", type = "STRING", mode = "NULLABLE" },
+    { name = "error_message", type = "STRING", mode = "NULLABLE" },
+    { name = "raw", type = "STRING", mode = "NULLABLE" },
+    { name = "event_meta", type = "STRING", mode = "NULLABLE" },
+    { name = "row_json", type = "STRING", mode = "NULLABLE" },
+    { name = "bq_errors", type = "STRING", mode = "NULLABLE" }
+  ])
+
+  time_partitioning {
+    type  = "DAY"
+    field = "dlq_ts"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  deletion_protection = true
+}
+
 
 # IAM for Pub/Sub Service Agent to write to DLQ Dataset
 resource "google_bigquery_dataset_iam_member" "pubsub_sa_dlq_editor" {
