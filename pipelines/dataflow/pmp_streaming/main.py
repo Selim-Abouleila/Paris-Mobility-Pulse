@@ -159,7 +159,7 @@ class VelibSnapshotToStationsWithDlq(beam.DoFn):
         try:
             # 1. Filter checks
             # equivalent to existing logic check but explicitly mentioned in req
-            if evt.get("event_type") != "velib_station_status":
+            if evt.get("event_type") != "station_status_snapshot":
                 return
 
             # 2. Validation
