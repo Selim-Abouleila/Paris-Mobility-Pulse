@@ -31,6 +31,8 @@ ACK_SKIPPED = os.getenv("ACK_SKIPPED", "false").lower() == "true"
 PULL_TIMEOUT_S = float(os.getenv("PULL_TIMEOUT_S", "10"))
 PUBLISH_TIMEOUT_S = float(os.getenv("PUBLISH_TIMEOUT_S", "30"))
 
+REPLAY_ENABLED = os.getenv("REPLAY_ENABLED", "false").lower() == "true"
+
 # Pub/Sub modifyAckDeadline max is 600s.
 MAX_ACK_DEADLINE_S = 600
 ACK_DEADLINE_BUFFER_S = 60  # extra safety margin
@@ -62,6 +64,10 @@ def _compute_ack_deadline(batch_size: int, sleep_s: float) -> int:
 
 
 def replay_dlq() -> int:
+    if not REPLAY_ENABLED:
+        logger.warning("REPLAY_ENABLED=false -> exiting (replay paused).")
+        return 0
+
     subscriber = pubsub_v1.SubscriberClient()
     publisher = pubsub_v1.PublisherClient()
 
@@ -165,9 +171,7 @@ def replay_dlq() -> int:
                 for k, v in attributes.items()
                 if not k.startswith("CloudPubSubDeadLetter")
             }
-            clean_attributes.pop(
-                "dl_test", None
-            )  # Corrected to match earlier logic but user used dlq_test. Actually user prompt said dlq_test.
+            clean_attributes.pop("dlq_test", None)
 
             # Add replay metadata
             clean_attributes["replay"] = "true"

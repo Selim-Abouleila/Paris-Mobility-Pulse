@@ -25,7 +25,38 @@ A Cloud Run Job to replay messages from the `station-info` Push DLQ hold subscri
 | `DRY_RUN` | `false` | If `true`, logs republish intent but does not publish or ACK. |
 | `ACK_SKIPPED` | `false` | If `true`, ACKs messages that are skipped due to replay loops. |
 
-## Deployment
+## Deployment & Operations
+
+The service includes an operational CLI tool `replayctl.sh` to simplify project lifecycle management.
+
+### 1. Deploy the Job
+```bash
+./replayctl.sh deploy
+```
+*Note: The job is deployed with `REPLAY_ENABLED=false` by default for safety.*
+
+### 2. Dry Run (Safe Verification)
+```bash
+MAX_MESSAGES=20 QPS=2 ./replayctl.sh dry-run
+```
+
+### 3. Run Replay
+```bash
+MAX_MESSAGES=50 QPS=5 ./replayctl.sh run
+```
+
+### 4. Pause / Resume
+```bash
+./replayctl.sh pause
+./replayctl.sh resume
+```
+
+### 5. Cancel Execution
+```bash
+./replayctl.sh cancel
+```
+
+## Legacy Manual Deployment (Reference)
 
 ### 1. Build & Push Image
 ```bash
@@ -39,18 +70,5 @@ gcloud run jobs create station-info-dlq-replayer \
   --image $IMAGE_TAG \
   --region europe-west9 \
   --service-account pmp-cloud-run-sa@paris-mobility-pulse.iam.gserviceaccount.com \
-  --set-env-vars DRY_RUN=true
-```
-
-## Execution
-
-### Run with Defaults
-```bash
-gcloud run jobs execute station-info-dlq-replayer --region europe-west9
-```
-
-### Run with Overrides (e.g., Live Replay of 100 messages)
-```bash
-gcloud run jobs execute station-info-dlq-replayer --region europe-west9 \
-  --update-env-vars DRY_RUN=false,MAX_MESSAGES=100
+  --set-env-vars DRY_RUN=true,REPLAY_ENABLED=false
 ```

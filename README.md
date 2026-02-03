@@ -11,6 +11,7 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 - **Cloud Run writer** (`pmp-bq-writer`) receives Pub/Sub push messages and inserts into BigQuery raw table.
 - **Dataflow Streaming** (`pmp-velib-curated`) reads from Pub/Sub, validates formats, and writes curated rows to `pmp_curated.velib_station_status`.
 - **Reliability (DLQ)**: Robust Dead Letter Queue (DLQ) implementations for both Metadata (Pub/Sub Push) and Status (Dataflow) paths.
+- **DLQ Replay Worker** (`station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
 - **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
 - **Looker Studio Dashboard** for real-time visualization and trends.
 
@@ -43,6 +44,7 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
     - `pmp-bq-writer`: Ingests JSON events into BigQuery.
     - `pmp-velib-station-info-collector`: Polls static station metadata (Daily).
     - `pmp-velib-station-info-writer`: Ingests metadata into BigQuery.
+    - `pmp-station-info-dlq-replayer`: Cloud Run Job to replay failed metadata events.
 - **Cloud Scheduler**:
     - `velib-poll-every-minute` (Every minute): Triggers status collection.
     - `pmp-velib-station-info-daily` (Daily at 03:10): Triggers daily metadata refresh.
@@ -216,8 +218,8 @@ Detailed guides for each component:
 
 ## Next milestone
 
-- Add automated Replay worker for the DLQ.
-- Implement windowed aggregations in Dataflow.
+- Windowed aggregations in Dataflow.
+- Enrichment Join: Add station names and coordinates to the status stream.
 
 ## Development
 
