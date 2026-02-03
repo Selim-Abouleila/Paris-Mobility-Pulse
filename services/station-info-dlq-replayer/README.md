@@ -1,4 +1,4 @@
-# Station-Info DLQ Replayer
+"# Station-Info DLQ Replayer
 
 A Cloud Run Job to replay messages from the `station-info` Push DLQ hold subscription back to the original topic.
 
@@ -23,7 +23,7 @@ A Cloud Run Job to replay messages from the `station-info` Push DLQ hold subscri
 | `PULL_TIMEOUT_S` | `10` | Timeout for pulling from Pub/Sub. |
 | `PUBLISH_TIMEOUT_S` | `30` | Timeout for publishing to Pub/Sub. |
 | `DRY_RUN` | `false` | If `true`, logs republish intent but does not publish or ACK. |
-| `ACK_SKIPPED` | `false` | If `true`, ACKs messages that are skipped due to replay loops. |
+| `ACK_SKIPPED` | `false` | "If `true`, ACKs messages that are skipped due to replay loops. |
 
 ## Deployment & Operations
 

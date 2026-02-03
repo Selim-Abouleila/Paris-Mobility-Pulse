@@ -1,5 +1,7 @@
 # Paris Mobility Pulse (Streaming Data Engineering on GCP)
 
+[![CI](https://github.com/Selim-Abouleila/Paris-Mobility-Pulse/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Selim-Abouleila/Paris-Mobility-Pulse/actions/workflows/ci.yml)
+
 Real-time pipeline that ingests Paris mobility signals (starting with Vélib station_status), processes events in near real-time, and stores them in BigQuery for analytics.
 
 ## Architecture
@@ -215,6 +217,23 @@ Detailed guides for each component:
 - [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
 - [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
 - [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
+
+## CI / Quality Gates
+
+The project enforces strict quality gates on every Pull Request and push to `main`:
+
+- **Linting**: Rules enforced by `ruff`.
+- **Formatting**: Unified style via `ruff format` (PEP 8 compliant).
+- **Type Checking**: Static analysis via `mypy`.
+- **Testing**: Automated smoke tests using `pytest`.
+- **Infrastructure**: Terraform `fmt`, `validate`, and `init` checks.
+
+### Run locally
+```bash
+make install  # Setup dev tools
+make check    # Run all quality gates locally
+make fmt      # Auto-format code
+```
 
 ## Next milestone
 

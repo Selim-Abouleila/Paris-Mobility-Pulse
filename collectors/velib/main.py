@@ -1,12 +1,11 @@
-import os
 import json
+import os
 from datetime import datetime, timezone
 
+import google.auth
 import requests
 from flask import Flask, jsonify
-
 from google.cloud import pubsub_v1
-import google.auth
 
 app = Flask(__name__)
 

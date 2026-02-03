@@ -1,12 +1,12 @@
+import json
+import logging
 import os
 import time
 import uuid
-import json
-import logging
 from datetime import datetime, timezone
 
-from google.cloud import pubsub_v1
 from google.api_core import exceptions
+from google.cloud import pubsub_v1
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

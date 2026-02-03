@@ -1,0 +1,26 @@
+[tool.ruff]
+# Target Python version
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+# Enable standard rules
+select = ["E", "F", "B", "I"]
+ignore = ["E501"] # Line too long (handled by formatter)
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false # Allow untyped defs initially for easy adoption
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = [
+    "services/bq-writer",
+    "services/station-info-writer",
+    "services/station-info-dlq-replayer",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"

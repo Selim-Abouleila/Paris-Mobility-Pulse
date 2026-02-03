@@ -1,13 +1,14 @@
 import argparse
 import json
 import os
-import apache_beam as beam
-from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.io.gcp.bigquery_tools import RetryStrategy
-from apache_beam.metrics import Metrics
 from datetime import datetime, timezone
 
-from .transforms import parse_event, normalize_event
+import apache_beam as beam
+from apache_beam.io.gcp.bigquery_tools import RetryStrategy
+from apache_beam.metrics import Metrics
+from apache_beam.options.pipeline_options import PipelineOptions
+
+from .transforms import normalize_event, parse_event
 
 
 def _to_int(v):

@@ -1,12 +1,11 @@
-import os
-import json
 import base64
+import json
 import logging
+import os
 
-from flask import Flask, request
-
-from google.cloud import bigquery
 import google.auth
+from flask import Flask, request
+from google.cloud import bigquery
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
