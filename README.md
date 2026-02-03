@@ -57,8 +57,11 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 
 [**View Dashboard**](https://lookerstudio.google.com/reporting/40ae9759-385b-4b7f-9248-325390e3c5df)
 
-![Vélib Dashboard v1](images/pmp_velib_dash_1.png)
-![Vélib Dashboard v2](images/pmp_velib_dash_2_readme.png)
+<p align="center">
+  <img src="images/pmp_velib_dash_1.png" alt="Vélib Dashboard v1" width="800">
+  <br>
+  <img src="images/pmp_velib_dash_2_readme.png" alt="Vélib Dashboard v2" width="800">
+</p>
 
 See [08 - Vélib Dashboard](./docs/08-velib-dashboard.md) for details on data sources and metrics.
 
@@ -205,20 +208,6 @@ Captures delivery failures for the `station-info` metadata path. If the Cloud Ru
 > [!TIP]
 > Use the `scripts/test_dlq.py` utility to end-to-end verify these error paths by injecting deliberate failures into the pipeline.
 
-## Documentation
-
-Detailed guides for each component:
-- [00 - Bootstrap](docs/00-bootstrap.md) - Initial project setup
-- [01 - MVP Pipeline](docs/01-mvp-pipeline.md) - Cloud Run ingestion setup
-- [02 - Ops & Troubleshooting](docs/02-ops-troubleshooting.md) - Operational procedures
-- [03 - Terraform IAC](docs/03-terraform-iac.md) - Infrastructure as Code setup
-- [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
-- [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
-- [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
-- [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
-- [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
-- [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
-
 ## CI / Quality Gates
 
 The project enforces strict quality gates on every Pull Request and push to `main`:
@@ -235,12 +224,6 @@ make install  # Setup dev tools
 make check    # Run all quality gates locally
 make fmt      # Auto-format code
 ```
-
-## Next milestone
-
-- Windowed aggregations in Dataflow.
-- Enrichment Join: Add station names and coordinates to the status stream.
-
 ## Development
 
 To maintain code quality, please run the quality gates before pushing:
@@ -250,3 +233,20 @@ make install  # Setup dev tools
 make fmt      # Format code (ruff + terraform)
 make check    # Check formatting, types, and tests
 ```
+## Documentation
+
+Detailed guides for each component:
+- [00 - Bootstrap](docs/00-bootstrap.md) - Initial project setup
+- [01 - MVP Pipeline](docs/01-mvp-pipeline.md) - Cloud Run ingestion setup
+- [02 - Ops & Troubleshooting](docs/02-ops-troubleshooting.md) - Operational procedures
+- [03 - Terraform IAC](docs/03-terraform-iac.md) - Infrastructure as Code setup
+- [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
+- [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
+- [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
+- [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
+- [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
+- [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
+
+## Next milestone
+
+- (Optional) Move windowed aggregations from BigQuery MVs to Dataflow.
