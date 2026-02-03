@@ -216,13 +216,15 @@ LIMIT 10
 
 ## 8. Context: Phase 1 & Future Expansion
 
-This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery" with integrated error handling.
+This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery" with **Reliability & DLQ** integrated from the start.
+
+For a detailed breakdown of the error capture mechanism and operational procedures, see [09 - Reliability: DLQ + Replay](file:///c:/Git%20Projects/Paris-Mobility-Pulse/docs/09-reliability-dlq-replay.md).
 
 **Future Roadmap**
 In later milestones, the Dataflow logic will be expanded to support:
 *   **Windowed Aggregations**: Calculating rolling averages or activity metrics over time windows.
 *   **Join & Enrichment**: Joining status stream with `station_information` (slowly changing dimension) to add `lat/lon` and names to the stream.
-*   **DLQ Replay**: Automated or manual replay of fixed DLQ records back into the pipeline.
+*   **DLQ Replay**: Automated or manual replay of fixed DLQ records back into the pipeline (Currently, DLQ captures data but Replay logic is manual/TBD).
 *   **Multiple Outputs**: Using Beam Side Outputs to write to different tables from a single pass.
 
 Currently, the focus is on a stable, error-aware streaming writer.
