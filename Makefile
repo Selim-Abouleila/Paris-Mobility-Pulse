@@ -5,7 +5,7 @@ all: check
 
 # Install development dependencies
 install:
-	pip install ruff mypy pytest
+	pip install ruff mypy pytest types-requests types-flask
 
 # Format code
 fmt:
