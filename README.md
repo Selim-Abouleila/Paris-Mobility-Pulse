@@ -13,7 +13,7 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 - **Cloud Run writer** (`pmp-bq-writer`) receives Pub/Sub push messages and inserts into BigQuery raw table.
 - **Dataflow Streaming** (`pmp-velib-curated`) reads from Pub/Sub, validates formats, and writes curated rows to `pmp_curated.velib_station_status`.
 - **Reliability (DLQ)**: Robust Dead Letter Queue (DLQ) implementations for both Metadata (Pub/Sub Push) and Status (Dataflow) paths.
-- **DLQ Replay Worker** (`station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
+- **DLQ Replay Worker** (`pmp-station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
 - **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
 - **Looker Studio Dashboard** for real-time visualization and trends.
 
@@ -58,6 +58,7 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 [**View Dashboard**](https://lookerstudio.google.com/reporting/40ae9759-385b-4b7f-9248-325390e3c5df)
 
 ![Vélib Dashboard v1](images/pmp_velib_dash_1.png)
+![Vélib Dashboard v2](images/pmp_velib_dash_2_readme.png)
 
 See [08 - Vélib Dashboard](./docs/08-velib-dashboard.md) for details on data sources and metrics.
 
@@ -97,7 +98,7 @@ A monthly budget alert is configured at **$40/month** to provide a safety guardr
 
 ### Disclaimer: Dataflow is optional for this MVP
 
-This curated table could have been produced without Dataflow by **Cloud Run writer directly flattening to pmp_curated** or **BigQuery SQL (views/materialized views) over pmp_raw**.
+This curated table could have been produced without Dataflow by **Cloud Run writer directly flattening to `pmp_curated`** or **BigQuery SQL (views/materialized views) over `pmp_raw`**.
 
 Dataflow was chosen because it demonstrates **"Professional Data Engineer" streaming patterns** and sets up safeguards for future complexity (dedup, windowing, DLQ, replay).
 
@@ -242,15 +243,10 @@ make fmt      # Auto-format code
 
 ## Development
 
-To maintain code quality, please run the following commands before pushing:
+To maintain code quality, please run the quality gates before pushing:
 
-### Installation
 ```bash
-make install
-```
-
-### Formatting
-```bash
-make fmt    # Format code (ruff + terraform)
-make check  # Check formatting and linting
+make install  # Setup dev tools
+make fmt      # Format code (ruff + terraform)
+make check    # Check formatting, types, and tests
 ```
