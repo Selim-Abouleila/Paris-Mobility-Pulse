@@ -53,7 +53,9 @@ def _compute_ack_deadline(batch_size: int, sleep_s: float) -> int:
     We ack each message after publishing, but messages later in the batch wait.
     """
     # Worst-case wait before processing last msg = (batch_size-1)*sleep_s
-    estimated_processing_s = int((max(0, batch_size - 1) * sleep_s) + ACK_DEADLINE_BUFFER_S)
+    estimated_processing_s = int(
+        (max(0, batch_size - 1) * sleep_s) + ACK_DEADLINE_BUFFER_S
+    )
 
     # Clamp to Pub/Sub max per request.
     return min(MAX_ACK_DEADLINE_S, max(10, estimated_processing_s))
@@ -71,7 +73,11 @@ def replay_dlq() -> int:
     logger.info("Dest Topic: %s", DEST_TOPIC)
     logger.info(
         "Config: MAX_MESSAGES=%s BATCH_SIZE=%s QPS=%s DRY_RUN=%s ACK_SKIPPED=%s",
-        MAX_MESSAGES, BATCH_SIZE, QPS, DRY_RUN, ACK_SKIPPED
+        MAX_MESSAGES,
+        BATCH_SIZE,
+        QPS,
+        DRY_RUN,
+        ACK_SKIPPED,
     )
 
     stats = {"pulled": 0, "republished": 0, "acked": 0, "skipped": 0, "failed": 0}
@@ -83,14 +89,19 @@ def replay_dlq() -> int:
         # If QPS is extremely low, batch processing might exceed 600s max ack deadline.
         # In that case, shrink the batch.
         if sleep_s > 0:
-            max_batch_that_fits = int((MAX_ACK_DEADLINE_S - ACK_DEADLINE_BUFFER_S) / sleep_s) + 1
+            max_batch_that_fits = (
+                int((MAX_ACK_DEADLINE_S - ACK_DEADLINE_BUFFER_S) / sleep_s) + 1
+            )
             if max_batch_that_fits < 1:
                 max_batch_that_fits = 1
             if batch_size > max_batch_that_fits:
                 logger.warning(
                     "BATCH_SIZE=%s too large for QPS=%s (ack deadline max %ss). "
                     "Reducing batch_size to %s.",
-                    batch_size, QPS, MAX_ACK_DEADLINE_S, max_batch_that_fits
+                    batch_size,
+                    QPS,
+                    MAX_ACK_DEADLINE_S,
+                    max_batch_that_fits,
                 )
                 batch_size = max_batch_that_fits
 
@@ -132,7 +143,9 @@ def replay_dlq() -> int:
 
             # Loop guard: treat any truthy replay marker as already replayed.
             if str(attributes.get("replay", "")).lower() == "true":
-                logger.info("Skipping message %s (already replay=true).", msg.message_id)
+                logger.info(
+                    "Skipping message %s (already replay=true).", msg.message_id
+                )
                 stats["skipped"] += 1
                 if ACK_SKIPPED and not DRY_RUN:
                     try:
@@ -141,15 +154,20 @@ def replay_dlq() -> int:
                         )
                         stats["acked"] += 1
                     except Exception as e:
-                        logger.error("Failed to ack skipped message %s: %s", msg.message_id, e)
+                        logger.error(
+                            "Failed to ack skipped message %s: %s", msg.message_id, e
+                        )
                 continue
 
             # Remove DLQ metadata + drill flags
             clean_attributes = {
-                k: v for k, v in attributes.items()
+                k: v
+                for k, v in attributes.items()
                 if not k.startswith("CloudPubSubDeadLetter")
             }
-            clean_attributes.pop("dl_test", None) # Corrected to match earlier logic but user used dlq_test. Actually user prompt said dlq_test.
+            clean_attributes.pop(
+                "dl_test", None
+            )  # Corrected to match earlier logic but user used dlq_test. Actually user prompt said dlq_test.
 
             # Add replay metadata
             clean_attributes["replay"] = "true"
@@ -160,14 +178,20 @@ def replay_dlq() -> int:
             clean_attributes = {str(k): str(v) for k, v in clean_attributes.items()}
 
             if DRY_RUN:
-                logger.info("[DRY RUN] Would republish message %s -> %s attrs=%s",
-                            msg.message_id, DEST_TOPIC, clean_attributes)
+                logger.info(
+                    "[DRY RUN] Would republish message %s -> %s attrs=%s",
+                    msg.message_id,
+                    DEST_TOPIC,
+                    clean_attributes,
+                )
                 stats["republished"] += 1
                 # No ack in dry-run
                 continue
 
             try:
-                future = publisher.publish(DEST_TOPIC, data=msg.data, **clean_attributes)
+                future = publisher.publish(
+                    DEST_TOPIC, data=msg.data, **clean_attributes
+                )
                 new_msg_id = future.result(timeout=PUBLISH_TIMEOUT_S)
                 stats["republished"] += 1
                 logger.info("Republished %s -> %s", msg.message_id, new_msg_id)
