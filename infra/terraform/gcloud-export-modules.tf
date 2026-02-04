@@ -1,6 +1,4 @@
-provider "google" {
-  project = "paris-mobility-pulse"
-}
+
 
 
 module "gcloud-export-projects-paris-mobility-pulse-PubSubSubscription" {

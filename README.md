@@ -5,7 +5,7 @@
 
 Real-time pipeline that ingests Paris mobility signals (starting with Vélib station_status), processes events in near real-time, and stores them in BigQuery for analytics.
 
-## 🚀 Quickstart (The Golden Path)
+## Quickstart (The Golden Path)
 
 Deploy this entire project to your own Google Cloud project in < 10 minutes.
 
