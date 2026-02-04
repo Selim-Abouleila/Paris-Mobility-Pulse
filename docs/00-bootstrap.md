@@ -3,7 +3,8 @@
 # Bootstrap & Prerequisites
 
 ## 1. Prerequisites
-- **Google Cloud Project** created (ID: `paris-mobility-pulse` or your own).
+- **Google Cloud Project** created (e.g., `my-mobility-project`). 
+- **Project ID**: You MUST use your own unique Project ID. Do NOT use `paris-mobility-pulse`.
 - **Billing enabled** for the project.
 - **Local Tools**:
     - `gcloud` (Authenticated)
@@ -16,8 +17,13 @@ Copy the example configuration and set your project details:
 
 ```bash
 cp .env.example .env
-nano .env  # Set PROJECT_ID=...
+# Edit .env and set your PROJECT_ID (NOT paris-mobility-pulse)
+nano .env  
 ```
+
+> [!CAUTION]
+> **Do not use the string `paris-mobility-pulse` as your Project ID.** 
+> This is a global identifier; you must use the ID of the GCP project you just created.
 
 ## 3. Automated Bootstrap
 Instead of manually clicking buttons in the console, run:

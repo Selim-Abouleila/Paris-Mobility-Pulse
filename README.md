@@ -10,10 +10,15 @@ Real-time pipeline that ingests Paris mobility signals (starting with Vélib sta
 Deploy this entire project to your own Google Cloud project in < 10 minutes.
 
 ### 1. Configure
+Set up your environment variables (see [00-bootstrap.md](docs/00-bootstrap.md) for details):
+
 ```bash
 cp .env.example .env
-# Edit .env and set your PROJECT_ID
+# Edit .env and set YOUR_OWN_PROJECT_ID
 ```
+
+> [!IMPORTANT]
+> **Use your own Project ID.** Do not use `paris-mobility-pulse`.
 
 ### 2. Bootstrap & Deploy
 ```bash
@@ -105,13 +110,13 @@ See [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for de
 Pause ingestion when not demoing:
 
 ```bash
-gcloud scheduler jobs pause velib-poll-every-minute --project=paris-mobility-pulse --location=europe-west1
+gcloud scheduler jobs pause velib-poll-every-minute --project=YOUR_PROJECT_ID --location=europe-west1
 ```
 
 Resume:
 
 ```bash
-gcloud scheduler jobs resume velib-poll-every-minute --project=paris-mobility-pulse --location=europe-west1
+gcloud scheduler jobs resume velib-poll-every-minute --project=YOUR_PROJECT_ID --location=europe-west1
 ```
 
 ## Budget Alert (Cost Guardrail)
@@ -148,7 +153,8 @@ Run the Apache Beam pipeline on DataflowRunner to write curated rows to BigQuery
 ### Run the Pipeline
 
 ```bash
-PROJECT_ID="paris-mobility-pulse"
+```bash
+PROJECT_ID="YOUR_PROJECT_ID"
 REGION="europe-west9"
 BUCKET="gs://pmp-dataflow-${PROJECT_ID}"
 INPUT_SUB="projects/${PROJECT_ID}/subscriptions/pmp-events-dataflow-sub"
