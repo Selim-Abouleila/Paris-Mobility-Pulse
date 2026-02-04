@@ -39,3 +39,10 @@ If the bootstrap completes successfully, you are ready to deploy:
 ```bash
 make deploy
 ```
+
+> [!TIP]
+> **Troubleshooting: Permission Denied**
+> If you encounter a `Permission denied` error when running make commands (e.g., related to `check_env.sh`), simply make the scripts executable:
+> ```bash
+> chmod +x scripts/*.sh scripts/setup/*.sh
+> ```

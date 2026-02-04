@@ -34,6 +34,7 @@ gcloud services enable serviceusage.googleapis.com \
     cloudresourcemanager.googleapis.com \
     servicecontrol.googleapis.com \
     iam.googleapis.com \
+    cloudbuild.googleapis.com \
     --project="$PROJECT_ID"
 
 echo -e "${GREEN}  OK: Base APIs enabled.${NC}"
