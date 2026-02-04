@@ -131,7 +131,6 @@ resource "google_pubsub_subscription" "pmp_events_to_bq_sub" {
   }
 
   expiration_policy {
-    ttl = "" 
+    ttl = ""
   }
 }
-
