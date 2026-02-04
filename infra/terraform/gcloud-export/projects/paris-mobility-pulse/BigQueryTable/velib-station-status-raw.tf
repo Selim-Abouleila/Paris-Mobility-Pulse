@@ -6,7 +6,7 @@ resource "google_bigquery_table" "velib_station_status_raw" {
     managed-by-cnrm = "true"
   }
 
-  project  = "paris-mobility-pulse"
+  
   schema   = "[{\"mode\":\"REQUIRED\",\"name\":\"ingest_ts\",\"type\":\"TIMESTAMP\"},{\"mode\":\"NULLABLE\",\"name\":\"event_ts\",\"type\":\"TIMESTAMP\"},{\"mode\":\"REQUIRED\",\"name\":\"source\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"event_type\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"key\",\"type\":\"STRING\"},{\"mode\":\"REQUIRED\",\"name\":\"payload\",\"type\":\"JSON\"}]"
   table_id = "velib_station_status_raw"
 

@@ -16,9 +16,7 @@ module "gcloud-export-paris-mobility-pulse-BigQueryDataset-europe-west9" {
 }
 
 
-module "gcloud-export-projects-paris-mobility-pulse-IAMServiceAccount" {
-  source = "./gcloud-export/projects/paris-mobility-pulse/IAMServiceAccount"
-}
+
 
 
 module "gcloud-export-19684349165-Service" {

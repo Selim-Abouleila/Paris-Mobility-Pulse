@@ -10,7 +10,7 @@ resource "google_cloud_run_v2_service" "pmp_bq_writer" {
   launch_stage = "GA"
   location     = "europe-west9"
   name         = "pmp-bq-writer"
-  project      = "paris-mobility-pulse"
+  
 
   template {
     containers {

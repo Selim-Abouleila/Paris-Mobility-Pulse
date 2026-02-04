@@ -4,6 +4,6 @@ resource "google_pubsub_topic" "pmp_events" {
   }
 
   name    = "pmp-events"
-  project = "paris-mobility-pulse"
+  
 }
 # terraform import google_pubsub_topic.pmp_events projects/paris-mobility-pulse/topics/pmp-events

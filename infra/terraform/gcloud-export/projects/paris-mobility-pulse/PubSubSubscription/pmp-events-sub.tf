@@ -11,7 +11,7 @@ resource "google_pubsub_subscription" "pmp_events_sub" {
 
   message_retention_duration = "604800s"
   name                       = "pmp-events-sub"
-  project                    = "paris-mobility-pulse"
+  
   topic                      = "projects/paris-mobility-pulse/topics/pmp-events"
 }
 # terraform import google_pubsub_subscription.pmp_events_sub projects/paris-mobility-pulse/subscriptions/pmp-events-sub

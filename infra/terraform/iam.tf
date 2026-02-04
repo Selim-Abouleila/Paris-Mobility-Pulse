@@ -50,16 +50,20 @@ resource "google_service_account_iam_member" "dataflow_service_agent_impersonati
 # ========================
 
 # Reference existing service accounts (created manually, not managed by this TF)
-data "google_service_account" "collector_sa" {
-  account_id = "pmp-collector-sa"
+# Service Accounts (Migrated from export modules to be managed here)
+resource "google_service_account" "collector_sa" {
+  account_id   = "pmp-collector-sa"
+  display_name = "PMP Cloud Run Collector"
 }
 
-data "google_service_account" "pubsub_push_sa" {
-  account_id = "pmp-pubsub-push-sa"
+resource "google_service_account" "pubsub_push_sa" {
+  account_id   = "pmp-pubsub-push-sa"
+  display_name = "PMP Pub/Sub Push SA"
 }
 
-data "google_service_account" "scheduler_sa" {
-  account_id = "pmp-scheduler-sa"
+resource "google_service_account" "scheduler_sa" {
+  account_id   = "pmp-scheduler-sa"
+  display_name = "PMP Cloud Scheduler SA"
 }
 
 # Create Station Info Writer Service Account
@@ -73,7 +77,7 @@ resource "google_pubsub_topic_iam_member" "collector_publisher" {
   project = var.project_id
   topic   = google_pubsub_topic.station_info_topic.name
   role    = "roles/pubsub.publisher"
-  member  = "serviceAccount:${data.google_service_account.collector_sa.email}"
+  member  = "serviceAccount:${google_service_account.collector_sa.email}"
 }
 
 # Writer SA: BigQuery Data Editor (project-level, consistent with existing pattern)
@@ -105,7 +109,7 @@ resource "google_cloud_run_v2_service_iam_member" "push_sa_invoke_writer" {
   location = var.region
   name     = google_cloud_run_v2_service.station_info_writer.name
   role     = "roles/run.invoker"
-  member   = "serviceAccount:${data.google_service_account.pubsub_push_sa.email}"
+  member   = "serviceAccount:${google_service_account.pubsub_push_sa.email}"
 }
 
 # Scheduler SA: Cloud Run Invoker on Collector service
@@ -114,12 +118,12 @@ resource "google_cloud_run_v2_service_iam_member" "scheduler_sa_invoke_collector
   location = var.region
   name     = google_cloud_run_v2_service.station_info_collector.name
   role     = "roles/run.invoker"
-  member   = "serviceAccount:${data.google_service_account.scheduler_sa.email}"
+  member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
 }
 
 # Cloud Scheduler Service Agent: Token Creator for Scheduler SA
 resource "google_service_account_iam_member" "scheduler_agent_token_creator" {
-  service_account_id = data.google_service_account.scheduler_sa.name
+  service_account_id = google_service_account.scheduler_sa.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-cloudscheduler.iam.gserviceaccount.com"
 }
