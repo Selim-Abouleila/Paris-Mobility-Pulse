@@ -28,6 +28,5 @@ resource "google_bigquery_dataset" "pmp_raw" {
 
   location              = "europe-west9"
   max_time_travel_hours = "168"
-  
 }
 # terraform import google_bigquery_dataset.pmp_raw projects/paris-mobility-pulse/datasets/pmp_raw

@@ -12,7 +12,6 @@ resource "google_storage_bucket" "run_sources_paris_mobility_pulse_europe_west9"
 
   location                 = "EUROPE-WEST9"
   name                     = "run-sources-paris-mobility-pulse-europe-west9"
-  
   public_access_prevention = "inherited"
 
   soft_delete_policy {

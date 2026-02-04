@@ -10,7 +10,6 @@ resource "google_cloud_run_v2_service" "pmp_velib_collector" {
   launch_stage = "GA"
   location     = "europe-west9"
   name         = "pmp-velib-collector"
-  
 
   template {
     containers {

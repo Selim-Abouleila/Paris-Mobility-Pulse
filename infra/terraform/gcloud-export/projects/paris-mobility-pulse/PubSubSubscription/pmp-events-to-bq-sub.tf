@@ -11,7 +11,6 @@ resource "google_pubsub_subscription" "pmp_events_to_bq_sub" {
 
   message_retention_duration = "604800s"
   name                       = "pmp-events-to-bq-sub"
-  
 
   push_config {
     oidc_token {
