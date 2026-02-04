@@ -3,6 +3,37 @@
 # Default target
 all: check
 
+# --------------------------
+# Golden Path (Start Here)
+# --------------------------
+
+# 1. Setup project (Enable APIs, Init Terraform)
+bootstrap:
+	@chmod +x scripts/setup/check_env.sh scripts/setup/bootstrap.sh || true
+	@./scripts/setup/bootstrap.sh
+
+# 2. Deploy Infrastructure (Terraform)
+deploy:
+	@./scripts/setup/check_env.sh
+	@echo "==> Building Containers..."
+	@chmod +x scripts/setup/build.sh
+	@./scripts/setup/build.sh
+	@echo "==> Deploying Infrastructure..."
+	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" -auto-approve
+
+# 3. Start Demo (Resume schedulers, start streaming)
+demo-up:
+	@./scripts/setup/check_env.sh
+	@./scripts/pmpctl.sh up
+
+# 4. Stop Demo (Pause schedulers, cancel streaming)
+demo-down:
+	@./scripts/pmpctl.sh down
+
+# --------------------------
+# Dev / CI
+# --------------------------
+
 # Install development dependencies
 install:
 	pip install ruff mypy pytest types-requests types-flask

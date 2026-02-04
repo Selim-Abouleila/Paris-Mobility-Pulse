@@ -2,7 +2,30 @@
 
 [![CI](https://github.com/Selim-Abouleila/Paris-Mobility-Pulse/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Selim-Abouleila/Paris-Mobility-Pulse/actions/workflows/ci.yml)
 
+
 Real-time pipeline that ingests Paris mobility signals (starting with Vélib station_status), processes events in near real-time, and stores them in BigQuery for analytics.
+
+## 🚀 Quickstart (The Golden Path)
+
+Deploy this entire project to your own Google Cloud project in < 10 minutes.
+
+### 1. Configure
+```bash
+cp .env.example .env
+# Edit .env and set your PROJECT_ID
+```
+
+### 2. Bootstrap & Deploy
+```bash
+make bootstrap   # Enables APIs, Inits Terraform
+make deploy      # Builds Containers, Deploys Infrastructure
+```
+
+### 3. Run Demo
+```bash
+make demo-up     # Starts pipelines & simulated traffic
+make demo-down   # Stops all cost-generating resources
+```
 
 ## Architecture
 
