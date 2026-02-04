@@ -79,7 +79,7 @@ resource "google_pubsub_subscription" "station_info_push_sub" {
     push_endpoint = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app/pubsub"
 
     oidc_token {
-      service_account_email = data.google_service_account.pubsub_push_sa.email
+      service_account_email = google_service_account.pubsub_push_sa.email
       audience              = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app"
     }
   }
@@ -113,3 +113,25 @@ resource "google_pubsub_subscription_iam_member" "source_subscriber_sa" {
   role         = "roles/pubsub.subscriber"
   member       = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
 }
+
+# Main Event Subscription (Push to BQ Writer)
+resource "google_pubsub_subscription" "pmp_events_to_bq_sub" {
+  name  = "pmp-events-to-bq-sub"
+  topic = data.google_pubsub_topic.pmp_events.name
+
+  ack_deadline_seconds = 60
+
+  push_config {
+    push_endpoint = "${google_cloud_run_v2_service.pmp_bq_writer.uri}/pubsub"
+
+    oidc_token {
+      service_account_email = google_service_account.pubsub_push_sa.email
+      audience              = google_cloud_run_v2_service.pmp_bq_writer.uri
+    }
+  }
+
+  expiration_policy {
+    ttl = "" 
+  }
+}
+

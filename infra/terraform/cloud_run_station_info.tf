@@ -9,7 +9,7 @@ resource "google_cloud_run_v2_service" "station_info_collector" {
   ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   template {
-    service_account = data.google_service_account.collector_sa.email
+    service_account = google_service_account.collector_sa.email
 
     containers {
       image = "gcr.io/${var.project_id}/velib-collector:latest" # Placeholder, built via Cloud Build

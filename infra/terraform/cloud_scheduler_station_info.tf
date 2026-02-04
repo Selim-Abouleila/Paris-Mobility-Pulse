@@ -13,7 +13,7 @@ resource "google_cloud_scheduler_job" "station_info_daily" {
     uri         = "${google_cloud_run_v2_service.station_info_collector.uri}/collect"
 
     oidc_token {
-      service_account_email = data.google_service_account.scheduler_sa.email
+      service_account_email = google_service_account.scheduler_sa.email
       audience              = google_cloud_run_v2_service.station_info_collector.uri
     }
   }

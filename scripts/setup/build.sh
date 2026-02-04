@@ -22,10 +22,9 @@ echo -e "${BLUE}==> Building Container Images for Project: $PROJECT_ID${NC}"
 # Format: "ImageName:DirectoryPath"
 # We map the concise image name used in Terraform to the source directory.
 declare -A IMAGES=(
-    ["velib-collector"]="services/pmp-velib-collector"
-    ["station-info-writer"]="services/pmp-velib-station-info-writer"
-    ["station-info-collector"]="services/pmp-velib-station-info-collector"
-    ["bq-writer"]="services/pmp-bq-writer"
+    ["velib-collector"]="collectors/velib"
+    ["station-info-writer"]="services/station-info-writer"
+    ["bq-writer"]="services/bq-writer"
 )
 
 # 3. Build Loop
