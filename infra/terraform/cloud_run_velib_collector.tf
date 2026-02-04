@@ -11,7 +11,7 @@ resource "google_cloud_run_v2_service" "pmp_velib_collector" {
 
       env {
         name  = "TOPIC_ID"
-        value = "pmp-events"
+        value = data.google_pubsub_topic.pmp_events.name
       }
       env {
         name  = "FEED_URL"

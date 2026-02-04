@@ -76,11 +76,11 @@ resource "google_pubsub_subscription" "station_info_push_sub" {
   ack_deadline_seconds = 60
 
   push_config {
-    push_endpoint = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app/pubsub"
+    push_endpoint = "${google_cloud_run_v2_service.station_info_writer.uri}/pubsub"
 
     oidc_token {
       service_account_email = google_service_account.pubsub_push_sa.email
-      audience              = "https://pmp-velib-station-info-writer-2cyaolkqiq-od.a.run.app"
+      audience              = google_cloud_run_v2_service.station_info_writer.uri
     }
   }
 

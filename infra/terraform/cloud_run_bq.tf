@@ -11,7 +11,7 @@ resource "google_cloud_run_v2_service" "pmp_bq_writer" {
 
       env {
         name  = "BQ_DATASET"
-        value = "pmp_raw"
+        value = google_bigquery_dataset.pmp_raw.dataset_id
       }
       env {
         name  = "BQ_TABLE"

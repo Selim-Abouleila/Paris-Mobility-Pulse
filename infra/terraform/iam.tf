@@ -121,6 +121,24 @@ resource "google_cloud_run_v2_service_iam_member" "scheduler_sa_invoke_collector
   member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
 }
 
+# Push SA: Cloud Run Invoker on BQ Writer service
+resource "google_cloud_run_v2_service_iam_member" "push_sa_invoke_bq_writer" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.pmp_bq_writer.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.pubsub_push_sa.email}"
+}
+
+# Scheduler SA: Cloud Run Invoker on Velib Collector service
+resource "google_cloud_run_v2_service_iam_member" "scheduler_sa_invoke_velib_collector" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.pmp_velib_collector.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
+}
+
 # Cloud Scheduler Service Agent: Token Creator for Scheduler SA
 resource "google_service_account_iam_member" "scheduler_agent_token_creator" {
   service_account_id = google_service_account.scheduler_sa.name
