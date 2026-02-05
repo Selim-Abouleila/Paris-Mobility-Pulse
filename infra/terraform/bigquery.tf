@@ -161,7 +161,7 @@ resource "google_bigquery_table" "velib_station_information_latest" {
           *,
           ROW_NUMBER() OVER (
             PARTITION BY station_id
-            ORDER BY last_updated DESC, ingest_ts DESC
+            ORDER BY event_ts DESC, ingest_ts DESC
           ) AS rn
         FROM `${var.project_id}.pmp_curated.velib_station_information`
       )

@@ -50,6 +50,15 @@ gcloud pubsub topics delete pmp-events --project="$PROJECT_ID" --quiet 2>/dev/nu
 gcloud pubsub topics delete pmp-velib-station-info --project="$PROJECT_ID" --quiet 2>/dev/null || true
 gcloud pubsub topics delete pmp-velib-station-info-push-dlq --project="$PROJECT_ID" --quiet 2>/dev/null || true
 
+echo -e "${YELLOW}==> Deleting Pub/Sub Subscriptions...${RESET}"
+gcloud pubsub subscriptions list --project="$PROJECT_ID" --format="value(name)" | grep "pmp-" | while read -r sub; do
+  echo "    Deleting Subscription: $sub"
+  gcloud pubsub subscriptions delete "$sub" --project="$PROJECT_ID" --quiet 2>/dev/null || true
+done
+
+echo -e "${YELLOW}==> Deleting Dataflow Bucket...${RESET}"
+gsutil rm -r "gs://pmp-dataflow-${PROJECT_ID}" 2>/dev/null || true
+
 echo -e "${YELLOW}==> Deleting Cloud Run Services...${RESET}"
 gcloud run services list --project="$PROJECT_ID" --format="value(name)" | grep "^pmp-" | while read -r svc; do
     echo "    Deleting Cloud Run service: $svc"
