@@ -5,6 +5,16 @@ set -euo pipefail
 # Paris Mobility Pulse - Demo Control
 # --------------------------
 
+
+# Validates environment and loads variables if needed
+if [ -z "$PROJECT_ID" ]; then
+    if [ -f ".env" ]; then
+        source .env
+    elif [ -f "$(dirname "$0")/../.env" ]; then
+        source "$(dirname "$0")/../.env"
+    fi
+fi
+
 # Defaults (override by exporting env vars before running)
 PROJECT_ID="${PROJECT_ID:-paris-mobility-pulse}"
 REGION="${REGION:-europe-west9}"

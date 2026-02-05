@@ -30,6 +30,11 @@ demo-up:
 demo-down:
 	@./scripts/pmpctl.sh down
 
+# 5. Emergency Cleanup (Fix "Already Exists" errors)
+clean-cloud:
+	@chmod +x scripts/setup/clean_project.sh
+	@./scripts/setup/clean_project.sh
+
 # --------------------------
 # Dev / CI
 # --------------------------

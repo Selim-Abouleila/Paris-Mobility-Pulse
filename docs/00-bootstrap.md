@@ -59,3 +59,12 @@ make deploy
 > **Fix:**
 > 1. Run `gcloud auth login --update-adc` inside Cloud Shell.
 > 2. If that hangs, close the tab and open a new Cloud Shell instance.
+
+## 5. Security & Safety Note
+You might wonder: *If I run this, can it accidentally modify someone else's project?*
+
+**No. It is completely safe.**
+
+1.  **Authentication Required**: The script uses your local credentials (`gcloud auth login`). It cannot access any project you don't own.
+2.  **Local-Only Cleanup**: The `rm terraform.tfstate` command in `bootstrap.sh` only deletes a **local text file** on your machine to ensure a clean install. It sends no delete commands to Google Cloud.
+3.  **Project Isolation**: If you accidentally set someone else's Project ID in `.env`, the script will simply fail with a `Permission Denied` error because you are not an Owner of that project.
