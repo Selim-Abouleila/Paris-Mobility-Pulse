@@ -1,5 +1,5 @@
 resource "google_cloud_scheduler_job" "velib_poll_every_minute" {
-  name        = "velib-poll-every-minute"
+  name        = "pmp-velib-poll-every-minute"
   description = "Triggers the Velib station status collector every minute"
   schedule    = "* * * * *"
   time_zone   = "Europe/Paris"

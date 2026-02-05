@@ -2,6 +2,13 @@
 
 The `scripts/pmpctl.sh` script provides one-command control over the cost-generating components of the Paris Mobility Pulse pipeline. This is the recommended way to start and stop the project for demos.
 
+> [!IMPORTANT]
+> **Project Targeting**: This script respects the `PROJECT_ID` defined in your `.env` file.
+> *   If you want to control Prod: `PROJECT_ID=paris-mobility-pulse` in `.env`.
+> *   If you want to control Dev: `PROJECT_ID=your-dev-project-id` in `.env`.
+>
+> If `.env` is missing, it defaults to `paris-mobility-pulse`, which will fail if you don't have permissions or if resources don't exist there.
+
 ## Purpose
 
 To minimize Google Cloud costs, we only run the processing infrastructure when actively demoing or testing. On GCP, the two main cost generators for this project are:
