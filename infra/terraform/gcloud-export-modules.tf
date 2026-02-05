@@ -9,16 +9,6 @@ module "gcloud-export-projects-paris-mobility-pulse-PubSubSubscription" {
 module "gcloud-export-projects-paris-mobility-pulse-PubSubTopic" {
   source = "./gcloud-export/projects/paris-mobility-pulse/PubSubTopic"
 }
-
-
-module "gcloud-export-paris-mobility-pulse-BigQueryDataset-europe-west9" {
-  source = "./gcloud-export/paris-mobility-pulse/BigQueryDataset/europe-west9"
-}
-
-
-
-
-
 module "gcloud-export-19684349165-Service" {
   source = "./gcloud-export/19684349165/Service"
 }

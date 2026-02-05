@@ -40,7 +40,13 @@ resource "google_bigquery_dataset" "pmp_marts" {
 # Ops Dataset (DLQ)
 resource "google_bigquery_dataset" "pmp_ops" {
   dataset_id = "pmp_ops"
-  location   = "europe-west9"
+  location   = var.region
+}
+
+# Raw Dataset (Landing Zone)
+resource "google_bigquery_dataset" "pmp_raw" {
+  dataset_id = "pmp_raw"
+  location   = var.region
 }
 
 # DLQ Table (Pub/Sub Station Info)
@@ -113,7 +119,7 @@ resource "google_bigquery_table" "velib_latest_state" {
             PARTITION BY station_id
             ORDER BY event_ts DESC, ingest_ts DESC
           ) AS rn
-        FROM `paris-mobility-pulse.pmp_curated.velib_station_status`
+        FROM `${var.project_id}.pmp_curated.velib_station_status`
       )
       WHERE rn = 1
     SQL
@@ -165,7 +171,7 @@ resource "google_bigquery_table" "velib_totals_hourly_mv" {
           SUM(num_bikes_available) as total_bikes,
           SUM(num_docks_available) as total_docks,
           COUNTIF(num_bikes_available = 0) as empty_stations
-        FROM `paris-mobility-pulse.pmp_curated.velib_station_status`
+        FROM `${var.project_id}.pmp_curated.velib_station_status`
         GROUP BY 1, 2
       )
       SELECT
@@ -199,10 +205,10 @@ resource "google_bigquery_table" "velib_totals_hourly" {
         DATETIME(base.hour_ts_paris, "Europe/Paris") as hour_paris,
         info.total_stations_known,
         SAFE_DIVIDE(base.avg_stations_reporting, info.total_stations_known) as avg_coverage_ratio
-      FROM `paris-mobility-pulse.pmp_marts.velib_totals_hourly_aggregate` base
+      FROM `${var.project_id}.pmp_marts.velib_totals_hourly_aggregate` base
       CROSS JOIN (
         SELECT COUNT(DISTINCT station_id) as total_stations_known
-        FROM `paris-mobility-pulse.pmp_curated.velib_station_information`
+        FROM `${var.project_id}.pmp_curated.velib_station_information`
       ) info
     SQL
     use_legacy_sql = false

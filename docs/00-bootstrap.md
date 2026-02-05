@@ -52,3 +52,10 @@ make deploy
 > ```bash
 > chmod +x scripts/*.sh scripts/setup/*.sh
 > ```
+> [!TIP]
+> **Troubleshooting: Cloud Shell Timeout / Metadata Error**
+> If `make deploy` fails with `Compute Engine Metadata server unavailable` or `TypeError: string indices must be integers`, your Cloud Shell session has disconnected from its identity server.
+>
+> **Fix:**
+> 1. Run `gcloud auth login --update-adc` inside Cloud Shell.
+> 2. If that hangs, close the tab and open a new Cloud Shell instance.
