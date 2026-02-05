@@ -38,7 +38,7 @@ WORKER_MACHINE_TYPE="${WORKER_MACHINE_TYPE:-}" # empty means default
 
 # Scheduler jobs that control ingestion (add more later as you create them)
 SCHED_JOBS=(
-  "velib-poll-every-minute"          # station_status every minute
+  "pmp-velib-poll-every-minute"      # station_status every minute
   "pmp-velib-station-info-daily"     # station_information daily (if created)
 )
 
