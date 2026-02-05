@@ -140,6 +140,14 @@ resource "google_cloud_run_v2_service_iam_member" "scheduler_sa_invoke_velib_col
 }
 
 
+
+# Pub/Sub Push SA: BigQuery Data Editor (for pmp-bq-writer)
+resource "google_project_iam_member" "push_sa_bq_editor" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${google_service_account.pubsub_push_sa.email}"
+}
+
 resource "google_service_account_iam_member" "scheduler_agent_token_creator" {
   service_account_id = google_service_account.scheduler_sa.name
   role               = "roles/iam.serviceAccountTokenCreator"
