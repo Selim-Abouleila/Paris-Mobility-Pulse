@@ -1,11 +1,11 @@
-# We reference the existing topic
-data "google_pubsub_topic" "pmp_events" {
+# Main Events Topic
+resource "google_pubsub_topic" "pmp_events" {
   name = "pmp-events"
 }
 
 resource "google_pubsub_subscription" "dataflow_sub" {
   name  = "pmp-events-dataflow-sub"
-  topic = data.google_pubsub_topic.pmp_events.name
+  topic = google_pubsub_topic.pmp_events.name
 
   ack_deadline_seconds = 60
 
@@ -15,6 +15,19 @@ resource "google_pubsub_subscription" "dataflow_sub" {
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+# Debug Subscription
+resource "google_pubsub_subscription" "pmp_events_sub" {
+  name  = "pmp-events-sub"
+  topic = google_pubsub_topic.pmp_events.name
+
+  ack_deadline_seconds = 10
+  message_retention_duration = "604800s" # 7 days
+
+  expiration_policy {
+    ttl = "2678400s" # 31 days
   }
 }
 
@@ -117,7 +130,7 @@ resource "google_pubsub_subscription_iam_member" "source_subscriber_sa" {
 # Main Event Subscription (Push to BQ Writer)
 resource "google_pubsub_subscription" "pmp_events_to_bq_sub" {
   name  = "pmp-events-to-bq-sub"
-  topic = data.google_pubsub_topic.pmp_events.name
+  topic = google_pubsub_topic.pmp_events.name
 
   ack_deadline_seconds = 60
 

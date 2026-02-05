@@ -49,6 +49,25 @@ resource "google_bigquery_dataset" "pmp_raw" {
   location   = var.region
 }
 
+resource "google_bigquery_table" "velib_station_status_raw" {
+  dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
+  table_id   = "velib_station_status_raw"
+
+  schema = jsonencode([
+    { name = "ingest_ts", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "event_ts", type = "TIMESTAMP", mode = "NULLABLE" },
+    { name = "source", type = "STRING", mode = "REQUIRED" },
+    { name = "event_type", type = "STRING", mode = "REQUIRED" },
+    { name = "key", type = "STRING", mode = "REQUIRED" },
+    { name = "payload", type = "JSON", mode = "REQUIRED" }
+  ])
+
+  time_partitioning {
+    type  = "DAY"
+    field = "ingest_ts"
+  }
+}
+
 # DLQ Table (Pub/Sub Station Info)
 resource "google_bigquery_table" "velib_dlq_raw" {
   dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
