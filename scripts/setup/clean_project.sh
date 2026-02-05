@@ -54,7 +54,7 @@ echo -e "${YELLOW}==> Deleting Cloud Run Services...${RESET}"
 gcloud run services list --project="$PROJECT_ID" --format="value(name)" | grep "^pmp-" | while read -r svc; do
     echo "    Deleting Cloud Run service: $svc"
     gcloud run services delete "$svc" --region="$REGION" --project="$PROJECT_ID" --quiet
-done
+done || true
 
 echo -e "${YELLOW}==> Deleting Cloud Scheduler Jobs...${RESET}"
 # Default to europe-west1 if not set, as that is the project standard for schedulers
@@ -63,7 +63,7 @@ SCHED_LOCATION="${SCHED_LOCATION:-europe-west1}"
 gcloud scheduler jobs list --location="$SCHED_LOCATION" --project="$PROJECT_ID" --format="value(name)" | grep "pmp-" | while read -r job; do
    echo "    Deleting Scheduler job: $job"
    gcloud scheduler jobs delete "$job" --location="$SCHED_LOCATION" --project="$PROJECT_ID" --quiet
-done
+done || true
 
 echo -e "${YELLOW}==> Deleting Service Accounts...${RESET}"
 SAs=("pmp-dataflow-sa" "pmp-collector-sa" "pmp-pubsub-push-sa" "pmp-scheduler-sa" "pmp-station-info-writer-sa" "pmp-bq-writer-sa")
