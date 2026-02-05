@@ -23,7 +23,7 @@ resource "google_pubsub_subscription" "pmp_events_sub" {
   name  = "pmp-events-sub"
   topic = google_pubsub_topic.pmp_events.name
 
-  ack_deadline_seconds = 10
+  ack_deadline_seconds       = 10
   message_retention_duration = "604800s" # 7 days
 
   expiration_policy {
