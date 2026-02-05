@@ -7,7 +7,9 @@ set -euo pipefail
 
 
 # Validates environment and loads variables if needed
-if [ -z "$PROJECT_ID" ]; then
+
+# Validates environment and loads variables if needed
+if [ -z "${PROJECT_ID:-}" ]; then
     if [ -f ".env" ]; then
         source .env
     elif [ -f "$(dirname "$0")/../.env" ]; then
