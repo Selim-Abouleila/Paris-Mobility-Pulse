@@ -68,3 +68,33 @@ You might wonder: *If I run this, can it accidentally modify someone else's proj
 1.  **Authentication Required**: The script uses your local credentials (`gcloud auth login`). It cannot access any project you don't own.
 2.  **Local-Only Cleanup**: The `rm terraform.tfstate` command in `bootstrap.sh` only deletes a **local text file** on your machine to ensure a clean install. It sends no delete commands to Google Cloud.
 3.  **Project Isolation**: If you accidentally set someone else's Project ID in `.env`, the script will simply fail with a `Permission Denied` error because you are not an Owner of that project.
+
+## 5. Teardown & Reset (Clean Cleanup)
+If you want to **stop everything** to save money, or if you need to **reset the environment** to test the bootstrap process from scratch (e.g., for judging reproducibility):
+
+```bash
+make clean-cloud
+```
+
+**⚠️ WARNING: DELETES DATA**
+This command explicitly deletes all project resources including:
+-   BigQuery Datasets (`pmp_raw`, `pmp_marts`, etc.)
+-   Pub/Sub Topics & Subscriptions
+-   Cloud Run Services & Scheduler Jobs
+-   Service Accounts
+
+Use this when you want a completely fresh start.
+
+## 6. Daily Operations FAQ
+
+### Can I just use `make demo-up`?
+Yes, **IF** you have already deployed the infrastructure.
+-   **`make deploy`**: The "Construction Crew" (Builds servers, databases, permissions).
+-   **`make demo-up`**: The "Remote Control" (Turns the existing machines ON/OFF).
+
+If you haven't deployed, `make demo-up` will fail because the resources don't exist.
+
+### I get "Resource Already Exists" errors on a new deploy?
+This usually means you deleted your local state file, but the cloud resources are still active.
+
+**Fix:** Run `make clean-cloud` (see Section 5) to reset the cloud environment, then run `make bootstrap` and `make deploy` again.

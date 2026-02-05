@@ -148,6 +148,58 @@ resource "google_bigquery_table" "velib_latest_state" {
   depends_on = [google_bigquery_table.velib_station_status]
 }
 
+# Latest Station Information View (Marts Layer)
+resource "google_bigquery_table" "velib_station_information_latest" {
+  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id   = "velib_station_information_latest"
+
+  view {
+    query          = <<-SQL
+      SELECT * EXCEPT(rn)
+      FROM (
+        SELECT
+          *,
+          ROW_NUMBER() OVER (
+            PARTITION BY station_id
+            ORDER BY last_updated DESC, ingest_ts DESC
+          ) AS rn
+        FROM `${var.project_id}.pmp_curated.velib_station_information`
+      )
+      WHERE rn = 1
+    SQL
+    use_legacy_sql = false
+  }
+
+  depends_on = [google_bigquery_table.velib_station_information]
+}
+
+# Latest State Enriched View (Marts Layer)
+resource "google_bigquery_table" "velib_latest_state_enriched" {
+  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id   = "velib_latest_state_enriched"
+
+  view {
+    query          = <<-SQL
+      SELECT
+        s.*,
+        i.name,
+        i.lat,
+        i.lon,
+        i.capacity,
+        i.address
+      FROM `${var.project_id}.pmp_marts.velib_latest_state` s
+      LEFT JOIN `${var.project_id}.pmp_marts.velib_station_information_latest` i
+      USING (station_id)
+    SQL
+    use_legacy_sql = false
+  }
+
+  depends_on = [
+    google_bigquery_table.velib_latest_state,
+    google_bigquery_table.velib_station_information_latest
+  ]
+}
+
 # Station Information Table (Curated)
 resource "google_bigquery_table" "velib_station_information" {
   dataset_id = google_bigquery_dataset.pmp_curated.dataset_id

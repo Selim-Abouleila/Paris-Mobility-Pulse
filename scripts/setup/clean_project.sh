@@ -57,11 +57,12 @@ gcloud run services list --project="$PROJECT_ID" --format="value(name)" | grep "
 done
 
 echo -e "${YELLOW}==> Deleting Cloud Scheduler Jobs...${RESET}"
-gcloud scheduler jobs list --project="$PROJECT_ID" --format="value(name)" | grep "pmp-" | while read -r job; do
-   # Job name usually comes with full path, extract basename if needed or pass full name
-   # gcloud scheduler delete accepts the full ID.
+# Default to europe-west1 if not set, as that is the project standard for schedulers
+SCHED_LOCATION="${SCHED_LOCATION:-europe-west1}"
+
+gcloud scheduler jobs list --location="$SCHED_LOCATION" --project="$PROJECT_ID" --format="value(name)" | grep "pmp-" | while read -r job; do
    echo "    Deleting Scheduler job: $job"
-   gcloud scheduler jobs delete "$job" --project="$PROJECT_ID" --quiet
+   gcloud scheduler jobs delete "$job" --location="$SCHED_LOCATION" --project="$PROJECT_ID" --quiet
 done
 
 echo -e "${YELLOW}==> Deleting Service Accounts...${RESET}"
