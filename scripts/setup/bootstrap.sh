@@ -51,18 +51,41 @@ region     = "$REGION"
 EOF
 echo -e "${GREEN}  OK: infra/terraform/terraform.tfvars created.${NC}"
 
-# 4. Initialize Terraform
-echo -e "${BLUE}==> Initializing Terraform...${NC}"
-cd infra/terraform
+# 4. Create Remote State Bucket (GCS)
+echo -e "${BLUE}==> Configuring Remote State (GCS Backend)...${NC}"
+STATE_BUCKET="pmp-terraform-state-${PROJECT_ID}"
 
-# ZERO-TRUST FIX: Nuke local state to prevent "paris-mobility-pulse" ghost resources
-if [[ -d ".terraform" ]] || [[ -f "terraform.tfstate" ]]; then
-    echo -e "${RED}WARNING: Clearing existing Terraform state to ensure fresh bootstrap...${NC}"
-    rm -rf .terraform
-    rm -f terraform.tfstate terraform.tfstate.backup
+if ! gsutil ls -b "gs://${STATE_BUCKET}" &>/dev/null; then
+    echo "Creating state bucket gs://${STATE_BUCKET}..."
+    gsutil mb -p "$PROJECT_ID" -l "$REGION" "gs://${STATE_BUCKET}" || {
+        echo -e "${RED}ERROR: Failed to create state bucket.${NC}"; exit 1;
+    }
+    gsutil versioning set on "gs://${STATE_BUCKET}"
+else
+    echo "State bucket gs://${STATE_BUCKET} already exists."
 fi
 
-terraform init -upgrade
+# 5. Generate backend.tf configuration
+# We do this dynamically so it works for any project ID
+echo -e "${BLUE}==> Generating backend.tf...${NC}"
+cat > infra/terraform/backend.tf <<EOF
+terraform {
+  backend "gcs" {
+    bucket = "${STATE_BUCKET}"
+    prefix = "terraform/state"
+  }
+}
+EOF
+echo -e "${GREEN}  OK: infra/terraform/backend.tf configured.${NC}"
+
+# 6. Initialize Terraform (Migrating state if needed)
+echo -e "${BLUE}==> Initializing Terraform with Remote Backend...${NC}"
+cd infra/terraform
+
+# Remove leftover local state crap validation (if any)
+rm -rf .terraform/terraform.tfstate
+
+terraform init -migrate-state || terraform init -reconfigure
 cd ../..
 
 echo -e ""
