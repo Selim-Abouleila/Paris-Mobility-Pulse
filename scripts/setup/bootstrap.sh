@@ -54,6 +54,14 @@ echo -e "${GREEN}  OK: infra/terraform/terraform.tfvars created.${NC}"
 # 4. Initialize Terraform
 echo -e "${BLUE}==> Initializing Terraform...${NC}"
 cd infra/terraform
+
+# ZERO-TRUST FIX: Nuke local state to prevent "paris-mobility-pulse" ghost resources
+if [[ -d ".terraform" ]] || [[ -f "terraform.tfstate" ]]; then
+    echo -e "${RED}WARNING: Clearing existing Terraform state to ensure fresh bootstrap...${NC}"
+    rm -rf .terraform
+    rm -f terraform.tfstate terraform.tfstate.backup
+fi
+
 terraform init -upgrade
 cd ../..
 
