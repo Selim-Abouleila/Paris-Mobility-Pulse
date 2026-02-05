@@ -6,7 +6,7 @@
 resource "google_cloud_run_v2_service" "station_info_collector" {
   name     = "pmp-velib-station-info-collector"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
     service_account = google_service_account.collector_sa.email

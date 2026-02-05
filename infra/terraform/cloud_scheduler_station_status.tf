@@ -3,7 +3,7 @@ resource "google_cloud_scheduler_job" "velib_poll_every_minute" {
   description = "Triggers the Velib station status collector every minute"
   schedule    = "* * * * *"
   time_zone   = "Europe/Paris"
-  region      = "europe-west1" # Scheduler is regional, sticking to west1 for consistency
+  region      = var.scheduler_location
 
   http_target {
     http_method = "GET"
@@ -11,7 +11,7 @@ resource "google_cloud_scheduler_job" "velib_poll_every_minute" {
 
     oidc_token {
       service_account_email = google_service_account.scheduler_sa.email
-      audience              = "${google_cloud_run_v2_service.pmp_velib_collector.uri}/collect"
+      audience              = google_cloud_run_v2_service.pmp_velib_collector.uri
     }
   }
 
