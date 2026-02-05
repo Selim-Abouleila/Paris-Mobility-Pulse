@@ -63,6 +63,7 @@ need_cmd() {
 }
 
 preflight() {
+
   need_cmd gcloud
   need_cmd python3
 
