@@ -35,6 +35,11 @@ clean-cloud:
 	@chmod +x scripts/setup/clean_project.sh
 	@./scripts/setup/clean_project.sh
 
+# 6. Adopt Production Resources (Import existing without deleting)
+adopt-prod:
+	@chmod +x scripts/adopt_prod.sh
+	@./scripts/adopt_prod.sh
+
 # --------------------------
 # Dev / CI
 # --------------------------

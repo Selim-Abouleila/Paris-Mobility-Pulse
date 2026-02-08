@@ -39,7 +39,21 @@ This script (`scripts/setup/bootstrap.sh`) will automatically:
 4.  **Generate** `infra/terraform/terraform.tfvars` from your configuration.
 5.  **Initialize** Terraform (`terraform init`).
 
-## 4. Verification
+### 4. (Optional) Adopt Existing Production Data
+**If you are deploying to an existing project with live data:**
+Do NOT run `make clean-cloud`. Instead, adopt the existing resources into Terraform:
+```bash
+make adopt-prod
+```
+This safely imports your BigQuery tables, Topics, and Storage buckets so Terraform manages them without deletion.
+
+### 5. Deploy Infrastructure
+Once bootstrapped (and optionally adopted), deploy the full stack:
+```bash
+make deploy
+```
+
+## 6. Verification
 If the bootstrap completes successfully, you are ready to deploy:
 
 ```bash
