@@ -134,8 +134,8 @@ resource "google_bigquery_table" "velib_station_information_latest" {
 
 # DLQ Tables (Ops)
 resource "google_bigquery_table" "velib_station_info_push_dlq" {
-  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
-  table_id   = "velib_station_info_push_dlq"
+  dataset_id          = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id            = "velib_station_info_push_dlq"
   deletion_protection = false
 
   schema = jsonencode([
@@ -153,8 +153,8 @@ resource "google_bigquery_table" "velib_station_info_push_dlq" {
 }
 
 resource "google_bigquery_table" "velib_station_status_curated_dlq" {
-  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
-  table_id   = "velib_station_status_curated_dlq"
+  dataset_id          = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id            = "velib_station_status_curated_dlq"
   deletion_protection = false
 
   schema = jsonencode([
@@ -231,8 +231,8 @@ resource "google_bigquery_table" "velib_station_information" {
 
 # Hourly Aggregates Base View (Virtual Materialized View Logic)
 resource "google_bigquery_table" "velib_totals_hourly_mv" {
-  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
-  table_id   = "velib_totals_hourly_aggregate"
+  dataset_id          = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id            = "velib_totals_hourly_aggregate"
   deletion_protection = false
 
   view {
@@ -269,8 +269,8 @@ resource "google_bigquery_table" "velib_totals_hourly_mv" {
 
 # Hourly Dashboard View (Looker Wrapper)
 resource "google_bigquery_table" "velib_totals_hourly" {
-  dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
-  table_id   = "velib_totals_hourly"
+  dataset_id          = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id            = "velib_totals_hourly"
   deletion_protection = false
 
   view {
