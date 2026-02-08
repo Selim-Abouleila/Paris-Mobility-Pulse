@@ -14,7 +14,7 @@ resource "google_pubsub_subscription" "dataflow_sub" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
