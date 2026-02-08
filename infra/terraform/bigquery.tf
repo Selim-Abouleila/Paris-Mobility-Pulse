@@ -1,6 +1,6 @@
 resource "google_bigquery_dataset" "pmp_curated" {
   dataset_id = "pmp_curated"
-  location   = "EU"
+  location   = var.region
 }
 
 resource "google_bigquery_table" "velib_station_status" {
@@ -34,7 +34,7 @@ resource "google_bigquery_table" "velib_station_status" {
 # Marts Dataset
 resource "google_bigquery_dataset" "pmp_marts" {
   dataset_id = "pmp_marts"
-  location   = "EU"
+  location   = var.region
 }
 
 # Ops Dataset (DLQ)

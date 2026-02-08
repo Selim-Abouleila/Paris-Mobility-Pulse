@@ -52,10 +52,10 @@ import_if_exists() {
 
 # 1. BigQuery Datasets
 echo -e "\n${BLUE}--> Adopting BigQuery Datasets${RESET}"
-import_if_exists "google_bigquery_dataset.pmp_raw" "$PROJECT_ID:pmp_raw" "Raw Dataset"
-import_if_exists "google_bigquery_dataset.pmp_curated" "$PROJECT_ID:pmp_curated" "Curated Dataset"
-import_if_exists "google_bigquery_dataset.pmp_marts" "$PROJECT_ID:pmp_marts" "Marts Dataset"
-import_if_exists "google_bigquery_dataset.pmp_ops" "$PROJECT_ID:pmp_ops" "Ops Dataset"
+import_if_exists "google_bigquery_dataset.pmp_raw" "projects/$PROJECT_ID/datasets/pmp_raw" "Raw Dataset"
+import_if_exists "google_bigquery_dataset.pmp_curated" "projects/$PROJECT_ID/datasets/pmp_curated" "Curated Dataset"
+import_if_exists "google_bigquery_dataset.pmp_marts" "projects/$PROJECT_ID/datasets/pmp_marts" "Marts Dataset"
+import_if_exists "google_bigquery_dataset.pmp_ops" "projects/$PROJECT_ID/datasets/pmp_ops" "Ops Dataset"
 
 # 2. Pub/Sub Topics
 echo -e "\n${BLUE}--> Adopting Pub/Sub Topics${RESET}"
