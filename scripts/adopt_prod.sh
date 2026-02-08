@@ -104,7 +104,7 @@ import_if_exists "google_service_account.station_info_writer_sa" "projects/$PROJ
 echo -e "\n${BLUE}--> Adopting Cloud Run Services${RESET}"
 import_if_exists "google_cloud_run_v2_service.pmp_velib_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-collector" "Velib Collector"
 import_if_exists "google_cloud_run_v2_service.station_info_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-station-info-collector" "Station Info Collector"
-import_if_exists "google_cloud_run_v2_service.station_info_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-station-info-writer" "Station Info Writer"
+import_if_exists "google_cloud_run_v2_service.station_info_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-station-info-writer" "Station Info Writer"
 import_if_exists "google_cloud_run_v2_service.pmp_bq_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-bq-writer" "BQ Writer"
 
 # 5.1 Pub/Sub Subscriptions (Explicit)

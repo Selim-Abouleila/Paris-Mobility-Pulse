@@ -1,6 +1,10 @@
 resource "google_bigquery_dataset" "pmp_curated" {
   dataset_id = "pmp_curated"
   location   = var.region
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "google_bigquery_table" "velib_station_status" {
@@ -40,18 +44,30 @@ resource "google_bigquery_table" "velib_station_status" {
 resource "google_bigquery_dataset" "pmp_marts" {
   dataset_id = "pmp_marts"
   location   = var.region
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Ops Dataset (DLQ)
 resource "google_bigquery_dataset" "pmp_ops" {
   dataset_id = "pmp_ops"
   location   = var.region
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Raw Dataset (Landing Zone)
 resource "google_bigquery_dataset" "pmp_raw" {
   dataset_id = "pmp_raw"
   location   = var.region
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "google_bigquery_table" "velib_station_status_raw" {
