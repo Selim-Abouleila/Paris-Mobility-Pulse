@@ -1,5 +1,11 @@
 .PHONY: fmt check lint install test typecheck
 
+# Load .env variables if file exists
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 # Default target
 all: check
 
@@ -19,6 +25,8 @@ deploy:
 	@chmod +x scripts/setup/build.sh
 	@./scripts/setup/build.sh
 	@echo "==> Deploying Infrastructure..."
+	@terraform -chdir=infra/terraform init -upgrade -reconfigure \
+		-backend-config="bucket=pmp-terraform-state-$(PROJECT_ID)"
 	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" -auto-approve
 
 # 3. Start Demo (Resume schedulers, start streaming)

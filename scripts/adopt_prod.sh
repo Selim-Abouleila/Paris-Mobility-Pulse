@@ -29,6 +29,13 @@ echo -e "${YELLOW}This script will import existing cloud resources into Terrafor
 
 cd infra/terraform
 
+# Ensure Terraform is initialized
+echo -e "${BLUE}Initializing Terraform...${RESET}"
+terraform init -upgrade -reconfigure \
+    -backend-config="bucket=pmp-terraform-state-${PROJECT_ID}"
+
+
+
 # Function to import resource if it exists in cloud but not in state
 import_if_exists() {
     local tf_resource="$1"
