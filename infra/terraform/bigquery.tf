@@ -29,7 +29,12 @@ resource "google_bigquery_table" "velib_station_status" {
   }
 
   clustering = ["station_id"]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
+
 
 # Marts Dataset
 resource "google_bigquery_dataset" "pmp_marts" {
@@ -227,7 +232,12 @@ resource "google_bigquery_table" "velib_station_information" {
   }
 
   clustering = ["station_id"]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
+
 
 # Hourly Aggregates Base View (Virtual Materialized View Logic)
 resource "google_bigquery_table" "velib_totals_hourly_mv" {

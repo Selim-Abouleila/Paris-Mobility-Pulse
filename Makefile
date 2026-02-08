@@ -27,7 +27,8 @@ deploy:
 	@echo "==> Deploying Infrastructure..."
 	@terraform -chdir=infra/terraform init -upgrade -reconfigure \
 		-backend-config="bucket=pmp-terraform-state-$(PROJECT_ID)"
-	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" -auto-approve
+	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" \
+		-var="project_id=$(PROJECT_ID)" -auto-approve
 
 # 3. Start Demo (Resume schedulers, start streaming)
 demo-up:

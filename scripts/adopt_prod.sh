@@ -12,14 +12,15 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 RESET='\033[0m'
 
+# Check if environment is set
 if [ -z "$PROJECT_ID" ]; then
-    if [ -f ".env" ]; then
-        source .env
-    else
-        echo -e "${RED}ERROR: PROJECT_ID not found. Run from root or set env var.${RESET}"
-        exit 1
-    fi
+    echo -e "${RED}Error: PROJECT_ID is not set. Please run 'source .env' first.${RESET}"
+    exit 1
 fi
+export TF_VAR_project_id=$PROJECT_ID
+
+echo -e "${GREEN}Adopting existing production resources into Terraform state...${RESET}"
+echo -e "Project ID: ${BOLD}$PROJECT_ID${RESET}"
 
 REGION="${REGION:-europe-west9}"
 SCHED_LOCATION="${SCHED_LOCATION:-europe-west1}"
