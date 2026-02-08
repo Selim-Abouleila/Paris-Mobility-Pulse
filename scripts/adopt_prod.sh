@@ -57,6 +57,21 @@ import_if_exists "google_bigquery_dataset.pmp_curated" "projects/$PROJECT_ID/dat
 import_if_exists "google_bigquery_dataset.pmp_marts" "projects/$PROJECT_ID/datasets/pmp_marts" "Marts Dataset"
 import_if_exists "google_bigquery_dataset.pmp_ops" "projects/$PROJECT_ID/datasets/pmp_ops" "Ops Dataset"
 
+# 1.1 BigQuery Tables (Must be explicit)
+echo -e "\n${BLUE}--> Adopting BigQuery Tables${RESET}"
+import_if_exists "google_bigquery_table.velib_station_status_raw" "projects/$PROJECT_ID/datasets/pmp_raw/tables/velib_station_status_raw" "T: velib_station_status_raw"
+import_if_exists "google_bigquery_table.velib_station_status" "projects/$PROJECT_ID/datasets/pmp_curated/tables/velib_station_status" "T: velib_station_status"
+import_if_exists "google_bigquery_table.velib_station_information" "projects/$PROJECT_ID/datasets/pmp_curated/tables/velib_station_information" "T: velib_station_information"
+import_if_exists "google_bigquery_table.velib_dlq_raw" "projects/$PROJECT_ID/datasets/pmp_ops/tables/velib_station_info_push_dlq" "T: velib_dlq_raw"
+import_if_exists "google_bigquery_table.velib_station_status_curated_dlq" "projects/$PROJECT_ID/datasets/pmp_ops/tables/velib_station_status_curated_dlq" "T: velib_station_status_curated_dlq"
+
+# 1.2 BigQuery Views (Marts)
+import_if_exists "google_bigquery_table.velib_latest_state" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_latest_state" "V: velib_latest_state"
+import_if_exists "google_bigquery_table.velib_station_information_latest" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_station_information_latest" "V: velib_station_information_latest"
+import_if_exists "google_bigquery_table.velib_latest_state_enriched" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_latest_state_enriched" "V: velib_latest_state_enriched"
+import_if_exists "google_bigquery_table.velib_totals_hourly_mv" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly_aggregate" "V: velib_totals_hourly_mv"
+import_if_exists "google_bigquery_table.velib_totals_hourly" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly" "V: velib_totals_hourly"
+
 # 2. Pub/Sub Topics
 echo -e "\n${BLUE}--> Adopting Pub/Sub Topics${RESET}"
 import_if_exists "google_pubsub_topic.pmp_events" "projects/$PROJECT_ID/topics/pmp-events" "Events Topic"
