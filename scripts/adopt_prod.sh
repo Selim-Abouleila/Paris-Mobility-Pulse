@@ -103,6 +103,7 @@ import_if_exists "google_cloud_run_v2_service.pmp_bq_writer" "projects/$PROJECT_
 echo -e "\n${BLUE}--> Adopting Pub/Sub Subscriptions${RESET}"
 import_if_exists "google_pubsub_subscription.dataflow_sub" "projects/$PROJECT_ID/subscriptions/pmp-events-dataflow-sub" "Sub: pmp-events-dataflow-sub"
 import_if_exists "google_pubsub_subscription.station_info_dlq_sub" "projects/$PROJECT_ID/subscriptions/pmp-velib-station-info-push-dlq-hold-sub" "Sub: pmp-velib-station-info-push-dlq-hold-sub"
+import_if_exists "google_pubsub_subscription.station_info_dlq_bq_sub" "projects/$PROJECT_ID/subscriptions/pmp-velib-station-info-push-dlq-to-bq-sub" "Sub: pmp-velib-station-info-push-dlq-to-bq-sub"
 
 # 6. Cloud Scheduler Jobs
 echo -e "\n${BLUE}--> Adopting Cloud Scheduler Jobs${RESET}"
