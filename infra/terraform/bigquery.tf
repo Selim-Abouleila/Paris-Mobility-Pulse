@@ -71,7 +71,12 @@ resource "google_bigquery_table" "velib_station_status_raw" {
     type  = "DAY"
     field = "ingest_ts"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
+
 
 
 # IAM for Pub/Sub Service Agent to write to DLQ Dataset
@@ -155,6 +160,10 @@ resource "google_bigquery_table" "velib_dlq_raw" {
     type  = "DAY"
     field = "publish_time"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "google_bigquery_table" "velib_station_status_curated_dlq" {
@@ -177,7 +186,12 @@ resource "google_bigquery_table" "velib_station_status_curated_dlq" {
     type  = "DAY"
     field = "dlq_ts"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
+
 
 
 # Latest State Enriched View (Marts Layer)
