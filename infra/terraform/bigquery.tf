@@ -133,7 +133,7 @@ resource "google_bigquery_table" "velib_station_information_latest" {
 }
 
 # DLQ Tables (Ops)
-resource "google_bigquery_table" "velib_station_info_push_dlq" {
+resource "google_bigquery_table" "velib_dlq_raw" {
   dataset_id          = google_bigquery_dataset.pmp_ops.dataset_id
   table_id            = "velib_station_info_push_dlq"
   deletion_protection = false
