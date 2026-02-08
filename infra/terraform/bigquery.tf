@@ -173,6 +173,49 @@ resource "google_bigquery_table" "velib_station_information_latest" {
   depends_on = [google_bigquery_table.velib_station_information]
 }
 
+# DLQ Tables (Ops)
+resource "google_bigquery_table" "velib_station_info_push_dlq" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id   = "velib_station_info_push_dlq"
+  deletion_protection = false
+
+  schema = jsonencode([
+    { name = "subscription_name", type = "STRING" },
+    { name = "message_id", type = "STRING" },
+    { name = "publish_time", type = "TIMESTAMP" },
+    { name = "data", type = "BYTES" },
+    { name = "attributes", type = "JSON" }
+  ])
+
+  time_partitioning {
+    type  = "DAY"
+    field = "publish_time"
+  }
+}
+
+resource "google_bigquery_table" "velib_station_status_curated_dlq" {
+  dataset_id = google_bigquery_dataset.pmp_ops.dataset_id
+  table_id   = "velib_station_status_curated_dlq"
+  deletion_protection = false
+
+  schema = jsonencode([
+    { name = "dlq_ts", type = "TIMESTAMP", mode = "REQUIRED" },
+    { name = "stage", type = "STRING", mode = "REQUIRED" },
+    { name = "error_type", type = "STRING", mode = "REQUIRED" },
+    { name = "error_message", type = "STRING", mode = "REQUIRED" },
+    { name = "raw", type = "STRING", mode = "NULLABLE" },
+    { name = "event_meta", type = "STRING", mode = "NULLABLE" },
+    { name = "row_json", type = "STRING", mode = "NULLABLE" },
+    { name = "bq_errors", type = "STRING", mode = "NULLABLE" }
+  ])
+
+  time_partitioning {
+    type  = "DAY"
+    field = "dlq_ts"
+  }
+}
+
+
 # Latest State Enriched View (Marts Layer)
 resource "google_bigquery_table" "velib_latest_state_enriched" {
   dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
@@ -231,6 +274,7 @@ resource "google_bigquery_table" "velib_station_information" {
 resource "google_bigquery_table" "velib_totals_hourly_mv" {
   dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
   table_id   = "velib_totals_hourly_aggregate"
+  deletion_protection = false
 
   view {
     query          = <<-SQL
@@ -268,6 +312,7 @@ resource "google_bigquery_table" "velib_totals_hourly_mv" {
 resource "google_bigquery_table" "velib_totals_hourly" {
   dataset_id = google_bigquery_dataset.pmp_marts.dataset_id
   table_id   = "velib_totals_hourly"
+  deletion_protection = false
 
   view {
     query          = <<-SQL

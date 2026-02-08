@@ -95,9 +95,14 @@ import_if_exists "google_service_account.station_info_writer_sa" "projects/$PROJ
 # 5. Cloud Run Services (Optional, as these are often ephemeral/redeployed)
 echo -e "\n${BLUE}--> Adopting Cloud Run Services${RESET}"
 import_if_exists "google_cloud_run_v2_service.pmp_velib_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-collector" "Velib Collector"
-import_if_exists "google_cloud_run_v2_service.station_info_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-station-info-collector" "Station Info Collector"
+import_if_exists "google_cloud_run_v2_service.station_info_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-station-info-collector" "Station Info Collector"
 import_if_exists "google_cloud_run_v2_service.station_info_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-station-info-writer" "Station Info Writer"
 import_if_exists "google_cloud_run_v2_service.pmp_bq_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-bq-writer" "BQ Writer"
+
+# 5.1 Pub/Sub Subscriptions (Explicit)
+echo -e "\n${BLUE}--> Adopting Pub/Sub Subscriptions${RESET}"
+import_if_exists "google_pubsub_subscription.dataflow_sub" "projects/$PROJECT_ID/subscriptions/pmp-events-dataflow-sub" "Sub: pmp-events-dataflow-sub"
+import_if_exists "google_pubsub_subscription.station_info_dlq_sub" "projects/$PROJECT_ID/subscriptions/pmp-velib-station-info-push-dlq-hold-sub" "Sub: pmp-velib-station-info-push-dlq-hold-sub"
 
 # 6. Cloud Scheduler Jobs
 echo -e "\n${BLUE}--> Adopting Cloud Scheduler Jobs${RESET}"
