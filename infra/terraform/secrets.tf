@@ -7,6 +7,8 @@ resource "google_secret_manager_secret" "api_key_placeholder" {
   replication {
     auto {}
   }
+
+  depends_on = [google_project_service.secretmanager]
 }
 
 # Example of granting access to a service account (commented out until needed)
