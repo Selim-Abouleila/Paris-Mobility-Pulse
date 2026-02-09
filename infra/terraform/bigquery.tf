@@ -334,3 +334,46 @@ resource "google_bigquery_table" "velib_totals_hourly" {
     google_bigquery_table.velib_station_information
   ]
 }
+
+# [NEW] Filtered View for Data Quality Analysis
+resource "google_bigquery_table" "velib_totals_hourly_paris" {
+  dataset_id          = google_bigquery_dataset.pmp_marts.dataset_id
+  table_id            = "velib_totals_hourly_paris"
+  deletion_protection = false
+
+  view {
+    query          = <<-SQL
+      SELECT
+        base.hour_ts_paris AS hour_ts,
+        DATETIME(base.hour_ts_paris, "Europe/Paris") as hour_paris,
+        DATE(DATETIME(base.hour_ts_paris, "Europe/Paris")) AS date_paris,
+        EXTRACT(HOUR FROM DATETIME(base.hour_ts_paris, "Europe/Paris")) AS hour_of_day_paris,
+        base.avg_total_bikes_available,
+        base.peak_total_bikes_available,
+        base.min_total_bikes_available,
+        base.avg_total_docks_available,
+        base.avg_stations_reporting,
+        base.avg_empty_stations,
+        base.peak_empty_stations,
+        base.snapshot_samples,
+        info.total_stations_known,
+        SAFE_DIVIDE(base.avg_stations_reporting, info.total_stations_known) as avg_coverage_ratio
+      FROM `${var.project_id}.pmp_marts.velib_totals_hourly_aggregate` base
+      CROSS JOIN (
+        SELECT COUNT(DISTINCT station_id) as total_stations_known
+        FROM `${var.project_id}.pmp_curated.velib_station_information`
+      ) info
+      WHERE SAFE_DIVIDE(base.avg_stations_reporting, info.total_stations_known) >= 0.999
+    SQL
+    use_legacy_sql = false
+  }
+
+  lifecycle {
+    ignore_changes = all
+  }
+
+  depends_on = [
+    google_bigquery_table.velib_totals_hourly_mv,
+    google_bigquery_table.velib_station_information
+  ]
+}
