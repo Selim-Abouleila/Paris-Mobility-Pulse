@@ -23,10 +23,20 @@ resource "google_project_iam_member" "pubsub_viewer" {
   member  = "serviceAccount:${google_service_account.dataflow_sa.email}"
 }
 
-resource "google_project_iam_member" "bq_editor" {
-  project = var.project_id
-  role    = "roles/bigquery.dataEditor"
-  member  = "serviceAccount:${google_service_account.dataflow_sa.email}"
+# Dataflow SA: Dataset-level permissions (Hardened)
+# Needs to read from events (via Pub/Sub, already covered) 
+# Needs to write to Curated (velib_station_status)
+resource "google_bigquery_dataset_iam_member" "dataflow_sa_curated_editor" {
+  dataset_id = google_bigquery_dataset.pmp_curated.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.dataflow_sa.email}"
+}
+
+# Needs to read Raw (if backfill/replay needed) - granting viewer just in case
+resource "google_bigquery_dataset_iam_member" "dataflow_sa_raw_viewer" {
+  dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
+  role       = "roles/bigquery.dataViewer"
+  member     = "serviceAccount:${google_service_account.dataflow_sa.email}"
 }
 
 # Bucket level permissions (Scoped to the specific bucket)
@@ -80,11 +90,11 @@ resource "google_pubsub_topic_iam_member" "collector_publisher" {
   member  = "serviceAccount:${google_service_account.collector_sa.email}"
 }
 
-# Writer SA: BigQuery Data Editor (project-level, consistent with existing pattern)
-resource "google_project_iam_member" "writer_bq_editor" {
-  project = var.project_id
-  role    = "roles/bigquery.dataEditor"
-  member  = "serviceAccount:${google_service_account.station_info_writer_sa.email}"
+# Writer SA: Dataset-level permissions (Hardened)
+resource "google_bigquery_dataset_iam_member" "writer_curated_editor" {
+  dataset_id = google_bigquery_dataset.pmp_curated.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.station_info_writer_sa.email}"
 }
 
 # Dataflow SA: Dataset-level permissions for DLQ table (pmp_ops)
@@ -141,11 +151,11 @@ resource "google_cloud_run_v2_service_iam_member" "scheduler_sa_invoke_velib_col
 
 
 
-# Pub/Sub Push SA: BigQuery Data Editor (for pmp-bq-writer)
-resource "google_project_iam_member" "push_sa_bq_editor" {
-  project = var.project_id
-  role    = "roles/bigquery.dataEditor"
-  member  = "serviceAccount:${google_service_account.pubsub_push_sa.email}"
+# Pub/Sub Push SA: Dataset-level permissions (Hardened for pmp-bq-writer)
+resource "google_bigquery_dataset_iam_member" "push_sa_raw_editor" {
+  dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.pubsub_push_sa.email}"
 }
 
 resource "google_service_account_iam_member" "scheduler_agent_token_creator" {

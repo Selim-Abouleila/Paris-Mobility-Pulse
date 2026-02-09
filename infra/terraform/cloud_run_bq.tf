@@ -1,7 +1,7 @@
 resource "google_cloud_run_v2_service" "pmp_bq_writer" {
   name     = "pmp-bq-writer"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
 
   template {
     service_account = google_service_account.pubsub_push_sa.email
