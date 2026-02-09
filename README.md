@@ -44,6 +44,8 @@ make demo-down   # Stops all cost-generating resources
 - **DLQ Replay Worker** (`pmp-station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
 - **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
 - **Looker Studio Dashboard** for real-time visualization and trends.
+- **Reproducible Deployment**: Complete golden path with `make bootstrap`, `make adopt-prod` (adopts existing resources into Terraform state), `make deploy` for zero-trust project-portable infrastructure, and `make clean-cloud` for emergency cleanup of "Already Exists" conflicts.
+
 
 ## Key GCP resources
 - **BigQuery**:
@@ -262,6 +264,17 @@ make install  # Setup dev tools
 make fmt      # Format code (ruff + terraform)
 make check    # Check formatting, types, and tests
 ```
+## Security Posture
+
+Designed with a **Zero Trust** and **Least Privilege** mindset for production readiness:
+
+- **Identity**: Dedicated Service Accounts for every component (Collector, Writer, Dataflow, Scheduler) with granular IAM roles.
+- **Network**: All Cloud Run services are **Private (No Allow Unauthenticated)** by default. Invocations are authenticated via OIDC tokens from specific authorized SAs.
+- **Data Boundaries**: BigQuery datasets (`pmp_raw`, `pmp_curated`, `pmp_marts`) have distinct access controls to enforce separation of concerns.
+- **Secrets**: Prepared for Google Secret Manager integration; no secrets stored in code or Terraform state.
+
+See [docs/10-security-posture.md](docs/10-security-posture.md) for the full security architecture and [docs/10x-security-implementation-plan.md](docs/10x-security-implementation-plan.md) for the hardening roadmap.
+
 ## Documentation
 
 Detailed guides for each component:
@@ -275,7 +288,8 @@ Detailed guides for each component:
 - [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
 - [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
 - [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
+- [10 - Security Posture](docs/10-security-posture.md) - Security architecture and hardening plan
+- [10x - Security Implementation Plan](docs/10x-security-implementation-plan.md) - Detailed Terraform refactoring roadmap
 
 ## Next milestone
-
 - (Optional) Move windowed aggregations from BigQuery MVs to Dataflow.
