@@ -111,7 +111,13 @@ source .env
 
 ---
 
-## 5. Next Steps
-To fully complete the migration, we will:
-1.  **Comment out/Remove** the `view` blocks in `infra/terraform/bigquery.tf` to authorize dbt as the sole owner.
-2.  Update the `Makefile` to include `dbt run` in the `deploy` target.
+## 5. Migration Status (Completed)
+We have successfully:
+1.  **Removed** the legacy `view` blocks from `infra/terraform/bigquery.tf`.
+2.  **Updated** the `Makefile` to automatically install dbt and run models during `deploy`.
+3.  **Deploying**: Running `make deploy` now handles both Infrastructure (Terraform) and Analytics (dbt) in a single command.
+
+## 6. Future Improvements
+*   Add more Data Quality tests (e.g., `accepted_values` for status fields).
+*   Implement dbt Docs for auto-generated data dictionaries.
+*   Set up a CI/CD pipeline step to run `dbt test` on Pull Requests.

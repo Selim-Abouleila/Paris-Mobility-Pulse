@@ -77,8 +77,9 @@ import_if_exists "google_bigquery_table.velib_station_status_curated_dlq" "proje
 import_if_exists "google_bigquery_table.velib_latest_state" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_latest_state" "V: velib_latest_state"
 import_if_exists "google_bigquery_table.velib_station_information_latest" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_station_information_latest" "V: velib_station_information_latest"
 import_if_exists "google_bigquery_table.velib_latest_state_enriched" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_latest_state_enriched" "V: velib_latest_state_enriched"
-import_if_exists "google_bigquery_table.velib_totals_hourly_mv" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly_aggregate" "V: velib_totals_hourly_mv"
-import_if_exists "google_bigquery_table.velib_totals_hourly" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly" "V: velib_totals_hourly"
+# import_if_exists "google_bigquery_table.velib_totals_hourly_mv" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly_aggregate" "V: velib_totals_hourly_mv"
+# import_if_exists "google_bigquery_table.velib_totals_hourly" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_totals_hourly" "V: velib_totals_hourly"
+# Note: These views are now managed by dbt and should not be imported into Terraform.
 
 # 2. Pub/Sub Topics
 echo -e "\n${BLUE}--> Adopting Pub/Sub Topics${RESET}"
