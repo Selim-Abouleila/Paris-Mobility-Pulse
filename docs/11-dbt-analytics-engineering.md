@@ -42,7 +42,15 @@ paris_mobility_pulse:
       method: oauth
       project: "{{ env_var('PROJECT_ID') }}"  # <--- Reads from .env
       dataset: pmp_dbt_dev
+      location: "{{ env_var('DBT_LOCATION', 'EU') }}" # <--- Auto-detected!
 ```
+
+### Dynamic Location handling (Cross-Region Compatibility)
+During implementation, we encountered a challenge: dbt default configuration (`europe-west9`) mismatched the actual dataset location (`EU` multi-region), causing failure. To solve this robustly:
+
+1.  **Profiles.yml**: Configured to accept a `DBT_LOCATION` environment variable.
+2.  **Makefile Auto-detection**: The `deploy` command now dynamically inspects the `pmp_curated` dataset location using `bq show` and injects it into dbt runtime.
+This makes the project truly versatile, working seamlessly regardless of where the underlying data resides (`EU`, `US`, or `europe-west9`).
 
 ---
 

@@ -32,9 +32,12 @@ deploy:
 	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" \
 		-var="project_id=$(PROJECT_ID)" -auto-approve
 	@echo "==> Deploying Analytics (dbt)..."
-	@dbt deps --project-dir dbt --profiles-dir dbt
-	@dbt run --project-dir dbt --profiles-dir dbt
-	@dbt test --project-dir dbt --profiles-dir dbt
+	@echo "    Detecting BigQuery location..."
+	$(eval DBT_LOCATION := $(shell bq show --format=prettyjson $(PROJECT_ID):pmp_curated 2>/dev/null | grep '"location":' | cut -d '"' -f 4 || echo "EU"))
+	@echo "    Location detected: $(DBT_LOCATION)"
+	@export DBT_LOCATION=$(DBT_LOCATION) && dbt deps --project-dir dbt --profiles-dir dbt
+	@export DBT_LOCATION=$(DBT_LOCATION) && dbt run --project-dir dbt --profiles-dir dbt
+	@export DBT_LOCATION=$(DBT_LOCATION) && dbt test --project-dir dbt --profiles-dir dbt
 
 # 3. Start Demo (Resume schedulers, start streaming)
 demo-up:

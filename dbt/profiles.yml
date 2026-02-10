@@ -9,5 +9,5 @@ paris_mobility_pulse:
       dataset: pmp_dbt_dev # Default dataset for dbt artifacts
       threads: 4
       timeout_seconds: 300
-      location: europe-west9
+      location: "{{ env_var('DBT_LOCATION', 'EU') }}" # Auto-detected by Makefile, defaults to EU
       priority: interactive
