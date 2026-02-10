@@ -56,11 +56,14 @@ make demo-down   # Stops all cost-generating resources
     - **Marts Layer** (`pmp_marts`):
         - `velib_latest_state`: Real-time snapshot (View).
         - `velib_latest_state_enriched`: Latest state + metadata (View).
-        - `velib_totals_hourly`: Aggregated trends for dashboarding (Materialized View).
-        - `velib_totals_hourly_paris`: Timezone-adjusted wrapper (View).
     - **Ops Layer** (`pmp_ops`):
         - `velib_station_info_push_dlq`: Pub/Sub Push delivery failures (Metadata).
         - `velib_station_status_curated_dlq`: Dataflow transformation/validation failures (Status).
+    - **Analytics Layer** (`pmp_dbt_dev_pmp_marts`):
+        - **Managed by dbt**: Contains all hourly business logic and aggregations.
+        - `velib_totals_hourly_aggregate`: Hourly station snapshots.
+        - `velib_totals_hourly`: Clean dashboard view.
+        - `velib_totals_hourly_paris`: Filtered view for high-coverage stations.
 - **Pub/Sub**:
     - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata), `pmp-velib-station-info-push-dlq` (Dead Letter Queue).
     - **Subscriptions**:
@@ -217,6 +220,16 @@ gcloud dataflow jobs cancel JOB_ID --project="$PROJECT_ID" --region="$REGION"
 
 **Console:**
 Dataflow → Jobs → Select job → **Stop / Cancel**.
+
+## Analytics Engineering: dbt (Data Modeling)
+
+We have migrated the "Marts" layer logic from brittle Terraform strings to **dbt (data build tool)**, achieving a production-grade Analytics Engineering workflow.
+
+- **Dynamic Location Handling**: The project uses a custom `Makefile` hook to auto-detect the BigQuery dataset location (`EU` vs `europe-west9`) and inject it into dbt at runtime, ensuring portability across regions.
+- **Separation of Concerns**: Terraform manages infrastructure (datasets, IAM); dbt manages business logic (SQL, tests).
+- **Data Quality**: Enables future schema tests (`unique`, `not_null`) as part of the CI/CD pipeline.
+
+See [docs/11-dbt-analytics-engineering.md](docs/11-dbt-analytics-engineering.md) for the full architecture and migration details.
 
 ## Reliability & Error Handling
 
