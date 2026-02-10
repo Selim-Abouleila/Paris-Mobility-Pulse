@@ -125,7 +125,32 @@ We have successfully:
 2.  **Updated** the `Makefile` to automatically install dbt and run models during `deploy`.
 3.  **Deploying**: Running `make deploy` now handles both Infrastructure (Terraform) and Analytics (dbt) in a single command.
 
-## 6. Future Improvements
-*   Add more Data Quality tests (e.g., `accepted_values` for status fields).
-*   Implement dbt Docs for auto-generated data dictionaries.
+## 6. Data Quality Tests (`schema.yml`)
+
+Every `make deploy` automatically runs `dbt test`, which executes SQL assertions against our models. If any test fails, the deployment **stops immediately**.
+
+### Implemented Tests
+
+| Model | Column | Test | What It Catches |
+| :--- | :--- | :--- | :--- |
+| `velib_totals_hourly_aggregate` | `hour_ts_paris` | `unique` | Duplicate hours (e.g., from retry storms) |
+| `velib_totals_hourly_aggregate` | `hour_ts_paris` | `not_null` | Ghost rows with no timestamp |
+| `velib_totals_hourly_aggregate` | `avg_total_bikes_available` | `not_null` | NULL metrics breaking dashboards |
+| `velib_totals_hourly_aggregate` | `snapshot_samples` | `not_null` | Missing sample counts |
+| `velib_totals_hourly` | `hour_ts_paris` | `unique` + `not_null` | Grain integrity |
+| `velib_totals_hourly_paris` | `hour_ts` | `unique` + `not_null` | Grain integrity |
+
+### How It Works
+dbt translates each test into a SQL query. For example, the `unique` test on `hour_ts_paris` generates:
+```sql
+SELECT hour_ts_paris
+FROM velib_totals_hourly_aggregate
+GROUP BY 1
+HAVING COUNT(*) > 1
+-- If ANY rows returned → FAIL ❌
+```
+
+## 7. Future Improvements
+*   Add **Source Freshness** tests to detect stale data (pipeline outages).
+*   Implement dbt Docs for auto-generated data dictionaries and lineage graphs.
 *   Set up a CI/CD pipeline step to run `dbt test` on Pull Requests.

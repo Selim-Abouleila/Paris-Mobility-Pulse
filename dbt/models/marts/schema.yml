@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: velib_totals_hourly_aggregate
+    description: "Hourly aggregation of station snapshots. One row per hour (grain = hour_ts_paris)."
+    columns:
+      - name: hour_ts_paris
+        description: "Hourly bucket timestamp (Europe/Paris timezone). Primary grain."
+        tests:
+          - unique
+          - not_null
+      - name: avg_total_bikes_available
+        description: "Average bikes available across all snapshots in this hour."
+        tests:
+          - not_null
+      - name: snapshot_samples
+        description: "Number of raw snapshots aggregated into this hour."
+        tests:
+          - not_null
+
+  - name: velib_totals_hourly
+    description: "Dashboard-ready wrapper with coverage ratio. One row per hour."
+    columns:
+      - name: hour_ts_paris
+        description: "Hourly bucket timestamp."
+        tests:
+          - unique
+          - not_null
+
+  - name: velib_totals_hourly_paris
+    description: "Filtered view for high-coverage hours only (>= 99.9% station coverage)."
+    columns:
+      - name: hour_ts
+        description: "Hourly bucket timestamp (aliased from hour_ts_paris)."
+        tests:
+          - unique
+          - not_null
