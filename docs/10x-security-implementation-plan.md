@@ -24,19 +24,7 @@ resource "google_bigquery_dataset_iam_member" "writer_raw_editor" {
 }
 ```
 
-## 2. Enforce Logical Service Account Separation
-**File**: `infra/terraform/iam.tf`
-
-Ensure every Cloud Run service has a unique SA. Currently:
-- `pmp-velib-collector` uses `collector_sa`
-- `pmp-velib-station-info-collector` uses `collector_sa` (Reuse!)
-
-**Action**:
-- Create `station_info_collector_sa` for the Station Info collector.
-- Grant `pubsub.publisher` *specifically* for the `pmp-velib-station-info` topic to this new SA.
-- Update `infra/terraform/cloud_run_station_info.tf` to use the new SA.
-
-## 3. Harden Cloud Run Invocations
+## 2. Harden Cloud Run Invocations
 **File**: `infra/terraform/cloud_run_*.tf`
 
 Verify `ingress` settings.
@@ -46,14 +34,14 @@ Verify `ingress` settings.
 **Action**:
 - Explicitly set `ingress = "INGRESS_TRAFFIC_INTERNAL_ONLY"` for all writers in `cloud_run_station_info.tf` and `cloud_run_bq.tf`.
 
-## 4. Pub/Sub Subscription Permissions
+## 3. Pub/Sub Subscription Permissions
 **File**: `infra/terraform/pubsub.tf` & `iam.tf`
 
 Explicitly map Publisher/Subscriber roles.
 - Ensure `pmp-pubsub-push-sa` does NOT have `pubsub.publisher`. It only needs to invoke Cloud Run.
 - Ensure `pmp-collector-sa` does NOT have `pubsub.subscriber`. It only needs to publish.
 
-## 5. Secret Manager Foundation (Optional/Future)
+## 4. Secret Manager Foundation (Optional/Future)
 **File**: `infra/terraform/secrets.tf` (New)
 
 Create a placeholder structure for secrets management if future credentials are required.
@@ -74,7 +62,7 @@ resource "google_secret_manager_secret_iam_member" "collector_access" {
 }
 ```
 
-## 6. GCS Uniform Bucket Access
+## 5. GCS Uniform Bucket Access
 **File**: `infra/terraform/storage.tf`
 
 Enforce uniform access on the Dataflow bucket.

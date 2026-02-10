@@ -1,0 +1,35 @@
+
+name: 'paris_mobility_pulse'
+version: '1.0.0'
+config-version: 2
+
+# Profile matches the name in profiles.yml
+profile: 'paris_mobility_pulse'
+
+# Directory structure
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # This is where compiled SQL goes (already gitignored)
+clean-targets:         # directories to remove with `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+models:
+  paris_mobility_pulse:
+    # Config for all models 
+    +materialized: view  # Default to views for simplicity/cost
+    
+    # Configure specific folders (Marts = Business Logic)
+    marts:
+      +schema: pmp_marts
+      +materialized: view
+    
+    # Staging = Raw Data cleanup
+    staging:
+      +schema: pmp_staging
+      +materialized: view

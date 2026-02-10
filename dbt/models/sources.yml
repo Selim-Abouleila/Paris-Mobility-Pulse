@@ -1,0 +1,10 @@
+
+version: 2
+
+sources:
+  - name: pmp_curated
+    database: "{{ env_var('PROJECT_ID') }}" # Reads from .env
+    schema: pmp_curated
+    tables:
+      - name: velib_station_status
+      - name: velib_station_information

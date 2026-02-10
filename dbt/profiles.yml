@@ -1,0 +1,13 @@
+
+paris_mobility_pulse:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth  # Use local gcloud credentials
+      project: "{{ env_var('PROJECT_ID') }}" # Reads from .env
+      dataset: pmp_dbt_dev # Default dataset for dbt artifacts
+      threads: 4
+      timeout_seconds: 300
+      location: europe-west9
+      priority: interactive
