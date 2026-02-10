@@ -18,9 +18,11 @@ bootstrap:
 	@chmod +x scripts/setup/check_env.sh scripts/setup/bootstrap.sh || true
 	@./scripts/setup/bootstrap.sh
 
-# 2. Deploy Infrastructure (Terraform)
+# 2. Deploy Infrastructure (Terraform + dbt)
 deploy:
 	@./scripts/setup/check_env.sh
+	@echo "==> installing dependencies..."
+	@pip install -r requirements.txt
 	@echo "==> Building Containers..."
 	@chmod +x scripts/setup/build.sh
 	@./scripts/setup/build.sh
@@ -29,6 +31,10 @@ deploy:
 		-backend-config="bucket=pmp-terraform-state-$(PROJECT_ID)"
 	@terraform -chdir=infra/terraform apply -var-file="terraform.tfvars" \
 		-var="project_id=$(PROJECT_ID)" -auto-approve
+	@echo "==> Deploying Analytics (dbt)..."
+	@dbt deps --project-dir dbt --profiles-dir dbt
+	@dbt run --project-dir dbt --profiles-dir dbt
+	@dbt test --project-dir dbt --profiles-dir dbt
 
 # 3. Start Demo (Resume schedulers, start streaming)
 demo-up:

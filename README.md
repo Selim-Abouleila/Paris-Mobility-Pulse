@@ -290,6 +290,7 @@ Detailed guides for each component:
 - [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
 - [10 - Security Posture](docs/10-security-posture.md) - Security architecture and hardening plan
 - [10x - Security Implementation Plan](docs/10x-security-implementation-plan.md) - Detailed Terraform refactoring roadmap
+- [11 - Analytics Engineering (dbt)](docs/11-dbt-analytics-engineering.md) - Migration to dbt for data modeling and quality tests
 
 ## Next milestone
 - (Optional) Move windowed aggregations from BigQuery MVs to Dataflow.
