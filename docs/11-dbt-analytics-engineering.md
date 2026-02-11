@@ -50,6 +50,13 @@ During implementation, we encountered a challenge: dbt default configuration (`e
 
 1.  **Profiles.yml**: Configured to accept a `DBT_LOCATION` environment variable.
 2.  **Makefile Auto-detection**: The `deploy` command now dynamically inspects the `pmp_curated` dataset location using `bq show` and injects it into dbt runtime.
+
+**Makefile Implementation:**
+![Makefile Location Detection](../images/make_file_location_detection.png)
+
+**Runtime Output:**
+![Terminal showing detected location](../images/dbt_pmp_curated_location_detection.png)
+
 This makes the project truly versatile, working seamlessly regardless of where the underlying data resides (`EU`, `US`, or `europe-west9`).
 
 ---
