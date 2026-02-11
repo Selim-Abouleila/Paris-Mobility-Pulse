@@ -19,6 +19,8 @@ exclude = [
     "services/bq-writer",
     "services/station-info-writer",
     "services/station-info-dlq-replayer",
+    "collectors/",
+    "scripts/",
 ]
 
 [tool.pytest.ini_options]
