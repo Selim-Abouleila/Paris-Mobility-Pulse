@@ -44,6 +44,7 @@ make demo-down   # Stops all cost-generating resources
 - **DLQ Replay Worker** (`pmp-station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
 - **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
 - **Looker Studio Dashboard** for real-time visualization and trends.
+- **Analytics Engineering (dbt)**: Marts layer managed by dbt with `ref()`/`source()` lineage, dynamic BigQuery location detection, and 8 schema tests (`unique`, `not_null`) enforced on every `make deploy`.
 - **Reproducible Deployment**: Complete golden path with `make bootstrap`, `make adopt-prod` (adopts existing resources into Terraform state), `make deploy` for zero-trust project-portable infrastructure, and `make clean-cloud` for emergency cleanup of "Already Exists" conflicts.
 
 
@@ -227,7 +228,7 @@ We have migrated the "Marts" layer logic from brittle Terraform strings to **dbt
 
 - **Dynamic Location Handling**: The project uses a custom `Makefile` hook to auto-detect the BigQuery dataset location (`EU` vs `europe-west9`) and inject it into dbt at runtime, ensuring portability across regions.
 - **Separation of Concerns**: Terraform manages infrastructure (datasets, IAM); dbt manages business logic (SQL, tests).
-- **Data Quality**: Enables future schema tests (`unique`, `not_null`) as part of the CI/CD pipeline.
+- **Data Quality**: 8 schema tests (`unique`, `not_null`) are enforced on every deployment via `dbt test`, catching duplicate hours, NULL metrics, and grain violations before they reach the dashboard.
 
 See [docs/11-dbt-analytics-engineering.md](docs/11-dbt-analytics-engineering.md) for the full architecture and migration details.
 

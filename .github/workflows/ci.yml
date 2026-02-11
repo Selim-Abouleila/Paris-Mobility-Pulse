@@ -20,6 +20,9 @@ jobs:
       - name: Install tools
         run: pip install ruff mypy pytest types-requests types-flask
 
+      - name: Install pipeline dependencies
+        run: pip install -r pipelines/dataflow/pmp_streaming/requirements.txt
+
       - name: Lint
         run: ruff check .
 
