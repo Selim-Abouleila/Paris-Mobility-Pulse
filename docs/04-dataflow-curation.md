@@ -214,7 +214,28 @@ LIMIT 10
 
 ---
 
-## 8. Context: Phase 1 & Future Expansion
+## 8. Unit Tests (Offline / CI)
+
+The core transform functions are tested offline (no GCP credentials required) and run on every push and PR via GitHub Actions.
+
+**Test file**: [`tests/test_dataflow_transforms.py`](../tests/test_dataflow_transforms.py)
+
+| Class | Tests | What's Covered |
+| :--- | :--- | :--- |
+| `TestVelibSnapshotToStationRows` | 7 | Core transform: valid multi-station event, field correctness, empty/missing/malformed payloads, stations without ID |
+| `TestExtractBikeTypes` | 4 | Vélib format, alternate GBFS format, missing/empty types |
+| `TestHelpers` | 7 | `_to_int` (int, string, None, garbage), `_epoch_to_rfc3339` (valid, None, garbage) |
+
+### Run locally
+```bash
+pytest tests/test_dataflow_transforms.py -v
+```
+
+> **Note**: These tests exercise pure Python logic (dict in → dict out). They do **not** start a Beam runner or require GCP access. For live end-to-end verification, see Section 5 above and [`scripts/test_dlq.py`](../scripts/test_dlq.py).
+
+---
+
+## 9. Context: Phase 1 & Future Expansion
 
 This pipeline represents **Phase 1** of the Dataflow implementation. We intentionally keep it simple: "Ingest → Normalize/Flatten → Write to BigQuery" with **Reliability & DLQ** integrated from the start.
 
@@ -231,7 +252,7 @@ Currently, the focus is on a stable, error-aware streaming writer.
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | Issue | Cause | Fix |
 | :--- | :--- | :--- |

@@ -1,220 +1,235 @@
-# Paris Mobility Pulse - Terraform Infrastructure
+# Paris Mobility Pulse — Terraform Infrastructure
 
-This directory contains the Terraform configuration to manage the core infrastructure for the **Paris Mobility Pulse** project.
+This directory contains the Terraform configuration for the **Paris Mobility Pulse** project's GCP infrastructure.
 
-## Purpose (Phase 1)
+## Managed Resources
 
-This Terraform configuration manages the following resources:
-*   **APIs Enablement**: Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager.
-*   **GCS Staging Bucket**: `gs://pmp-dataflow-paris-mobility-pulse` for Dataflow staging and temp files.
-*   **Pub/Sub Subscription**: `pmp-events-dataflow-sub` (pull subscription) attached to the existing `pmp-events` topic.
-    *   *Note: The `pmp-events` topic is pre-existing and not managed here; only the subscription is managed.*
-*   **Pub/Sub (Station Information Pipeline)**:
-    *   Topic: `pmp-velib-station-info`
-    *   Push Subscription: `pmp-velib-station-info-to-bq-sub` (pushes to writer Cloud Run service)
-*   **BigQuery**:
-    *   Curated Dataset: `pmp_curated`
-        *   Table: `velib_station_status` (partitioned by day, clustered by station_id)
-        *   Table: `velib_station_information` (partitioned by day, clustered by station_id)
-    *   Marts Dataset: `pmp_marts`
-        *   View: `velib_latest_state` (latest status per station)
-*   **IAM & Service Accounts**:
-    *   Service Account: `pmp-dataflow-sa` (Dataflow Worker)
-    *   Service Account: `pmp-station-info-writer-sa` (Station Info Writer)
-    *   Roles: Dataflow Worker, Pub/Sub Subscriber/Viewer/Publisher, BigQuery Data Editor, Storage Object Admin (bucket-scoped), Cloud Run Invoker.
-*   **Cloud Scheduler**:
-    *   Job: `pmp-velib-station-info-daily` (triggers station info collection daily at 3:10 AM)
+### APIs (`apis.tf`)
+Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cloud Scheduler, Secret Manager.
 
-> **Note**: The running streaming Dataflow job is currently launched via the CLI (Python SDK) and is *not* yet managed by Terraform. Future phases may introduce Flex Templates and `google_dataflow_flex_template_job`.
+### Pub/Sub (`pubsub.tf`)
 
-> **Note**: Cloud Run services are deployed via `gcloud run deploy` and excluded from Terraform state to avoid drift (see [docs/03-terraform-iac.md](../../docs/03-terraform-iac.md)).
+| Resource | Name | Purpose |
+| :--- | :--- | :--- |
+| **Topic** | `pmp-events` | Main event bus (station status snapshots) |
+| **Subscription** | `pmp-events-dataflow-sub` | Pull → Dataflow streaming pipeline |
+| **Subscription** | `pmp-events-sub` | Debug/manual pull (31-day TTL) |
+| **Subscription** | `pmp-events-to-bq-sub` | Push → `pmp-bq-writer` Cloud Run (raw ingestion) |
+| **Topic** | `pmp-velib-station-info` | Station information (metadata) events |
+| **Subscription** | `pmp-velib-station-info-to-bq-sub` | Push → `pmp-velib-station-info-writer` Cloud Run |
+| **Topic** | `pmp-velib-station-info-push-dlq` | Dead Letter Queue for station info push failures |
+| **Subscription** | `pmp-velib-station-info-push-dlq-hold-sub` | DLQ hold (7-day retention for replay) |
+| **Subscription** | `pmp-velib-station-info-push-dlq-to-bq-sub` | DLQ → BigQuery export for analysis |
+
+### BigQuery (`bigquery.tf`)
+
+| Dataset | Table / View | Type | Details |
+| :--- | :--- | :--- | :--- |
+| `pmp_raw` | `velib_station_status_raw` | Table | Raw JSON payloads, partitioned by `ingest_ts` |
+| `pmp_curated` | `velib_station_status` | Table | Flattened station rows, partitioned by day, clustered by `station_id` |
+| `pmp_curated` | `velib_station_information` | Table | Station metadata (name, lat/lon, capacity), partitioned by day |
+| `pmp_marts` | `velib_latest_state` | View | Latest status per station (ROW_NUMBER window) |
+| `pmp_marts` | `velib_station_information_latest` | View | Latest metadata per station |
+| `pmp_marts` | `velib_latest_state_enriched` | View | Joins latest status + latest metadata (name, lat/lon) |
+| `pmp_ops` | `velib_dlq_raw` | Table | Pub/Sub DLQ raw messages, partitioned by `publish_time` |
+| `pmp_ops` | `velib_station_status_curated_dlq` | Table | Dataflow DLQ errors, partitioned by `dlq_ts` |
+
+> **dbt-managed views**: `velib_totals_hourly_aggregate`, `velib_totals_hourly`, and `velib_totals_hourly_paris` are managed by dbt in `dbt/models/` and have been removed from Terraform. See [docs/11-dbt-analytics-engineering.md](../../docs/11-dbt-analytics-engineering.md).
+
+### Cloud Run (`cloud_run_*.tf`)
+
+| Service | File | Purpose |
+| :--- | :--- | :--- |
+| `pmp-velib-collector` | `cloud_run_velib_collector.tf` | Collects Vélib station_status snapshots → publishes to `pmp-events` |
+| `pmp-velib-station-info-collector` | `cloud_run_station_info.tf` | Collects station_information metadata → publishes to `pmp-velib-station-info` |
+| `pmp-velib-station-info-writer` | `cloud_run_station_info.tf` | Receives push from Pub/Sub → writes to BigQuery |
+| `pmp-bq-writer` | `cloud_run_bq.tf` | Receives push from `pmp-events-to-bq-sub` → writes raw events to BigQuery |
+
+> **Deployment note**: Cloud Run services are deployed via `gcloud run deploy` (see Makefile). Terraform defines their configuration for reference and IAM bindings, but actual images are pushed separately. See [docs/03-terraform-iac.md](../../docs/03-terraform-iac.md).
+
+### Cloud Scheduler (`cloud_scheduler_*.tf`)
+
+| Job | Schedule | Target |
+| :--- | :--- | :--- |
+| `pmp-velib-poll-every-minute` | `* * * * *` (every minute) | `pmp-velib-collector` `/collect` |
+| `pmp-velib-station-info-daily` | `10 3 * * *` (daily 3:10 AM) | `pmp-velib-station-info-collector` `/collect` |
+
+### IAM & Service Accounts (`iam.tf`)
+
+| Service Account | Purpose | Key Roles |
+| :--- | :--- | :--- |
+| `pmp-dataflow-sa` | Dataflow streaming worker | Dataflow Worker, Pub/Sub Subscriber/Viewer, BigQuery DataEditor (curated + ops), Storage ObjectAdmin (bucket-scoped) |
+| `pmp-collector-sa` | Cloud Run collector | Pub/Sub Publisher (events + station-info topics) |
+| `pmp-station-info-writer-sa` | Station info writer | BigQuery DataEditor (curated) |
+| `pmp-pubsub-push-sa` | Pub/Sub push invoker | Cloud Run Invoker (writer + bq-writer services), BigQuery DataEditor (raw) |
+| `pmp-scheduler-sa` | Cloud Scheduler trigger | Cloud Run Invoker (collector services) |
+
+> **Least Privilege**: All BigQuery permissions are scoped to dataset-level, not project-level. Storage permissions are scoped to the specific Dataflow bucket.
+
+### Storage (`storage.tf`)
+- **Bucket**: `gs://pmp-dataflow-paris-mobility-pulse` — Dataflow staging/temp files with 7-day lifecycle cleanup.
+
+### Secrets (`secrets.tf`)
+- **Placeholder**: `pmp-api-key-placeholder` — prepared for future API key management via Secret Manager.
+
+---
 
 ## Prerequisites
 
-*   **Terraform**: Version `>= 1.5`
-*   **Google Cloud SDK**: Installed and authenticated.
+- **Terraform**: `>= 1.5`
+- **Google Cloud SDK**: Installed and authenticated.
 
 ### Authentication
 
-1.  Login for Application Default Credentials (ADC) to run Terraform:
-    ```bash
-    gcloud auth application-default login
-    gcloud config set project paris-mobility-pulse
-    ```
+```bash
+gcloud auth application-default login
+gcloud config set project paris-mobility-pulse
+```
 
-2.  **Fix for "401 Anonymous caller":**
-    If you encounter `gsutil: 401 Anonymous caller does not have storage.buckets.get` during plans/applies involving GCS, run:
-    ```bash
-    gcloud auth login --update-adc
-    ```
+If you encounter `401 Anonymous caller` errors:
+```bash
+gcloud auth login --update-adc
+```
+
+---
 
 ## Quick Start
 
-The provider is configured with defaults for `paris-mobility-pulse`.
+```bash
+cd infra/terraform
+terraform init
+terraform plan
+terraform apply
+```
 
-1.  **Navigate to directory**:
-    ```bash
-    cd infra/terraform
-    ```
+> Variables `project_id` and `region` default to `paris-mobility-pulse` and `europe-west9` (see `variables.tf` / `terraform.tfvars`).
 
-2.  **Initialize**:
-    ```bash
-    terraform init
-    ```
-
-3.  **Import Existing Resources**:
-    *If this is the first run, you must import existing manual resources. See the [Import Existing Resources](#import-existing-resources) section below.*
-
-4.  **Plan**:
-    ```bash
-    terraform plan -var="project_id=paris-mobility-pulse" -var="region=europe-west9"
-    ```
-
-5.  **Apply**:
-    ```bash
-    terraform apply
-    ```
+---
 
 ## Import Existing Resources
 
-Since some resources were created manually before Terraform, you must import them into your state to avoid errors or duplication.
+If resources were created manually before Terraform, import them into state.
 
-**Prerequisite**: Run `terraform init` before importing.
+**Prerequisite**: Run `terraform init` first.
 
-**Recommended Import Order:**
+### Core Pipeline
 
-1.  **GCS Staging Bucket**
-    ```bash
-    terraform import google_storage_bucket.dataflow_bucket pmp-dataflow-paris-mobility-pulse
-    ```
+```bash
+# 1. GCS Staging Bucket
+terraform import google_storage_bucket.dataflow_bucket pmp-dataflow-paris-mobility-pulse
 
-2.  **BigQuery Dataset**
-    ```bash
-    terraform import google_bigquery_dataset.pmp_curated projects/paris-mobility-pulse/datasets/pmp_curated
-    ```
+# 2. BigQuery Datasets
+terraform import google_bigquery_dataset.pmp_raw projects/paris-mobility-pulse/datasets/pmp_raw
+terraform import google_bigquery_dataset.pmp_curated projects/paris-mobility-pulse/datasets/pmp_curated
+terraform import google_bigquery_dataset.pmp_marts projects/paris-mobility-pulse/datasets/pmp_marts
+terraform import google_bigquery_dataset.pmp_ops projects/paris-mobility-pulse/datasets/pmp_ops
 
-3.  **BigQuery Table**
-    ```bash
-    terraform import google_bigquery_table.velib_station_status projects/paris-mobility-pulse/datasets/pmp_curated/tables/velib_station_status
-    ```
+# 3. BigQuery Tables (Curated)
+terraform import google_bigquery_table.velib_station_status projects/paris-mobility-pulse/datasets/pmp_curated/tables/velib_station_status
+terraform import google_bigquery_table.velib_station_information projects/paris-mobility-pulse/datasets/pmp_curated/tables/velib_station_information
 
-4.  **Pub/Sub Subscription**
-    ```bash
-    terraform import google_pubsub_subscription.dataflow_sub projects/paris-mobility-pulse/subscriptions/pmp-events-dataflow-sub
-    ```
+# 4. BigQuery Tables (Raw + DLQ)
+terraform import google_bigquery_table.velib_station_status_raw projects/paris-mobility-pulse/datasets/pmp_raw/tables/velib_station_status_raw
+terraform import google_bigquery_table.velib_dlq_raw projects/paris-mobility-pulse/datasets/pmp_ops/tables/velib_dlq_raw
+terraform import google_bigquery_table.velib_station_status_curated_dlq projects/paris-mobility-pulse/datasets/pmp_ops/tables/velib_station_status_curated_dlq
 
-5.  **Dataflow Worker Service Account**
-    ```bash
-    terraform import google_service_account.dataflow_sa projects/paris-mobility-pulse/serviceAccounts/pmp-dataflow-sa@paris-mobility-pulse.iam.gserviceaccount.com
-    ```
+# 5. BigQuery Views (Marts)
+terraform import google_bigquery_table.velib_latest_state projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_latest_state
+terraform import google_bigquery_table.velib_station_information_latest projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_station_information_latest
+terraform import google_bigquery_table.velib_latest_state_enriched projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_latest_state_enriched
 
-6.  **BigQuery Marts Dataset**
-    ```bash
-    terraform import google_bigquery_dataset.pmp_marts projects/paris-mobility-pulse/datasets/pmp_marts
-    ```
+# 6. Pub/Sub Topic + Subscriptions
+terraform import google_pubsub_topic.pmp_events projects/paris-mobility-pulse/topics/pmp-events
+terraform import google_pubsub_subscription.dataflow_sub projects/paris-mobility-pulse/subscriptions/pmp-events-dataflow-sub
+terraform import google_pubsub_subscription.pmp_events_sub projects/paris-mobility-pulse/subscriptions/pmp-events-sub
+terraform import google_pubsub_subscription.pmp_events_to_bq_sub projects/paris-mobility-pulse/subscriptions/pmp-events-to-bq-sub
 
-7.  **BigQuery Latest State View**
-    ```bash
-    terraform import google_bigquery_table.velib_latest_state projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_latest_state
-    ```
+# 7. Service Accounts
+terraform import google_service_account.dataflow_sa projects/paris-mobility-pulse/serviceAccounts/pmp-dataflow-sa@paris-mobility-pulse.iam.gserviceaccount.com
+terraform import google_service_account.collector_sa projects/paris-mobility-pulse/serviceAccounts/pmp-collector-sa@paris-mobility-pulse.iam.gserviceaccount.com
+terraform import google_service_account.pubsub_push_sa projects/paris-mobility-pulse/serviceAccounts/pmp-pubsub-push-sa@paris-mobility-pulse.iam.gserviceaccount.com
+terraform import google_service_account.scheduler_sa projects/paris-mobility-pulse/serviceAccounts/pmp-scheduler-sa@paris-mobility-pulse.iam.gserviceaccount.com
+terraform import google_service_account.station_info_writer_sa projects/paris-mobility-pulse/serviceAccounts/pmp-station-info-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com
+```
 
-8.  **BigQuery Hourly Aggregate (Base View)**
-    ```bash
-    terraform import google_bigquery_table.velib_totals_hourly_mv projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_totals_hourly_aggregate
-    ```
+### Station Information Pipeline
 
-9.  **BigQuery Hourly Dashboard View**
-    ```bash
-    terraform import google_bigquery_table.velib_totals_hourly projects/paris-mobility-pulse/datasets/pmp_marts/tables/velib_totals_hourly
-    ```
+```bash
+# 8. Pub/Sub (Station Info + DLQ)
+terraform import google_pubsub_topic.station_info_topic projects/paris-mobility-pulse/topics/pmp-velib-station-info
+terraform import google_pubsub_topic.station_info_dlq_topic projects/paris-mobility-pulse/topics/pmp-velib-station-info-push-dlq
+terraform import google_pubsub_subscription.station_info_push_sub projects/paris-mobility-pulse/subscriptions/pmp-velib-station-info-to-bq-sub
+terraform import google_pubsub_subscription.station_info_dlq_sub projects/paris-mobility-pulse/subscriptions/pmp-velib-station-info-push-dlq-hold-sub
+terraform import google_pubsub_subscription.station_info_dlq_bq_sub projects/paris-mobility-pulse/subscriptions/pmp-velib-station-info-push-dlq-to-bq-sub
 
-### Station Information Pipeline (Phase 1B)
+# 9. Cloud Scheduler Jobs
+terraform import google_cloud_scheduler_job.velib_poll_every_minute projects/paris-mobility-pulse/locations/europe-west1/jobs/pmp-velib-poll-every-minute
+terraform import google_cloud_scheduler_job.station_info_daily projects/paris-mobility-pulse/locations/europe-west1/jobs/pmp-velib-station-info-daily
+```
 
-If you have already deployed the station information pipeline manually, import these resources:
-
-10. **Station Info Pub/Sub Topic**
-    ```bash
-    terraform import google_pubsub_topic.station_info_topic projects/paris-mobility-pulse/topics/pmp-velib-station-info
-    ```
-
-9.  **Station Info Push Subscription**
-    ```bash
-    terraform import google_pubsub_subscription.station_info_push_sub projects/paris-mobility-pulse/subscriptions/pmp-velib-station-info-to-bq-sub
-    ```
-
-10. **Station Information BigQuery Table**
-    ```bash
-    terraform import google_bigquery_table.velib_station_information projects/paris-mobility-pulse/datasets/pmp_curated/tables/velib_station_information
-    ```
-
-11. **Station Info Writer Service Account**
-    ```bash
-    terraform import google_service_account.station_info_writer_sa projects/paris-mobility-pulse/serviceAccounts/pmp-station-info-writer-sa@paris-mobility-pulse.iam.gserviceaccount.com
-    ```
-
-12. **Cloud Scheduler Job**
-    ```bash
-    terraform import google_cloud_scheduler_job.station_info_daily projects/paris-mobility-pulse/locations/europe-west1/jobs/pmp-velib-station-info-daily
-    ```
-
-> **Important**: Cloud Run services (`pmp-velib-station-info-collector` and `pmp-velib-station-info-writer`) should **NOT** be imported. They are defined in `cloud_run_station_info.tf` for documentation but should be deployed via `gcloud run deploy` and excluded from Terraform state. If they were accidentally imported, remove them:
-> ```bash
-> terraform state rm google_cloud_run_v2_service.station_info_collector
-> terraform state rm google_cloud_run_v2_service.station_info_writer
-> ```
+---
 
 ## Validation After Apply
 
-Verify the resources were correctly configured:
-
 ```bash
-# Check Bucket
-gsutil ls -b gs://pmp-dataflow-paris-mobility-pulse
+# BigQuery datasets
+bq ls --project_id=paris-mobility-pulse
 
-# Check BigQuery Table partitions/clustering
+# Curated table schema
 bq show --format=prettyjson paris-mobility-pulse:pmp_curated.velib_station_status
 
-# Check BigQuery Marts View
-bq show --format=prettyjson paris-mobility-pulse:pmp_marts.velib_latest_state
+# Pub/Sub subscriptions
+gcloud pubsub subscriptions list --project=paris-mobility-pulse
 
-# Check Pub/Sub Subscription
-gcloud pubsub subscriptions describe pmp-events-dataflow-sub --project=paris-mobility-pulse
-
-# View Terraform Outputs
+# Terraform outputs
 terraform output
 ```
 
-## Cost Control & Operations
+---
 
-*   **Bucket Lifecycle**: The staging bucket (`pmp-dataflow-...`) has a lifecycle rule that deletes objects under `temp/` and `staging/` after **7 days** to reduce costs.
-*   **Dataflow Job**: The streaming job runs until cancelled. It is **not** stopped by Terraform.
-    *   **Cost Saving**: The job is typically configured with `--max_num_workers=1` to control costs.
-    *   **To Cancel (Console)**: Go to [Dataflow Jobs Console](https://console.cloud.google.com/dataflow/jobs), select the job, and click **Cancel**.
-    *   **To Cancel (CLI)**:
-        ```bash
-        # List jobs to find the ID
-        gcloud dataflow jobs list --project="paris-mobility-pulse" --region="europe-west9" --status=active
+## Cost Control
 
-        # Cancel the specific job
-        gcloud dataflow jobs cancel JOB_ID --project="paris-mobility-pulse" --region="europe-west9"
-        ```
+- **Bucket Lifecycle**: Objects under `temp/` and `staging/` are auto-deleted after 7 days.
+- **Dataflow Job**: Streaming job runs until cancelled — not managed by Terraform. Use `pmpctl.sh demo-down` or cancel manually:
+    ```bash
+    gcloud dataflow jobs list --project="paris-mobility-pulse" --region="europe-west9" --status=active
+    gcloud dataflow jobs cancel JOB_ID --project="paris-mobility-pulse" --region="europe-west9"
+    ```
+- **Cloud Scheduler**: Schedulers can be paused via `pmpctl.sh` to stop collection when the demo is inactive.
 
-## Phase 1 vs Future
+---
 
-*   **Phase 1 (Current)**:
-    *   **Scope**: Storage, Pub/Sub (Topics + Subscriptions), BigQuery Datasets (Curated + Marts), IAM, Cloud Scheduler, and API enablement.
-    *   **Pipelines**:
-        *   **Status Pipeline**: Streaming pipeline (Vélib status) via Dataflow → `velib_station_status`
-        *   **Station Info Pipeline**: Daily collection via push subscription → `velib_station_information`
-    *   **Marts**: `velib_latest_state` view provides the latest status per station for downstream consumption.
+## File Layout
 
-*   **Phase 1B (Station Information) - Completed**:
-    *   **Sources**: Station metadata ingestion from GBFS station_information.json
-    *   **Architecture**: Cloud Scheduler → Collector (Cloud Run) → Pub/Sub → Writer (Cloud Run) → BigQuery
-    *   **Cost Optimization**: Push subscription design avoids second always-on Dataflow job
+```
+infra/terraform/
+├── apis.tf                            # API enablement
+├── backend.tf                         # State backend config
+├── bigquery.tf                        # Datasets, tables, views (raw/curated/marts/ops)
+├── cloud_run_bq.tf                    # BQ writer service (raw ingestion)
+├── cloud_run_station_info.tf          # Station info collector + writer services
+├── cloud_run_velib_collector.tf       # Vélib status collector service
+├── cloud_scheduler_station_info.tf    # Daily station info trigger
+├── cloud_scheduler_station_status.tf  # Per-minute status collection trigger
+├── dlq_table_schema.json              # DLQ table schema definition
+├── iam.tf                             # Service accounts + IAM bindings
+├── outputs.tf                         # Terraform outputs
+├── provider.tf                        # Google provider config
+├── pubsub.tf                          # Topics + subscriptions (events, station-info, DLQ)
+├── secrets.tf                         # Secret Manager placeholder
+├── storage.tf                         # GCS bucket for Dataflow
+├── variables.tf                       # Input variables
+├── versions.tf                        # Required provider versions
+└── gcloud-export/                     # Reference exports from gcloud (read-only)
+```
 
-*   **Future**:
-    *   **Enrichment**: Create `velib_latest_state_enriched` view joining status with station_information (lat/lon, name, capacity)
-    *   **Architecture**: Dead Letter Queues (DLQ) for error handling, additional Data Marts for aggregated views
-    *   **Automation**: Fully managed Dataflow jobs using Terraform Flex Templates (`google_dataflow_flex_template_job`)
-    *   **Additional Sources**: Expand to other mobility APIs (Autolib, bike lanes, traffic data)
+---
+
+## What's NOT in Terraform
+
+| Resource | Why | Managed By |
+| :--- | :--- | :--- |
+| Dataflow streaming job | Launched via CLI/Python SDK; future: Flex Templates | `pmpctl.sh` / manual CLI |
+| Cloud Run container images | Built and pushed via `gcloud builds submit` | Makefile |
+| dbt views (`velib_totals_hourly_*`) | Business logic belongs in dbt, not IaC | `dbt run` (Makefile) |
+| Budget alerts | Created via Console | GCP Console |
