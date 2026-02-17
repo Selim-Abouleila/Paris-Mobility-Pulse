@@ -2,6 +2,16 @@
 
 # MVP Pipeline Deployment
 
+> [!NOTE]
+> **This document describes the initial bootstrap phase of the project** — the first pipeline we built to prove the end-to-end flow works, covering only the **Vélib station status** data source. Since then, the platform has grown significantly with:
+> - [Dataflow streaming curation + DLQ](04-dataflow-curation.md) (curated layer)
+> - [Station information pipeline](06-velib-station-information-pipeline.md) (metadata collection)
+> - [dbt analytics engineering](11-dbt-analytics-engineering.md) (marts layer)
+> - [Terraform IaC](03-terraform-iac.md) (reproducible infrastructure)
+> - [Reliability & replay](09-reliability-dlq-replay.md) (DLQ + replay strategy)
+>
+> The steps below remain accurate for understanding the foundational architecture, but day-to-day deployment is now handled by `make deploy` (see [README](../README.md)).
+
 ## Architecture Overview
 **Flow**: Cloud Scheduler → Cloud Run Collector → Pub/Sub (`pmp-events`) → Cloud Run Writer → BigQuery (`pmp_raw.velib_station_status_raw`)
 

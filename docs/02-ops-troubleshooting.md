@@ -2,6 +2,12 @@
 
 This document serves as the **SRE Runbook** for the Paris Mobility Pulse pipeline. It maps out standard operating procedures, incident response workflows, and log signatures for rapid debugging.
 
+> [!NOTE]
+> **Scope**: This runbook covers the **core MVP pipeline** — Cloud Scheduler → Cloud Run Collector → Pub/Sub → Cloud Run Writer → BigQuery (`pmp_raw`), plus Dataflow streaming curation to `pmp_curated`. For component-specific troubleshooting, see:
+> - [04 - Dataflow Curation](04-dataflow-curation.md) — Dataflow job issues, DLQ table queries
+> - [09 - Reliability: DLQ + Replay](09-reliability-dlq-replay.md) — DLQ inspection and replay procedures
+> - [07 - Operations: Demo Control](07-operations-demo-control.md) — Start/stop lifecycle via `pmpctl.sh`
+
 ## 1. System Health Checks
 
 Use these commands to quickly assess the pulse of the system.
