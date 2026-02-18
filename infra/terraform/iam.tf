@@ -170,3 +170,5 @@ resource "google_pubsub_topic_iam_member" "collector_publisher_events" {
   role    = "roles/pubsub.publisher"
   member  = "serviceAccount:${google_service_account.collector_sa.email}"
 }
+
+

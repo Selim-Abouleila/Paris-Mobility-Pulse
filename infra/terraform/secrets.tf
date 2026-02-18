@@ -11,9 +11,4 @@ resource "google_secret_manager_secret" "api_key_placeholder" {
   depends_on = [google_project_service.secretmanager]
 }
 
-# Example of granting access to a service account (commented out until needed)
-# resource "google_secret_manager_secret_iam_member" "collector_access" {
-#   secret_id = google_secret_manager_secret.api_key_placeholder.id
-#   role      = "roles/secretmanager.secretAccessor"
-#   member    = "serviceAccount:${google_service_account.collector_sa.email}"
-# }
+
