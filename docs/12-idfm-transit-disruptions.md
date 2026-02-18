@@ -20,7 +20,7 @@ This is a genuinely interesting analytics question that demonstrates **platform 
 | Dimension | Vélib Only | + IDFM Disruptions |
 |---|---|---|
 | Data sources | 1 (GBFS) | 2 (GBFS + SIRI) |
-| Data shape | Periodic snapshots (every 1 min) | Event-based alerts (poll every 5 min) |
+| Data shape | Periodic snapshots (every 1 min) | Event-based alerts (poll every 10 min) |
 | Transport mode | Micro-mobility (bikes) | Public transit (metro, RER, bus, tram) |
 | Cross-source analytics | ❌ | ✅ Geographic proximity joins |
 | Dashboard story | Single-source monitoring | Multi-modal mobility intelligence |
@@ -49,7 +49,7 @@ This is a genuinely interesting analytics question that demonstrates **platform 
 | **Per-line endpoint** | `GET /general-message?LineRef=STIF:Line::C01371:` |
 | **Auth** | Header: `apikey: <YOUR_KEY>` |
 | **Quota** | 1,000 requests/day (new users), 5 req/sec |
-| **Polling frequency** | Every 5 minutes → 288 calls/day (well within quota) |
+| **Polling frequency** | Every 10 minutes → 144 calls/day (well within quota) |
 
 ### API Verification (Confirmed Working)
 
@@ -308,7 +308,7 @@ Same pattern as Vélib — a lightweight Cloud Run service that:
 2. Wraps the response in a Pub/Sub message envelope
 3. Publishes to `pmp-events` topic (same topic, different `event_type`)
 
-**Triggered by**: Cloud Scheduler every 5 minutes
+**Triggered by**: Cloud Scheduler every 10 minutes
 **Service name**: `pmp-idfm-collector`
 **Event type**: `transit_disruption_snapshot`
 
@@ -356,7 +356,7 @@ dbt/models/
 | Resource | Type | Purpose |
 |---|---|---|
 | `pmp-idfm-collector` | Cloud Run Service | Polls IDFM API |
-| `idfm-poll-every-5min` | Cloud Scheduler Job | Triggers collector every 5 min |
+| `idfm-poll-every-10min` | Cloud Scheduler Job | Triggers collector every 10 min |
 | `pmp-idfm-collector-sa` | Service Account | Least-privilege SA for collector |
 | `idfm_disruptions_raw` | BigQuery Table | Raw storage in `pmp_raw` |
 
@@ -406,7 +406,7 @@ The unified overview page (page 1 of the dashboard) should include:
 1. Trim and commit `idfm_stops_reference.csv` as a dbt seed
 2. Create `pmp_raw.idfm_disruptions_raw` table in Terraform
 3. Build `pmp-idfm-collector` Cloud Run service
-4. Add Cloud Scheduler job (every 5 min)
+4. Add Cloud Scheduler job (every 10 min)
 5. Store IDFM API key in Secret Manager
 
 ### Phase 2: Curated Layer (dbt)
@@ -446,5 +446,5 @@ Common line IDs for testing:
 
 - **API Key**: Must be stored in Secret Manager, never hardcoded or committed to Git
 - **Data License**: ODbL (Open Database License) — requires attribution in dashboard/docs
-- **Rate Limiting**: 5 req/sec, 1,000 req/day — polling every 10 min stays well within limits (288/day)
+- **Rate Limiting**: 5 req/sec, 1,000 req/day — polling every 10 min stays well within limits (144/day)
 - **PII**: No personal data in disruption feed — only infrastructure/service information

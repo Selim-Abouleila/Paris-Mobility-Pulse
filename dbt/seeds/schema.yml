@@ -1,0 +1,30 @@
+version: 2
+
+seeds:
+  - name: idfm_stops_reference
+    config:
+      schema: curated
+      column_types:
+        zda_id: INT64
+        name: STRING
+        lat: FLOAT64
+        lon: FLOAT64
+        town: STRING
+        type: STRING
+    description: "Static reference table of IDFM transit stops with coordinates (from 'Arrêts et lignes associées' dataset)"
+    columns:
+      - name: zda_id
+        description: "Stopping area ID (ZdAId) - Primary join key for real-time disruptions"
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Human-readable name of the stop"
+      - name: lat
+        description: "Latitude (WGS84)"
+      - name: lon
+        description: "Longitude (WGS84)"
+      - name: town
+        description: "Municipality name"
+      - name: type
+        description: "Transport mode (bus, metro, rail, etc.)"

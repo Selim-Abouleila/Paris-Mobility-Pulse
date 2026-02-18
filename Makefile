@@ -36,6 +36,7 @@ deploy:
 	$(eval DBT_LOCATION := $(shell bq show --format=prettyjson $(PROJECT_ID):pmp_curated 2>/dev/null | grep '"location":' | cut -d '"' -f 4 || echo "EU"))
 	@echo "    Location detected: $(DBT_LOCATION)"
 	@export DBT_LOCATION=$(DBT_LOCATION) && dbt deps --project-dir dbt --profiles-dir dbt
+	@export DBT_LOCATION=$(DBT_LOCATION) && dbt seed --project-dir dbt --profiles-dir dbt
 	@export DBT_LOCATION=$(DBT_LOCATION) && dbt run --project-dir dbt --profiles-dir dbt
 	@export DBT_LOCATION=$(DBT_LOCATION) && dbt test --project-dir dbt --profiles-dir dbt
 
