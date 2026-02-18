@@ -111,20 +111,6 @@ The project includes a control script to safely start/stop the pipeline and mana
 ```
 See [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for details.
 
-## Cost control (Manual)
-
-Pause ingestion when not demoing:
-
-```bash
-gcloud scheduler jobs pause velib-poll-every-minute --project=YOUR_PROJECT_ID --location=europe-west1
-```
-
-Resume:
-
-```bash
-gcloud scheduler jobs resume velib-poll-every-minute --project=YOUR_PROJECT_ID --location=europe-west1
-```
-
 ## Budget Alert (Cost Guardrail)
 
 A monthly budget alert is configured at **$40/month** to provide a safety guardrail for demo activities and prevent accidental spend. This budget alert complements the project's operational stop controls; see [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for instructions on pausing or stopping cost-generating resources.
@@ -133,94 +119,12 @@ A monthly budget alert is configured at **$40/month** to provide a safety guardr
 
 ## Dataflow: Pub/Sub → Curated BigQuery (Streaming)
 
-### Disclaimer: Dataflow is optional for this MVP
+The Dataflow streaming pipeline reads validated events from Pub/Sub, flattens nested station snapshots into one row per station, and writes curated rows to `pmp_curated.velib_station_status`. Errors are captured at three stages (parse, transform, BigQuery insert) and routed to a dedicated DLQ table.
 
-This curated table could have been produced without Dataflow by **Cloud Run writer directly flattening to `pmp_curated`** or **BigQuery SQL (views/materialized views) over `pmp_raw`**.
+> [!NOTE]
+> **Why Dataflow?** This curated table could have been produced with a Cloud Run writer or BigQuery SQL views. Dataflow was chosen to demonstrate **Professional Data Engineer streaming patterns** (side outputs, DLQ, metrics) and to set up safeguards for future complexity (dedup, windowing, replay). Streaming jobs have ongoing cost, so future pipelines may use simpler approaches unless Dataflow's capabilities are needed.
 
-Dataflow was chosen because it demonstrates **"Professional Data Engineer" streaming patterns** and sets up safeguards for future complexity (dedup, windowing, DLQ, replay).
-
-**Cost note**: Streaming Dataflow jobs have ongoing cost, so for future pipelines we prefer non-Dataflow approaches unless needed.
-
-See [docs/04-dataflow-curation.md](docs/04-dataflow-curation.md) for the full rationale and tradeoffs.
-
-Run the Apache Beam pipeline on DataflowRunner to write curated rows to BigQuery.
-
-### Prerequisites
-
-1. **Authenticated Google Cloud SDK**:
-   - `gcloud auth login`
-   - `gcloud auth application-default login`
-   - **Fix**: Run `gcloud auth login --update-adc` if `gsutil` or Dataflow complains about "Anonymous caller".
-2. **Environment**:
-   - Bucket accessible: `gs://pmp-dataflow-paris-mobility-pulse`
-   - APIs enabled: Dataflow, Pub/Sub, BigQuery.
-   - Project dependencies: `pip install -r pipelines/dataflow/pmp_streaming/requirements.txt`
-
-### Run the Pipeline
-
-```bash
-```bash
-PROJECT_ID="YOUR_PROJECT_ID"
-REGION="europe-west9"
-BUCKET="gs://pmp-dataflow-${PROJECT_ID}"
-INPUT_SUB="projects/${PROJECT_ID}/subscriptions/pmp-events-dataflow-sub"
-OUT_TABLE="${PROJECT_ID}:pmp_curated.velib_station_status"
-DLQ_TABLE="${PROJECT_ID}:pmp_ops.velib_station_status_curated_dlq"
-
-python3 -m pipelines.dataflow.pmp_streaming.main \
-  --runner DataflowRunner \
-  --allow_dataflow_runner \
-  --project "$PROJECT_ID" \
-  --region "$REGION" \
-  --temp_location "$BUCKET/temp" \
-  --staging_location "$BUCKET/staging" \
-  --job_name "pmp-velib-curated-$(date +%Y%m%d-%H%M%S)" \
-  --service_account_email "pmp-dataflow-sa@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --streaming \
-  --input_subscription "$INPUT_SUB" \
-  --output_bq_table "$OUT_TABLE" \
-  --dlq_bq_table "$DLQ_TABLE" \
-  --setup_file ./setup.py \
-  --requirements_file pipelines/dataflow/pmp_streaming/requirements.txt \
-  --num_workers 1 \
-  --max_num_workers 1 \
-  --autoscaling_algorithm=NONE \
-  --save_main_session
-```
-
-### Verification
-
-**1. List Jobs**
-```bash
-gcloud dataflow jobs list --project="$PROJECT_ID" --region="$REGION"
-```
-
-**2. Query BigQuery (Curated)**
-Ensure rows are arriving (disable cache if needed):
-```sql
-SELECT * FROM `paris-mobility-pulse.pmp_curated.velib_station_status`
-ORDER BY ingest_ts DESC
-LIMIT 20
-```
-
-**3. Test Publish (Optional)**
-Publish a single station message to `pmp-events`:
-```bash
-gcloud pubsub topics publish pmp-events --project="$PROJECT_ID" --message='{"ingest_ts":"2026-01-24T16:00:00Z","event_ts":"2026-01-24T16:00:00Z","source":"velib","event_type":"station_status_snapshot","key":"test:one_station","payload":{"data":{"stations":[{"station_id":123,"stationCode":"X1","is_installed":1,"is_renting":1,"is_returning":1,"last_reported":1768918344,"num_bikes_available":5,"num_docks_available":10,"num_bikes_available_types":[{"mechanical":3},{"ebike":2}]}]}}}'
-```
-
-### Stop the Job
-
-The pipeline runs until cancelled.
-
-**CLI:**
-```bash
-gcloud dataflow jobs cancel JOB_ID --project="$PROJECT_ID" --region="$REGION"
-```
-*(Replace `JOB_ID` with the ID from the list command)*
-
-**Console:**
-Dataflow → Jobs → Select job → **Stop / Cancel**.
+The pipeline is launched via `pmpctl.sh up` (or `make demo-up`) and cancelled via `pmpctl.sh down` (or `make demo-down`). See [04 - Dataflow Curation](docs/04-dataflow-curation.md) for the full Dataflow job launch command, verification queries, and DLQ architecture.
 
 ## Analytics Engineering: dbt (Data Modeling)
 
