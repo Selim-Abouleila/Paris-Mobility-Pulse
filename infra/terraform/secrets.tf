@@ -21,3 +21,8 @@ resource "google_secret_manager_secret" "idfm_api_key" {
     auto {}
   }
 }
+
+resource "google_secret_manager_secret_version" "idfm_api_key_version" {
+  secret      = google_secret_manager_secret.idfm_api_key.id
+  secret_data = "changeme"
+}
