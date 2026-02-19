@@ -1,4 +1,3 @@
-
 resource "google_bigquery_table" "idfm_disruptions_raw" {
   dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
   table_id   = "idfm_disruptions_raw"

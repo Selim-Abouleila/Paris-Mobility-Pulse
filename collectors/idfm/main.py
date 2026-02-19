@@ -1,10 +1,11 @@
-import os
+import datetime
 import json
 import logging
-import requests
+import os
+
 from flask import Flask, jsonify
 from google.cloud import pubsub_v1
-import datetime
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +62,7 @@ def trigger_collection():
                 "payload": disruption
             }
             
-            future = publisher.publish(
+            publisher.publish(
                 topic_path, 
                 json.dumps(message_payload).encode("utf-8"),
                 source="idfm_collector",

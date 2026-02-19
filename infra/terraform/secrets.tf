@@ -16,11 +16,8 @@ resource "google_secret_manager_secret" "api_key_placeholder" {
 # -----------------------------------------------------------------------------
 resource "google_secret_manager_secret" "idfm_api_key" {
   secret_id = "pmp-idfm-api-key"
-  
+
   replication {
     auto {}
   }
 }
-
-
-

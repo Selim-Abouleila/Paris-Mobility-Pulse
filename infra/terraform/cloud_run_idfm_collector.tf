@@ -9,13 +9,13 @@ resource "google_cloud_run_v2_service" "pmp_idfm_collector" {
 
     containers {
       # Placeholder image until the real one is built
-      image = "us-docker.pkg.dev/cloudrun/container/hello" 
+      image = "us-docker.pkg.dev/cloudrun/container/hello"
 
       env {
         name  = "PROJECT_ID"
         value = var.project_id
       }
-      
+
       env {
         name = "IDFM_API_KEY"
         value_source {
