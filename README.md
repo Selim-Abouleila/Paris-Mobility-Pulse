@@ -26,6 +26,10 @@ make bootstrap   # Enables APIs, Inits Terraform
 make deploy      # Builds Containers, Deploys Infrastructure
 ```
 
+> [!NOTE]
+> **Post-Deploy Action**: You must manually add your **IDFM API Key** to Secret Manager after deployment. See [00-bootstrap.md Section 5.1](docs/00-bootstrap.md#51-post-deployment-secrets-configuration).
+
+
 ### 3. Run Demo
 ```bash
 make demo-up     # Starts pipelines & simulated traffic

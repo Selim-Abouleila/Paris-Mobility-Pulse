@@ -53,6 +53,19 @@ Once bootstrapped (and optionally adopted), deploy the full stack:
 make deploy
 ```
 
+### 5.1. Post-Deployment: Secrets Configuration
+The deployment creates empty "placeholder" secrets in Google Secret Manager. You **must** manually add the actual API keys for the collectors to work:
+
+1.  Go to **Google Cloud Console > Security > Secret Manager**.
+2.  Find the secret named `pmp-idfm-api-key`.
+3.  Click **"Add New Version"**.
+4.  Paste your **IDFM API Key** (from the [Prim Marketplace](https://prim.iledefrance-mobilites.fr/)).
+5.  Click **"Add New Version"** to save.
+
+> [!NOTE]
+> The IDFM Collector will likely restart/crash (CrashLoopBackOff) until this key is added. This is expected behavior.
+
+
 ## 6. Verification
 If the bootstrap completes successfully, you are ready to deploy:
 
