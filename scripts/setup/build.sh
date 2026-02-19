@@ -25,7 +25,9 @@ declare -A IMAGES=(
     ["velib-collector"]="collectors/velib"
     ["station-info-writer"]="services/station-info-writer"
     ["bq-writer"]="services/bq-writer"
+    ["idfm-collector"]="collectors/idfm"
 )
+
 
 # 3. Build Loop
 for IMAGE_NAME in "${!IMAGES[@]}"; do

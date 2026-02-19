@@ -176,40 +176,8 @@ Loaded into BigQuery automatically during `make deploy` via `dbt seed`.
 
 ### Architecture
 
-```
-┌─────────────────────────────┐       ┌──────────────────────────────┐
-│  IDFM Disruptions (live)    │       │  Vélib Station Status (live) │
-│  pmp_raw.idfm_disruptions   │       │  pmp_curated.velib_station   │
-│                             │       │  _status                     │
-│  Fields:                    │       │                              │
-│  - disruption_id            │       │  Fields:                     │
-│  - stop_area_id             │       │  - station_id                │
-│  - severity (BLOQUANTE...)  │       │  - num_bikes_available       │
-│  - cause (TRAVAUX...)       │       │  - lat, lon                  │
-│  - application_periods      │       │  - ingest_ts                 │
-└─────────┬───────────────────┘       └──────────────┬───────────────┘
-          │                                          │
-          ▼                                          │
-┌─────────────────────────────┐                      │
-│  IDFM Stops Reference       │                      │
-│  pmp_curated.idfm_stops_ref │                      │
-│                             │                      │
-│  Fields:                    │                      │
-│  - ZdAId (= stop_area_id)  │                      │
-│  - lat, lon (from Geopoint) │                      │
-│  - name, town              │                      │
-└─────────┬───────────────────┘                      │
-          │                                          │
-          └──────── ST_DISTANCE() < 500m ◄───────────┘
-                          │
-                          ▼
-              ┌───────────────────────┐
-              │  Cross-Source Mart     │
-              │  "Disrupted lines     │
-              │   + nearby Vélib      │
-              │   station usage"      │
-              └───────────────────────┘
-```
+![Architecture: Correlating Transit Disruptions with Vélib](../images/second_data_source.png)
+*Figure 1: Multi-modal data correlation architecture (IDFM + Vélib)*
 
 ### Example Query
 

@@ -171,4 +171,37 @@ resource "google_pubsub_topic_iam_member" "collector_publisher_events" {
   member  = "serviceAccount:${google_service_account.collector_sa.email}"
 }
 
+# ========================
+# IDFM Disruption Pipeline Service Account
+# ========================
+resource "google_service_account" "idfm_collector_sa" {
+  account_id   = "pmp-idfm-collector-sa"
+  display_name = "IDFM Disruption Collector SA"
+}
+
+# IDFM Collector: Pub/Sub Publisher on pmp-events
+resource "google_pubsub_topic_iam_member" "idfm_collector_publisher" {
+  project = var.project_id
+  topic   = google_pubsub_topic.pmp_events.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${google_service_account.idfm_collector_sa.email}"
+}
+
+# IDFM Collector: Access Secret Manager (API Key)
+resource "google_secret_manager_secret_iam_member" "idfm_collector_secret_access" {
+  secret_id = google_secret_manager_secret.idfm_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.idfm_collector_sa.email}"
+}
+
+# Scheduler: Invoke IDFM Collector Cloud Run Service
+resource "google_cloud_run_v2_service_iam_member" "scheduler_invoke_idfm" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.pmp_idfm_collector.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
+}
+
+
 
