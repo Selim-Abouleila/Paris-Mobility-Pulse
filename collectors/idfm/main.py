@@ -3,9 +3,9 @@ import json
 import logging
 import os
 
+import requests
 from flask import Flask, jsonify
 from google.cloud import pubsub_v1
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
