@@ -3,9 +3,9 @@ import json
 import logging
 import os
 
+import requests
 from flask import Flask, jsonify
 from google.cloud import pubsub_v1
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,8 +16,10 @@ app = Flask(__name__)
 # Configuration
 PROJECT_ID = os.getenv("PROJECT_ID")
 IDFM_API_KEY = os.getenv("IDFM_API_KEY")
-TOPIC_ID = "pmp-events" # Hardcoded or env var? Let's use env var if reliable, but for now hardcode as in other collectors
-IDFM_API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/disruptions_bulk/disruptions/v2"
+TOPIC_ID = "pmp-events"  # Hardcoded or env var? Let's use env var if reliable, but for now hardcode as in other collectors
+IDFM_API_URL = (
+    "https://prim.iledefrance-mobilites.fr/marketplace/disruptions_bulk/disruptions/v2"
+)
 
 if not PROJECT_ID:
     logger.error("PROJECT_ID environment variable is not set.")
@@ -30,6 +32,7 @@ if not IDFM_API_KEY:
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
 
+
 @app.route("/", methods=["POST"])
 def trigger_collection():
     """
@@ -38,19 +41,17 @@ def trigger_collection():
     """
     try:
         logger.info("Starting IDFM disruption collection...")
-        
-        headers = {
-            "apikey": IDFM_API_KEY
-        }
-        
+
+        headers = {"apikey": IDFM_API_KEY}
+
         response = requests.get(IDFM_API_URL, headers=headers, timeout=30)
         response.raise_for_status()
-        
+
         data = response.json()
         disruptions = data.get("disruptions", [])
-        
+
         logger.info(f"Fetched {len(disruptions)} disruptions.")
-        
+
         # Publish each disruption as a separate message
         published_count = 0
         for disruption in disruptions:
@@ -59,24 +60,25 @@ def trigger_collection():
                 "source": "idfm_disruptions",
                 "event_type": "disruption",
                 "ingest_ts": datetime.datetime.utcnow().isoformat(),
-                "payload": disruption
+                "payload": disruption,
             }
-            
+
             publisher.publish(
-                topic_path, 
+                topic_path,
                 json.dumps(message_payload).encode("utf-8"),
                 source="idfm_collector",
-                event_type="disruption"
+                event_type="disruption",
             )
             published_count += 1
-            
+
         logger.info(f"Published {published_count} messages to {topic_path}.")
-        
+
         return jsonify({"status": "success", "published_count": published_count}), 200
 
     except Exception as e:
         logger.error(f"Error in collection: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
