@@ -179,12 +179,12 @@ resource "google_service_account" "idfm_collector_sa" {
   display_name = "IDFM Disruption Collector SA"
 }
 
-# IDFM Collector: Pub/Sub Publisher on pmp-events
-resource "google_pubsub_topic_iam_member" "idfm_collector_publisher" {
-  project = var.project_id
-  topic   = google_pubsub_topic.pmp_events.name
-  role    = "roles/pubsub.publisher"
-  member  = "serviceAccount:${google_service_account.idfm_collector_sa.email}"
+# IDFM Collector: BigQuery DataEditor on pmp_raw
+resource "google_bigquery_dataset_iam_member" "idfm_collector_bq_raw" {
+  project    = var.project_id
+  dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.idfm_collector_sa.email}"
 }
 
 # IDFM Collector: Access Secret Manager (API Key)

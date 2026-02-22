@@ -54,7 +54,7 @@ make demo-down   # Stops all cost-generating resources
 
 ## Key GCP resources
 - **BigQuery**:
-    - **Raw Layer** (`pmp_raw`): Landing zone for JSON payloads.
+    - **Raw Layer** (`pmp_raw`): Landing zone for JSON payloads (`velib_station_status_raw`, `idfm_disruptions_raw`).
     - **Curated Layer** (`pmp_curated`):
         - `velib_station_status`: History of station updates.
         - `velib_station_information`: Static metadata (names, capacity).
@@ -69,6 +69,8 @@ make demo-down   # Stops all cost-generating resources
         - `velib_totals_hourly_aggregate`: Hourly station snapshots.
         - `velib_totals_hourly`: Clean dashboard view.
         - `velib_totals_hourly_paris`: Filtered view for high-coverage stations.
+    - **Reference Data** (`pmp_dbt_dev_curated`):
+        - `idfm_stops_reference`: IDFM transit stops reference data (dbt seed, 18K rows).
 - **Pub/Sub**:
     - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata), `pmp-velib-station-info-push-dlq` (Dead Letter Queue).
     - **Subscriptions**:
@@ -85,9 +87,13 @@ make demo-down   # Stops all cost-generating resources
     - `pmp-velib-station-info-collector`: Polls static station metadata (Daily).
     - `pmp-velib-station-info-writer`: Ingests metadata into BigQuery.
     - `pmp-station-info-dlq-replayer`: Cloud Run Job to replay failed metadata events.
+    - `pmp-idfm-collector`: Polls IDFM transit disruptions (every 10 min).
 - **Cloud Scheduler**:
     - `velib-poll-every-minute` (Every minute): Triggers status collection.
     - `pmp-velib-station-info-daily` (Daily at 03:10): Triggers daily metadata refresh.
+    - `idfm-poll-every-10min` (Every 10 min): Triggers IDFM disruption collection.
+- **Secret Manager**:
+    - `pmp-idfm-api-key`: IDFM API key for transit disruption collection.
 
 ## Dashboards
 

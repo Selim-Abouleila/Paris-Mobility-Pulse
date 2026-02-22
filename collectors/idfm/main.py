@@ -5,7 +5,7 @@ import os
 
 import requests
 from flask import Flask, jsonify
-from google.cloud import pubsub_v1
+from google.cloud import bigquery
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,10 +16,10 @@ app = Flask(__name__)
 # Configuration
 PROJECT_ID = os.getenv("PROJECT_ID")
 IDFM_API_KEY = os.getenv("IDFM_API_KEY")
-TOPIC_ID = "pmp-events"  # Hardcoded or env var? Let's use env var if reliable, but for now hardcode as in other collectors
 IDFM_API_URL = (
     "https://prim.iledefrance-mobilites.fr/marketplace/disruptions_bulk/disruptions/v2"
 )
+BQ_TABLE = f"{PROJECT_ID}.pmp_raw.idfm_disruptions_raw"
 
 if not PROJECT_ID:
     logger.error("PROJECT_ID environment variable is not set.")
@@ -28,16 +28,15 @@ if not PROJECT_ID:
 if not IDFM_API_KEY:
     logger.warning("IDFM_API_KEY environment variable is not set. API calls may fail.")
 
-# Initialize Pub/Sub Publisher
-publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
+# Initialize BigQuery client
+bq_client = bigquery.Client(project=PROJECT_ID)
 
 
 @app.route("/", methods=["POST"])
 def trigger_collection():
     """
     Cloud Scheduler triggers this endpoint via POST.
-    Fetches disruptions from IDFM API and publishes to Pub/Sub.
+    Fetches disruptions from IDFM API and writes directly to BigQuery.
     """
     try:
         logger.info("Starting IDFM disruption collection...")
@@ -52,28 +51,30 @@ def trigger_collection():
 
         logger.info(f"Fetched {len(disruptions)} disruptions.")
 
-        # Publish each disruption as a separate message
-        published_count = 0
+        now = datetime.datetime.utcnow().isoformat()
+
+        # Build rows for BigQuery
+        rows = []
         for disruption in disruptions:
-            # Add metadata
-            message_payload = {
+            row = {
+                "ingest_ts": now,
+                "event_ts": now,
                 "source": "idfm_disruptions",
                 "event_type": "disruption",
-                "ingest_ts": datetime.datetime.utcnow().isoformat(),
-                "payload": disruption,
+                "key": disruption.get("id", "unknown"),
+                "payload": json.dumps(disruption),
             }
+            rows.append(row)
 
-            publisher.publish(
-                topic_path,
-                json.dumps(message_payload).encode("utf-8"),
-                source="idfm_collector",
-                event_type="disruption",
-            )
-            published_count += 1
+        if rows:
+            errors = bq_client.insert_rows_json(BQ_TABLE, rows)
+            if errors:
+                logger.error(f"BigQuery insert errors: {errors}")
+                return jsonify({"status": "error", "errors": errors}), 500
 
-        logger.info(f"Published {published_count} messages to {topic_path}.")
+        logger.info(f"Inserted {len(rows)} rows into {BQ_TABLE}.")
 
-        return jsonify({"status": "success", "published_count": published_count}), 200
+        return jsonify({"status": "success", "inserted_count": len(rows)}), 200
 
     except Exception as e:
         logger.error(f"Error in collection: {e}")
