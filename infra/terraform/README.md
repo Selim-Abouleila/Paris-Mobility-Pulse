@@ -34,6 +34,12 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp_ops` | `velib_dlq_raw` | Table | Pub/Sub DLQ raw messages, partitioned by `publish_time` |
 | `pmp_ops` | `velib_station_status_curated_dlq` | Table | Dataflow DLQ errors, partitioned by `dlq_ts` |
 
+#### IDFM Disruptions (`bigquery_idfm.tf`)
+
+| Dataset | Table | Type | Details |
+| :--- | :--- | :--- | :--- |
+| `pmp_raw` | `idfm_disruptions_raw` | Table | Raw IDFM disruption JSON payloads, partitioned by `ingest_ts`, clustered by `source`, `event_type` |
+
 > **dbt-managed views**: `velib_totals_hourly_aggregate`, `velib_totals_hourly`, and `velib_totals_hourly_paris` are managed by dbt in `dbt/models/` and have been removed from Terraform. See [docs/11-dbt-analytics-engineering.md](../../docs/11-dbt-analytics-engineering.md).
 
 ### Cloud Run (`cloud_run_*.tf`)
@@ -44,6 +50,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp-velib-station-info-collector` | `cloud_run_station_info.tf` | Collects station_information metadata → publishes to `pmp-velib-station-info` |
 | `pmp-velib-station-info-writer` | `cloud_run_station_info.tf` | Receives push from Pub/Sub → writes to BigQuery |
 | `pmp-bq-writer` | `cloud_run_bq.tf` | Receives push from `pmp-events-to-bq-sub` → writes raw events to BigQuery |
+| `pmp-idfm-collector` | `cloud_run_idfm_collector.tf` | Collects IDFM transit disruptions → publishes to `pmp-events` |
 
 > **Deployment note**: Cloud Run services are deployed via `gcloud run deploy` (see Makefile). Terraform defines their configuration for reference and IAM bindings, but actual images are pushed separately. See [docs/03-terraform-iac.md](../../docs/03-terraform-iac.md).
 
@@ -53,6 +60,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | :--- | :--- | :--- |
 | `pmp-velib-poll-every-minute` | `* * * * *` (every minute) | `pmp-velib-collector` `/collect` |
 | `pmp-velib-station-info-daily` | `10 3 * * *` (daily 3:10 AM) | `pmp-velib-station-info-collector` `/collect` |
+| `idfm-poll-every-10min` | `*/10 * * * *` (every 10 min) | `pmp-idfm-collector` `/` |
 
 ### IAM & Service Accounts (`iam.tf`)
 
@@ -63,6 +71,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp-station-info-writer-sa` | Station info writer | BigQuery DataEditor (curated) |
 | `pmp-pubsub-push-sa` | Pub/Sub push invoker | Cloud Run Invoker (writer + bq-writer services), BigQuery DataEditor (raw) |
 | `pmp-scheduler-sa` | Cloud Scheduler trigger | Cloud Run Invoker (collector services) |
+| `pmp-idfm-collector-sa` | IDFM collector | Pub/Sub Publisher (`pmp-events`), Secret Manager Accessor (`pmp-idfm-api-key`) |
 
 > **Least Privilege**: All BigQuery permissions are scoped to dataset-level, not project-level. Storage permissions are scoped to the specific Dataflow bucket.
 
@@ -71,6 +80,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 
 ### Secrets (`secrets.tf`)
 - **Placeholder**: `pmp-api-key-placeholder` — prepared for future API key management via Secret Manager.
+- **IDFM API Key**: `pmp-idfm-api-key` — stores the IDFM API key for the transit disruptions collector (initial placeholder version created by Terraform; replace with real key in Secret Manager Console).
 
 ---
 
@@ -207,8 +217,10 @@ infra/terraform/
 ├── backend.tf                         # State backend config
 ├── bigquery.tf                        # Datasets, tables, views (raw/curated/marts/ops)
 ├── cloud_run_bq.tf                    # BQ writer service (raw ingestion)
+├── cloud_run_idfm_collector.tf        # IDFM disruptions collector service
 ├── cloud_run_station_info.tf          # Station info collector + writer services
 ├── cloud_run_velib_collector.tf       # Vélib status collector service
+├── cloud_scheduler_idfm.tf            # IDFM disruptions trigger (every 10 min)
 ├── cloud_scheduler_station_info.tf    # Daily station info trigger
 ├── cloud_scheduler_station_status.tf  # Per-minute status collection trigger
 ├── dlq_table_schema.json              # DLQ table schema definition
@@ -216,7 +228,8 @@ infra/terraform/
 ├── outputs.tf                         # Terraform outputs
 ├── provider.tf                        # Google provider config
 ├── pubsub.tf                          # Topics + subscriptions (events, station-info, DLQ)
-├── secrets.tf                         # Secret Manager placeholder
+├── bigquery_idfm.tf                   # IDFM disruptions raw table
+├── secrets.tf                         # Secret Manager (placeholder + IDFM API key)
 ├── storage.tf                         # GCS bucket for Dataflow
 ├── variables.tf                       # Input variables
 ├── versions.tf                        # Required provider versions

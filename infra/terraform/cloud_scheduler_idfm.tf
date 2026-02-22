@@ -5,6 +5,7 @@ resource "google_cloud_scheduler_job" "idfm_poll" {
   schedule         = "*/10 * * * *" # Every 10 min
   time_zone        = "Europe/Paris"
   attempt_deadline = "320s"
+  region           = var.scheduler_location
 
   http_target {
     http_method = "POST"
