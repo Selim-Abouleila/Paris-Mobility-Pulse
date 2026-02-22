@@ -9,8 +9,7 @@ resource "google_cloud_run_v2_service" "pmp_idfm_collector" {
     service_account = google_service_account.idfm_collector_sa.email
 
     containers {
-      # Placeholder image until the real one is built
-      image = "us-docker.pkg.dev/cloudrun/container/hello"
+      image = "gcr.io/${var.project_id}/idfm-collector:latest"
 
       env {
         name  = "PROJECT_ID"
@@ -27,13 +26,5 @@ resource "google_cloud_run_v2_service" "pmp_idfm_collector" {
         }
       }
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      template[0].containers[0].image, # Ignore image changes (managed by CI/CD)
-      client,
-      client_version
-    ]
   }
 }
