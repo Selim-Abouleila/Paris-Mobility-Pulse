@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # -----------------------------------------------------------------------------
-# Build Script
-# Builds all Docker images found in the repository.
+# Build & Deploy Script
+# Builds all Docker images and deploys them to Cloud Run.
 # -----------------------------------------------------------------------------
 
 RED='\033[0;31m'
@@ -16,11 +16,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 "$SCRIPT_DIR/check_env.sh"
 source .env
 
-echo -e "${BLUE}==> Building Container Images for Project: $PROJECT_ID${NC}"
+REGION="${REGION:-europe-west9}"
 
-# 2. Define Services to Build
-# Format: "ImageName:DirectoryPath"
-# We map the concise image name used in Terraform to the source directory.
+echo -e "${BLUE}==> Building & Deploying Container Images for Project: $PROJECT_ID${NC}"
+
+# 2. Define Services to Build & Deploy
+# Maps image name → source directory
 declare -A IMAGES=(
     ["velib-collector"]="collectors/velib"
     ["station-info-writer"]="services/station-info-writer"
@@ -28,10 +29,18 @@ declare -A IMAGES=(
     ["idfm-collector"]="collectors/idfm"
 )
 
+# Maps image name → Cloud Run service name
+declare -A SERVICES=(
+    ["velib-collector"]="pmp-velib-collector"
+    ["station-info-writer"]="pmp-velib-station-info-writer"
+    ["bq-writer"]="pmp-bq-writer"
+    ["idfm-collector"]="pmp-idfm-collector"
+)
 
-# 3. Build Loop
+# 3. Build & Deploy Loop
 for IMAGE_NAME in "${!IMAGES[@]}"; do
     SOURCE_DIR="${IMAGES[$IMAGE_NAME]}"
+    SERVICE_NAME="${SERVICES[$IMAGE_NAME]}"
     FULL_IMAGE="gcr.io/$PROJECT_ID/$IMAGE_NAME:latest"
     
     if [[ ! -d "$SOURCE_DIR" ]]; then
@@ -39,17 +48,23 @@ for IMAGE_NAME in "${!IMAGES[@]}"; do
         continue
     fi
 
+    # Build
     echo -e "${BLUE}--> Building $IMAGE_NAME from $SOURCE_DIR...${NC}"
-    
-    # Check if Cloud Build is enabled (handled in bootstrap, but good to fail fast)
-    
     gcloud builds submit "$SOURCE_DIR" \
         --tag "$FULL_IMAGE" \
         --project "$PROJECT_ID" \
         --quiet
-        
-    echo -e "${GREEN}    Success: $FULL_IMAGE${NC}"
+    echo -e "${GREEN}    Built: $FULL_IMAGE${NC}"
+
+    # Deploy to Cloud Run (forces new revision to pull the fresh image)
+    echo -e "${BLUE}--> Deploying $SERVICE_NAME...${NC}"
+    gcloud run deploy "$SERVICE_NAME" \
+        --image "$FULL_IMAGE" \
+        --region "$REGION" \
+        --project "$PROJECT_ID" \
+        --quiet
+    echo -e "${GREEN}    Deployed: $SERVICE_NAME${NC}"
 done
 
 echo -e ""
-echo -e "${GREEN}SUCCESS: All images built and pushed.${NC}"
+echo -e "${GREEN}SUCCESS: All images built and deployed.${NC}"
