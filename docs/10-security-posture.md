@@ -11,7 +11,7 @@ This document outlines the security architecture, principles, and controls imple
 -   **Configuration as Code**: all security policies (IAM, Firewalls) are defined in Terraform. No manual console changes.
 
 ### Assumptions
--   **Public Data**: The source data (Vélib availability) is public Opendata. Confidentiality concerns are primarily for **infrastructure integrity, billing protection, and operational continuity**, not user privacy.
+-   **Public Data**: The source data (Vélib availability, IDFM transit disruptions) is public Opendata. Confidentiality concerns are primarily for **infrastructure integrity, billing protection, and operational continuity**, not user privacy. The IDFM API key is the only secret requiring active protection.
 -   **Demo Environment**: While "production-grade", the pipeline is designed for cost-efficiency. Highly expensive controls (e.g., VPC Service Controls, Cloud HSM) are out of scope for this MVP but the architecture supports future adoption.
 
 ---
@@ -29,6 +29,7 @@ We use **dedicated Service Accounts (SAs)** for each compute workload to prevent
 | `pmp-scheduler-sa` | Cloud Scheduler | `run.invoker` | Invoke Collector services via OIDC. |
 | `pmp-pubsub-push-sa` | Pub/Sub Push | `run.invoker` | Invoke Writer services via OIDC. |
 | `pmp-dlq-replayer-sa` | Cloud Run Job | `pubsub.writer`<br>`pubsub.subscriber` | Consume DLQ subscription, Republish to source topic. |
+| `pmp-idfm-collector-sa` | Cloud Run Collector | `bigquery.dataEditor`<br>`secretmanager.secretAccessor` | Write to `pmp_raw` (disruptions). Read `pmp-idfm-api-key` secret ONLY. |
 
 ---
 
@@ -37,12 +38,18 @@ We use **dedicated Service Accounts (SAs)** for each compute workload to prevent
 All Cloud Run services are **Private (No Allow Unauthenticated)** by default.
 
 ### Invocation Path
-1.  **Scheduler → Collector**:
+1.  **Scheduler → Vélib Collector**:
     -   Cloud Scheduler uses `pmp-scheduler-sa`.
     -   Authenticates via OIDC ID token.
     -   `pmp-velib-collector` accepts only this identity.
 
-2.  **Pub/Sub → Writer**:
+2.  **Scheduler → IDFM Collector**:
+    -   Cloud Scheduler uses `pmp-scheduler-sa`.
+    -   Authenticates via OIDC ID token.
+    -   `pmp-idfm-collector` accepts only this identity.
+    -   Collector writes directly to BigQuery (no Pub/Sub intermediary).
+
+3.  **Pub/Sub → Writer**:
     -   Pub/Sub Push Subscription uses `pmp-pubsub-push-sa`.
     -   Authenticates via OIDC ID token.
     -   `pmp-bq-writer` accepts only this identity.
@@ -69,7 +76,7 @@ Datasets are logically isolated. We are migrating away from Project-Level roles 
 
 | Layer | Dataset | Write Access | Read Access | Purpose |
 | :--- | :--- | :--- | :--- | :--- |
-| **Raw** | `pmp_raw` | `pmp-bq-writer-sa` | `group:data-engineers` | Landing zone for original JSON. Immutable. |
+| **Raw** | `pmp_raw` | `pmp-bq-writer-sa`<br>`pmp-idfm-collector-sa` | `group:data-engineers` | Landing zone for original JSON. Immutable. |
 | **Curated** | `pmp_curated` | `pmp-dataflow-sa` | `group:data-analysts` | Cleaned, deduplicated, schema-validated tables. |
 | **Marts** | `pmp_marts` | *Read-Only Views* | `service:looker-studio` | Aggregated business views for dashboards. |
 | **Ops** | `pmp_ops` | `pubsub-service-agent`<br>`pmp-dataflow-sa` | `group:platform-admins` | Dead Letter Queues and Pipeline Audit logs. |
@@ -78,12 +85,15 @@ Datasets are logically isolated. We are migrating away from Project-Level roles 
 
 ## 6. Secrets Management
 
-**Current State**: No sensitive secrets (passwords/keys) are strictly required for the public data MVP.
-**Future State (Ready)**: If API keys or database credentials are added:
-1.  **Storage**: Google Secret Manager (GSM).
-2.  **Access**: `roles/secretmanager.secretAccessor` granted ONLY to the runtime SA.
-3.  **Consumption**: Mounted as environment variables or volumes in Cloud Run.
-4.  **Anti-Pattern**: NEVER store secrets in `terraform.tfvars` or environment variables in code.
+| Secret | Consumer SA | Access Method | Purpose |
+| :--- | :--- | :--- | :--- |
+| `pmp-idfm-api-key` | `pmp-idfm-collector-sa` | Cloud Run env var (Secret Manager ref, `version=latest`) | IDFM Prim API authentication |
+
+### Controls
+1.  **Storage**: Google Secret Manager (GSM). Terraform creates the secret + a placeholder version; the real key is added manually post-deployment.
+2.  **Access**: `roles/secretmanager.secretAccessor` granted ONLY to the runtime SA that needs it (`pmp-idfm-collector-sa`).
+3.  **Consumption**: Mounted as environment variables in Cloud Run via `secret_key_ref`. Cloud Run resolves `latest` at container cold start.
+4.  **Anti-Pattern**: NEVER store secrets in `terraform.tfvars`, `.env` files, or hardcoded in source code.
 
 ---
 
@@ -106,12 +116,20 @@ Datasets are logically isolated. We are migrating away from Project-Level roles 
 ```bash
 # Should return 401 Unauthorized or 403 Forbidden
 curl -X GET $(gcloud run services describe pmp-velib-collector --region europe-west9 --format 'value(status.url)')
+curl -X POST $(gcloud run services describe pmp-idfm-collector --region europe-west9 --format 'value(status.url)')
 ```
 
 ### Verify Service Account Identity
 ```bash
-# Check who allows Scheduler to invoke Collector
+# Check who can invoke the Vélib Collector
 gcloud run services get-iam-policy pmp-velib-collector \
+  --region europe-west9 \
+  --flatten="bindings[].members" \
+  --format="table(bindings.role, bindings.members)" \
+  --filter="bindings.role:roles/run.invoker"
+
+# Check who can invoke the IDFM Collector
+gcloud run services get-iam-policy pmp-idfm-collector \
   --region europe-west9 \
   --flatten="bindings[].members" \
   --format="table(bindings.role, bindings.members)" \
@@ -120,6 +138,17 @@ gcloud run services get-iam-policy pmp-velib-collector \
 
 ### Verify BigQuery Access
 ```bash
+# List permissions on the Raw dataset (Vélib bq-writer + IDFM collector)
+bq show --format=prettyjson pmp_raw | jq '.access'
+
 # List permissions on the Curated dataset
 bq show --format=prettyjson pmp_curated | jq '.access'
+```
+
+### Verify Secret Access
+```bash
+# Check who can access the IDFM API key
+gcloud secrets get-iam-policy pmp-idfm-api-key \
+  --project paris-mobility-pulse \
+  --format="table(bindings.role, bindings.members)"
 ```
