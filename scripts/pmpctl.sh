@@ -36,16 +36,18 @@ DATAFLOW_SA="${DATAFLOW_SA:-pmp-dataflow-sa@${PROJECT_ID}.iam.gserviceaccount.co
 WORKER_ZONE="${WORKER_ZONE:-}"                 # empty means let Dataflow choose
 WORKER_MACHINE_TYPE="${WORKER_MACHINE_TYPE:-}" # empty means default
 
-# Scheduler jobs that control ingestion (add more later as you create them)
+# Scheduler jobs that control ingestion
 SCHED_JOBS=(
   "pmp-velib-poll-every-minute"      # station_status every minute
   "pmp-velib-station-info-daily"     # station_information daily (if created)
+  "idfm-poll-every-10min"            # IDFM transit disruptions every 10 min
 )
 
 # Cloud Run collectors you may want to "poke" once during demo
 RUN_COLLECTORS=(
   "pmp-velib-collector"              # station_status collector
   "pmp-velib-station-info-collector" # station_information collector
+  "pmp-idfm-collector"              # IDFM transit disruptions collector
 )
 
 # Dataflow job naming
