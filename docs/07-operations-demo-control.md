@@ -11,12 +11,24 @@ The `scripts/pmpctl.sh` script provides one-command control over the cost-genera
 
 ## Purpose
 
-To minimize Google Cloud costs, we only run the processing infrastructure when actively demoing or testing. On GCP, the two main cost generators for this project are:
+To minimize Google Cloud costs, we only run the processing infrastructure when actively demoing or testing. On GCP, the main cost generators for this project are:
 
-1.  **Cloud Scheduler Jobs**: These trigger the ingestion every minute.
+1.  **Cloud Scheduler Jobs**: These trigger ingestion (Vélib every minute, IDFM every 10 minutes).
 2.  **Dataflow Streaming Jobs**: These keep worker VMs running.
 
 The `pmpctl.sh` script automates pausing/resuming schedulers and starting/canceling Dataflow jobs.
+
+### Managed Components
+
+| Component | Type | Controlled by |
+| :--- | :--- | :--- |
+| `pmp-velib-poll-every-minute` | Cloud Scheduler | `up` / `down` |
+| `pmp-velib-station-info-daily` | Cloud Scheduler | `up` / `down` |
+| `idfm-poll-every-10min` | Cloud Scheduler | `up` / `down` |
+| `pmp-velib-curated-*` | Dataflow streaming | `up` / `down` |
+| `pmp-velib-collector` | Cloud Run (poke) | `collect` |
+| `pmp-velib-station-info-collector` | Cloud Run (poke) | `collect` |
+| `pmp-idfm-collector` | Cloud Run (poke) | `collect` |
 
 > [!NOTE]
 > Cloud Run services (collectors and writers) do **not** need to be started or stopped. They scale to zero and only cost money when they are processing a request.
@@ -27,8 +39,8 @@ The `pmpctl.sh` script automates pausing/resuming schedulers and starting/cancel
 | :--- | :--- |
 | `./scripts/pmpctl.sh status` | Show current state of schedulers and Dataflow jobs. |
 | `./scripts/pmpctl.sh up` | **Start Demo**: Resume schedulers + Launch Dataflow streaming job. |
-| `./scripts/pmpctl.sh collect` | **Poke**: Manually trigger all collectors once (bypasses scheduler). |
-| `./scripts/pmpctl.sh down` | **Stop Demo**: Pause schedulers + Cancel Dataflow streaming job(s). |
+| `./scripts/pmpctl.sh collect` | **Poke**: Manually trigger all collectors once — Vélib + IDFM (bypasses scheduler). |
+| `./scripts/pmpctl.sh down` | **Stop Demo**: Pause all schedulers + Cancel Dataflow streaming job(s). |
 
 ## Usage Examples
 
@@ -43,9 +55,10 @@ The `pmpctl.sh` script automates pausing/resuming schedulers and starting/cancel
 ```
 *Submission logs are saved to `logs/dataflow_pmp-velib-curated-*.log`.*
 
-### 3. Trigger data ingestion immediately
+### 3. Trigger data ingestion immediately (all collectors)
 ```bash
 ./scripts/pmpctl.sh collect
+# Pokes: pmp-velib-collector, pmp-velib-station-info-collector, pmp-idfm-collector
 ```
 
 ### 4. Shut down all cost-generating resources
@@ -83,4 +96,5 @@ If the script fails to find scheduler jobs, ensure `SCHED_LOCATION` matches wher
 
 ## Cost Safety
 - **Streaming Dataflow**: Costs money as long as the job is `Running`. Always run `./scripts/pmpctl.sh down` when your demo session is over.
-- **Automated Pausing**: By pausing the scheduler, we stop the continuous flow of events even if the Cloud Run services remain deployed.
+- **Automated Pausing**: By pausing all schedulers (Vélib + IDFM), we stop the continuous flow of events even if the Cloud Run services remain deployed.
+- **IDFM Collector**: Writes directly to BigQuery (no Dataflow needed). Cost is minimal — only BigQuery streaming insert charges (~$0.01 per 200 MB).
