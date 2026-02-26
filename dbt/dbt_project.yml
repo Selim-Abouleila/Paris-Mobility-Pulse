@@ -29,6 +29,11 @@ models:
       +schema: pmp_marts
       +materialized: view
     
+    # Curated = Cleaned & enriched data
+    curated:
+      +schema: curated
+      +materialized: table
+
     # Staging = Raw Data cleanup
     staging:
       +schema: pmp_staging

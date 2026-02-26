@@ -8,3 +8,9 @@ sources:
     tables:
       - name: velib_station_status
       - name: velib_station_information
+
+  - name: pmp_raw
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: pmp_raw
+    tables:
+      - name: idfm_disruptions_raw
