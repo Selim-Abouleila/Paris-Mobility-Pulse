@@ -61,7 +61,7 @@ Contains transit stop coordinates (`ZdAId`, `name`, `lat`, `lon`, `town`, `type`
 
 **File**: `dbt/models/curated/stg_idfm_disruptions.sql`
 
-Extracts fields from the raw JSON `payload` column into a structured table in `pmp_dbt_dev_curated`.
+Extracts fields from the raw JSON `payload` column into a structured **incremental** table in `pmp_dbt_dev_curated`.
 
 ```sql
 SELECT
@@ -76,23 +76,43 @@ SELECT
   JSON_QUERY(payload, '$.applicationPeriods') AS application_periods,
   JSON_QUERY(payload, '$.impactedSections')   AS impacted_sections
 FROM pmp_raw.idfm_disruptions_raw
+WHERE ingest_ts > TIMESTAMP_SUB((SELECT MAX(ingest_ts) FROM this), INTERVAL 1 MINUTE)
 ```
 
 **Table config**:
-- **Materialized**: `table`
+- **Materialized**: `incremental` (merge on `disruption_id` + `ingest_ts`)
 - **Partitioned by**: `MONTH` on `ingest_ts`
 - **Clustered by**: `severity`
+- **Safety overlap**: 1 minute lookback to avoid missing rows
 - **Dataset**: `pmp_dbt_dev_curated`
 
 **dbt config changes**:
 - `dbt_project.yml` — Added `curated:` folder config (`+schema: curated`, `+materialized: table`)
 - `models/sources.yml` — Added `pmp_raw` source with `idfm_disruptions_raw` table
 
-### 2.2 Flattened Disruptions Model ⬜
+### 2.2 Scheduled dbt Runner ✅
+
+Automated hourly dbt runs via Cloud Run Job + Cloud Scheduler.
+
+| Resource | File | Purpose |
+|---|---|---|
+| `dbt/Dockerfile` | `dbt/Dockerfile` | Lightweight `python:3.11-slim` + `dbt-bigquery` image |
+| `dbt/.dockerignore` | `dbt/.dockerignore` | Excludes `target/`, `dbt_packages/`, `logs/` |
+| `pmp-dbt-runner` | `cloud_run_dbt_runner.tf` | Cloud Run Job (10 min timeout) |
+| `dbt-run-every-hour` | `cloud_run_dbt_runner.tf` | Cloud Scheduler (`0 * * * *`, Europe/Paris) |
+| `pmp-dbt-runner-sa` | `iam.tf` | Service account: BigQuery dataViewer on `pmp_raw`, dataEditor + jobUser project-level |
+| Scheduler → Job invoke | `iam.tf` | IAM binding for scheduler to invoke the Cloud Run Job |
+
+**Operations**:
+- `pmpctl.sh up` resumes the `dbt-run-every-hour` scheduler (added to `SCHED_JOBS` array)
+- `pmpctl.sh down` pauses it
+- `build.sh` builds and deploys the dbt-runner container image
+
+### 2.3 Flattened Disruptions Model ⬜
 
 `idfm_disruptions.sql` — Flatten `impactedSections` array → one row per impacted section per disruption.
 
-### 2.3 Cross-Source Mart ⬜
+### 2.4 Cross-Source Mart ⬜
 
 `disruptions_near_velib.sql` — Geographic join between disrupted stops and nearby Vélib stations.
 
@@ -105,6 +125,14 @@ Not started.
 ## Phase 4: Operations ⬜
 
 Not started.
+
+---
+
+## Known Issues
+
+### BigQuery Region Mismatch (Resolved)
+
+`pmp_raw` was originally in `europe-west9`, while `pmp_curated` and all dbt-managed datasets are in `EU`. This caused `Dataset not found in location EU` errors during `dbt run`. **Fixed** by recreating `pmp_raw` in EU.
 
 ---
 
@@ -125,4 +153,12 @@ FROM `paris-mobility-pulse.pmp_raw.idfm_disruptions_raw`
 SELECT disruption_id, cause, severity, title, last_update
 FROM `paris-mobility-pulse.pmp_dbt_dev_curated.stg_idfm_disruptions`
 LIMIT 10
+```
+
+### Confirm incremental is working (after 2nd+ run)
+
+```sql
+SELECT COUNT(*) AS total_rows,
+       COUNT(DISTINCT ingest_ts) AS distinct_polls
+FROM `paris-mobility-pulse.pmp_dbt_dev_curated.stg_idfm_disruptions`
 ```

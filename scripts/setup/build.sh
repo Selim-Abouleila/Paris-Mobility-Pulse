@@ -66,21 +66,13 @@ for IMAGE_NAME in "${!IMAGES[@]}"; do
     echo -e "${GREEN}    Deployed: $SERVICE_NAME${NC}"
 done
 
-# 4. Build & Deploy dbt Runner (Cloud Run Job, not a Service)
+# 4. Build dbt Runner image (Cloud Run Job is created by Terraform)
 echo -e "${BLUE}--> Building dbt-runner from dbt/...${NC}"
 gcloud builds submit "dbt" \
     --tag "gcr.io/$PROJECT_ID/dbt-runner:latest" \
     --project "$PROJECT_ID" \
     --quiet
 echo -e "${GREEN}    Built: gcr.io/$PROJECT_ID/dbt-runner:latest${NC}"
-
-echo -e "${BLUE}--> Deploying dbt-runner job...${NC}"
-gcloud run jobs deploy pmp-dbt-runner \
-    --image "gcr.io/$PROJECT_ID/dbt-runner:latest" \
-    --region "$REGION" \
-    --project "$PROJECT_ID" \
-    --quiet
-echo -e "${GREEN}    Deployed: pmp-dbt-runner (Cloud Run Job)${NC}"
 
 echo -e ""
 echo -e "${GREEN}SUCCESS: All images built and deployed.${NC}"
