@@ -41,6 +41,7 @@ SCHED_JOBS=(
   "pmp-velib-poll-every-minute"      # station_status every minute
   "pmp-velib-station-info-daily"     # station_information daily (if created)
   "idfm-poll-every-10min"            # IDFM transit disruptions every 10 min
+  "dbt-run-every-hour"               # dbt incremental curated models every hour
 )
 
 # Cloud Run collectors you may want to "poke" once during demo
