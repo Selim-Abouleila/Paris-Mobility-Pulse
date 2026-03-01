@@ -1,12 +1,14 @@
 {{
   config(
-    materialized = 'table',
+    materialized = 'incremental',
+    unique_key = ['disruption_id', 'ingest_ts'],
     partition_by = {
       "field": "ingest_ts",
       "data_type": "timestamp",
       "granularity": "month"
     },
-    cluster_by = ["severity"]
+    cluster_by = ["severity"],
+    on_schema_change = 'sync_all_columns'
   )
 }}
 
@@ -25,3 +27,10 @@ SELECT
   JSON_QUERY(payload, '$.applicationPeriods') AS application_periods,
   JSON_QUERY(payload, '$.impactedSections')   AS impacted_sections
 FROM {{ source('pmp_raw', 'idfm_disruptions_raw') }}
+
+{% if is_incremental() %}
+WHERE ingest_ts > TIMESTAMP_SUB(
+  (SELECT MAX(ingest_ts) FROM {{ this }}),
+  INTERVAL 1 MINUTE
+)
+{% endif %}

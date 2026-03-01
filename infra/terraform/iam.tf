@@ -203,5 +203,40 @@ resource "google_cloud_run_v2_service_iam_member" "scheduler_invoke_idfm" {
   member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
 }
 
+# ========================
+# dbt Runner Service Account
+# ========================
+resource "google_service_account" "dbt_runner_sa" {
+  account_id   = "pmp-dbt-runner-sa"
+  display_name = "dbt Runner Service Account"
+}
 
+# dbt Runner: Read from pmp_raw (source tables)
+resource "google_bigquery_dataset_iam_member" "dbt_runner_raw_viewer" {
+  dataset_id = google_bigquery_dataset.pmp_raw.dataset_id
+  role       = "roles/bigquery.dataViewer"
+  member     = "serviceAccount:${google_service_account.dbt_runner_sa.email}"
+}
 
+# dbt Runner: Write to pmp_dbt_dev_curated (target tables)
+# Project-level because dbt-managed datasets aren't in Terraform
+resource "google_project_iam_member" "dbt_runner_bq_data_editor" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = "serviceAccount:${google_service_account.dbt_runner_sa.email}"
+}
+
+resource "google_project_iam_member" "dbt_runner_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${google_service_account.dbt_runner_sa.email}"
+}
+
+# Scheduler: Invoke dbt Runner Cloud Run Job
+resource "google_cloud_run_v2_job_iam_member" "scheduler_invoke_dbt" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_job.dbt_runner.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.scheduler_sa.email}"
+}
