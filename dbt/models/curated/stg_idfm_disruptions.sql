@@ -34,3 +34,8 @@ WHERE ingest_ts > TIMESTAMP_SUB(
   INTERVAL 1 MINUTE
 )
 {% endif %}
+
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY JSON_VALUE(payload, '$.id'), ingest_ts
+  ORDER BY ingest_ts
+) = 1
