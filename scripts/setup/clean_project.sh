@@ -26,11 +26,11 @@ echo -e "${RED}!!! WARNING !!!${RESET}"
 echo -e "You are about to DELETE infrastructure in project: ${YELLOW}$PROJECT_ID${RESET}"
 echo -e "This is used to fix 'Already Exists' errors when Terraform state is lost."
 echo -e "Resources to be deleted:"
-echo -e " - BigQuery Datasets: pmp_raw, pmp_curated, pmp_marts, pmp_ops"
+echo -e " - BigQuery Datasets: pmp_raw, pmp_curated, pmp_marts, pmp_ops, pmp_dbt_dev*"
 echo -e " - Pub/Sub Topics: pmp-events, pmp-velib-station-info*"
-echo -e " - Service Accounts: pmp-* (dataflow, collector, writer, etc)"
-echo -e " - Cloud Run Services: pmp-*"
-echo -e " - Cloud Scheduler Jobs: pmp-*"
+echo -e " - Service Accounts: pmp-* (dataflow, collector, writer, dbt-runner, etc)"
+echo -e " - Cloud Run Services + Jobs: pmp-*"
+echo -e " - Cloud Scheduler Jobs: pmp-*, idfm-*, dbt-*"
 echo
 read -p "Are you sure? (y/N) " -n 1 -r
 echo
@@ -42,6 +42,12 @@ fi
 echo -e "${YELLOW}==> Deleting BigQuery Datasets...${RESET}"
 for ds in pmp_raw pmp_curated pmp_marts pmp_ops; do
     echo "    Removing $ds..."
+    bq rm -r -f -d "$PROJECT_ID:$ds" 2>/dev/null || true
+done
+
+# dbt-managed datasets (auto-created by dbt, not in Terraform)
+for ds in $(bq ls --project_id="$PROJECT_ID" --format=csv 2>/dev/null | grep "pmp_dbt_dev" | cut -d, -f1); do
+    echo "    Removing dbt dataset: $ds..."
     bq rm -r -f -d "$PROJECT_ID:$ds" 2>/dev/null || true
 done
 
@@ -60,22 +66,28 @@ echo -e "${YELLOW}==> Deleting Dataflow Bucket...${RESET}"
 gsutil rm -r "gs://pmp-dataflow-${PROJECT_ID}" 2>/dev/null || true
 
 echo -e "${YELLOW}==> Deleting Cloud Run Services...${RESET}"
-gcloud run services list --project="$PROJECT_ID" --format="value(name)" | grep "^pmp-" | while read -r svc; do
+gcloud run services list --project="$PROJECT_ID" --region="${REGION:-europe-west9}" --format="value(name)" | grep "^pmp-" | while read -r svc; do
     echo "    Deleting Cloud Run service: $svc"
-    gcloud run services delete "$svc" --region="$REGION" --project="$PROJECT_ID" --quiet
+    gcloud run services delete "$svc" --region="${REGION:-europe-west9}" --project="$PROJECT_ID" --quiet
+done || true
+
+echo -e "${YELLOW}==> Deleting Cloud Run Jobs...${RESET}"
+gcloud run jobs list --project="$PROJECT_ID" --region="${REGION:-europe-west9}" --format="value(name)" | grep "^pmp-" | while read -r job; do
+    echo "    Deleting Cloud Run job: $job"
+    gcloud run jobs delete "$job" --region="${REGION:-europe-west9}" --project="$PROJECT_ID" --quiet
 done || true
 
 echo -e "${YELLOW}==> Deleting Cloud Scheduler Jobs...${RESET}"
 # Default to europe-west1 if not set, as that is the project standard for schedulers
 SCHED_LOCATION="${SCHED_LOCATION:-europe-west1}"
 
-gcloud scheduler jobs list --location="$SCHED_LOCATION" --project="$PROJECT_ID" --format="value(name)" | grep "pmp-" | while read -r job; do
+gcloud scheduler jobs list --location="$SCHED_LOCATION" --project="$PROJECT_ID" --format="value(name)" | grep -E "(pmp-|idfm-|dbt-)" | while read -r job; do
    echo "    Deleting Scheduler job: $job"
    gcloud scheduler jobs delete "$job" --location="$SCHED_LOCATION" --project="$PROJECT_ID" --quiet
 done || true
 
 echo -e "${YELLOW}==> Deleting Service Accounts...${RESET}"
-SAs=("pmp-dataflow-sa" "pmp-collector-sa" "pmp-pubsub-push-sa" "pmp-scheduler-sa" "pmp-station-info-writer-sa" "pmp-bq-writer-sa")
+SAs=("pmp-dataflow-sa" "pmp-collector-sa" "pmp-pubsub-push-sa" "pmp-scheduler-sa" "pmp-station-info-writer-sa" "pmp-bq-writer-sa" "pmp-idfm-collector-sa" "pmp-dbt-runner-sa")
 for sa in "${SAs[@]}"; do
     email="$sa@$PROJECT_ID.iam.gserviceaccount.com"
     echo "    Deleting SA: $email"
