@@ -72,6 +72,7 @@ import_if_exists "google_bigquery_table.velib_station_status" "projects/$PROJECT
 import_if_exists "google_bigquery_table.velib_station_information" "projects/$PROJECT_ID/datasets/pmp_curated/tables/velib_station_information" "T: velib_station_information"
 import_if_exists "google_bigquery_table.velib_dlq_raw" "projects/$PROJECT_ID/datasets/pmp_ops/tables/velib_station_info_push_dlq" "T: velib_dlq_raw"
 import_if_exists "google_bigquery_table.velib_station_status_curated_dlq" "projects/$PROJECT_ID/datasets/pmp_ops/tables/velib_station_status_curated_dlq" "T: velib_station_status_curated_dlq"
+import_if_exists "google_bigquery_table.idfm_disruptions_raw" "projects/$PROJECT_ID/datasets/pmp_raw/tables/idfm_disruptions_raw" "T: idfm_disruptions_raw"
 
 # 1.2 BigQuery Views (Marts)
 import_if_exists "google_bigquery_table.velib_latest_state" "projects/$PROJECT_ID/datasets/pmp_marts/tables/velib_latest_state" "V: velib_latest_state"
@@ -100,6 +101,8 @@ import_if_exists "google_service_account.collector_sa" "projects/$PROJECT_ID/ser
 import_if_exists "google_service_account.pubsub_push_sa" "projects/$PROJECT_ID/serviceAccounts/pmp-pubsub-push-sa@$PROJECT_ID.iam.gserviceaccount.com" "Pub/Sub Push SA"
 import_if_exists "google_service_account.scheduler_sa" "projects/$PROJECT_ID/serviceAccounts/pmp-scheduler-sa@$PROJECT_ID.iam.gserviceaccount.com" "Scheduler SA"
 import_if_exists "google_service_account.station_info_writer_sa" "projects/$PROJECT_ID/serviceAccounts/pmp-station-info-writer-sa@$PROJECT_ID.iam.gserviceaccount.com" "Station Info Writer SA"
+import_if_exists "google_service_account.idfm_collector_sa" "projects/$PROJECT_ID/serviceAccounts/pmp-idfm-collector-sa@$PROJECT_ID.iam.gserviceaccount.com" "IDFM Collector SA"
+import_if_exists "google_service_account.dbt_runner_sa" "projects/$PROJECT_ID/serviceAccounts/pmp-dbt-runner-sa@$PROJECT_ID.iam.gserviceaccount.com" "dbt Runner SA"
 
 # 5. Cloud Run Services (Optional, as these are often ephemeral/redeployed)
 echo -e "\n${BLUE}--> Adopting Cloud Run Services${RESET}"
@@ -107,6 +110,7 @@ import_if_exists "google_cloud_run_v2_service.pmp_velib_collector" "projects/$PR
 import_if_exists "google_cloud_run_v2_service.station_info_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-station-info-collector" "Station Info Collector"
 import_if_exists "google_cloud_run_v2_service.station_info_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-velib-station-info-writer" "Station Info Writer"
 import_if_exists "google_cloud_run_v2_service.pmp_bq_writer" "projects/$PROJECT_ID/locations/$REGION/services/pmp-bq-writer" "BQ Writer"
+import_if_exists "google_cloud_run_v2_service.pmp_idfm_collector" "projects/$PROJECT_ID/locations/$REGION/services/pmp-idfm-collector" "IDFM Collector"
 
 # 5.1 Pub/Sub Subscriptions (Explicit)
 echo -e "\n${BLUE}--> Adopting Pub/Sub Subscriptions${RESET}"
@@ -117,9 +121,15 @@ import_if_exists "google_pubsub_subscription.station_info_dlq_sub" "projects/$PR
 import_if_exists "google_pubsub_subscription.station_info_dlq_bq_sub" "projects/$PROJECT_ID/subscriptions/pmp-velib-station-info-push-dlq-to-bq-sub" "Sub: pmp-velib-station-info-push-dlq-to-bq-sub"
 import_if_exists "google_pubsub_subscription.station_info_push_sub" "projects/$PROJECT_ID/subscriptions/pmp-velib-station-info-to-bq-sub" "Sub: pmp-velib-station-info-to-bq-sub"
 
+# 5.2 Cloud Run Jobs
+echo -e "\n${BLUE}--> Adopting Cloud Run Jobs${RESET}"
+import_if_exists "google_cloud_run_v2_job.dbt_runner" "projects/$PROJECT_ID/locations/$REGION/jobs/pmp-dbt-runner" "dbt Runner Job"
+
 # 6. Cloud Scheduler Jobs
 echo -e "\n${BLUE}--> Adopting Cloud Scheduler Jobs${RESET}"
 import_if_exists "google_cloud_scheduler_job.velib_poll_every_minute" "projects/$PROJECT_ID/locations/$SCHED_LOCATION/jobs/pmp-velib-poll-every-minute" "Poll Job"
 import_if_exists "google_cloud_scheduler_job.station_info_daily" "projects/$PROJECT_ID/locations/$SCHED_LOCATION/jobs/pmp-velib-station-info-daily" "Station Info Job"
+import_if_exists "google_cloud_scheduler_job.idfm_poll" "projects/$PROJECT_ID/locations/$SCHED_LOCATION/jobs/idfm-poll-every-10min" "IDFM Poll Job"
+import_if_exists "google_cloud_scheduler_job.dbt_run_hourly" "projects/$PROJECT_ID/locations/$SCHED_LOCATION/jobs/dbt-run-every-hour" "dbt Run Hourly Job"
 
 echo -e "\n${GREEN}Adoption Complete. You can now run 'make deploy' safely.${RESET}"
