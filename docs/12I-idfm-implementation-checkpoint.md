@@ -108,9 +108,16 @@ Automated hourly dbt runs via Cloud Run Job + Cloud Scheduler.
 - `pmpctl.sh down` pauses it
 - `build.sh` builds and deploys the dbt-runner container image
 
-### 2.3 Flattened Disruptions Model ⬜
+### 2.3 Flattened Disruptions Model ✅
 
-`idfm_disruptions.sql` — Flatten `impactedSections` array → one row per impacted section per disruption.
+**File**: `dbt/models/curated/idfm_disruptions.sql`
+
+Extracts the latest snapshot of each disruption, unnest the `impactedSections` array, and joins to the `idfm_stops_reference` table.
+
+**Table config**:
+- **Materialized**: `view`
+- **Dataset**: `pmp_dbt_dev_curated`
+- **Output**: Resolves `stop_area:IDFM:XXXX` string to an integer ID, pulling `lat`, `lon`, and `name` coordinates for the from and to stops. Only returns currently active disruptions (`BLOQUANTE` or `PERTURBEE`).
 
 ### 2.4 Cross-Source Mart ⬜
 
