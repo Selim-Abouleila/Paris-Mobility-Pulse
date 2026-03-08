@@ -38,3 +38,7 @@ models:
     staging:
       +schema: pmp_staging
       +materialized: view
+
+seeds:
+  paris_mobility_pulse:
+    +schema: curated  # Seeds go to pmp_dbt_dev_curated (EU region)
