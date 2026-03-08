@@ -45,13 +45,14 @@ All Phase 1 items from doc 12 are **complete and deployed**.
 | `pmp-idfm-collector-sa` | `iam.tf` | Service account with BigQuery DataEditor on `pmp_raw` + Secret Accessor on API key |
 | Scheduler → Cloud Run invoke | `iam.tf` | IAM binding for scheduler to invoke the collector |
 
-### 1.3 Reference Data (dbt Seed)
+### 1.3 Reference Data (dbt Seeds)
 
-| File | Dataset | Table |
-|---|---|---|
-| `dbt/seeds/idfm_stops_reference.csv` | `pmp_dbt_dev_curated` | `idfm_stops_reference` |
+| File | Dataset | Table | Purpose |
+|---|---|---|---|
+| `dbt/seeds/idfm_stops_reference.csv` | `pmp_dbt_dev_curated` | `idfm_stops_reference` | Stop coordinates (`zda_id`, `name`, `lat`, `lon`, `town`, `type`) |
+| `dbt/seeds/idfm_zones_darret.csv` | `pmp_dbt_dev_curated` | `idfm_zones_darret` | Bridge table mapping `ZdCId` → `ZdAId` (sourced from IDFM Référentiel des arrêts) |
 
-Contains transit stop coordinates (`ZdAId`, `name`, `lat`, `lon`, `town`, `type`) for geographic cross-joins with Vélib.
+The disruptions API references stops by **Zone de Correspondance (ZdC)** IDs, while the stops reference file is keyed by **Zone d'Arrêt (ZdA)** IDs. The `idfm_zones_darret` seed bridges the two.
 
 ---
 
@@ -112,12 +113,18 @@ Automated hourly dbt runs via Cloud Run Job + Cloud Scheduler.
 
 **File**: `dbt/models/curated/idfm_disruptions.sql`
 
-Extracts the latest snapshot of each disruption, unnest the `impactedSections` array, and joins to the `idfm_stops_reference` table.
+Extracts the latest snapshot of each disruption, unnests the `impactedSections` array, and resolves stop coordinates via a **two-step join**:
+
+```
+stop_area:IDFM:XXXXX (ZdC ID)
+  → idfm_zones_darret (ZdCId → ZdAId)
+    → idfm_stops_reference (zda_id → lat, lon, name)
+```
 
 **Table config**:
 - **Materialized**: `view`
 - **Dataset**: `pmp_dbt_dev_curated`
-- **Output**: Resolves `stop_area:IDFM:XXXX` string to an integer ID, pulling `lat`, `lon`, and `name` coordinates for the from and to stops. Only returns currently active disruptions (`BLOQUANTE` or `PERTURBEE`).
+- **Output**: Resolves `stop_area:IDFM:XXXX` ZdC IDs through the zones d'arrêt bridge table to pull `lat`, `lon`, and `name` for from/to stops. Only returns currently active disruptions (`BLOQUANTE` or `PERTURBEE`).
 
 ### 2.4 Cross-Source Mart ⬜
 
@@ -140,6 +147,16 @@ Not started.
 ### BigQuery Region Mismatch (Resolved)
 
 `pmp_raw` was originally in `europe-west9`, while `pmp_curated` and all dbt-managed datasets are in `EU`. This caused `Dataset not found in location EU` errors during `dbt run`. **Fixed** by recreating `pmp_raw` in EU.
+
+### Null lat/lon in `idfm_disruptions` View (Resolved)
+
+The disruptions API `impactedSections` references stops as `stop_area:IDFM:XXXXX`, where `XXXXX` is a **Zone de Correspondance (ZdC)** ID — not a Zone d'Arrêt (ZdA) ID. The original view joined directly on `idfm_stops_reference.zda_id`, which never matched because the ID hierarchy is:
+
+```
+ArR (stop point) → ZdA (stop area) → ZdC (interchange zone)
+```
+
+**Fixed** by adding an `idfm_zones_darret` seed (sourced from IDFM Référentiel des arrêts) as a bridge table that maps `ZdCId → ZdAId`. The view now performs a two-step join through this bridge table to resolve coordinates.
 
 ---
 
@@ -169,3 +186,13 @@ SELECT COUNT(*) AS total_rows,
        COUNT(DISTINCT ingest_ts) AS distinct_polls
 FROM `paris-mobility-pulse.pmp_dbt_dev_curated.stg_idfm_disruptions`
 ```
+
+### Confirm lat/lon resolution in flattened view
+
+```sql
+SELECT disruption_id, title, from_zdc_id, from_stop_name, from_lat, from_lon
+FROM `paris-mobility-pulse.pmp_dbt_dev_curated.idfm_disruptions`
+LIMIT 10
+```
+
+All rows should have non-null `from_lat`/`from_lon` values.
