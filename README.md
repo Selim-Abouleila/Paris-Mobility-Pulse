@@ -70,7 +70,8 @@ make demo-down   # Stops all cost-generating resources
         - `velib_totals_hourly`: Clean dashboard view.
         - `velib_totals_hourly_paris`: Filtered view for high-coverage stations.
     - **Reference Data** (`pmp_dbt_dev_curated`):
-        - `idfm_stops_reference`: IDFM transit stops reference data (dbt seed, 18K rows).
+        - `idfm_stops_reference`: IDFM transit stop coordinates keyed by ZdA ID (dbt seed, 18K rows).
+        - `idfm_zones_darret`: Bridge table mapping ZdC IDs (from disruptions API) → ZdA IDs (dbt seed, 18K rows).
 - **Pub/Sub**:
     - **Topics**: `pmp-events` (Real-time status), `pmp-velib-station-info` (Daily metadata), `pmp-velib-station-info-push-dlq` (Dead Letter Queue).
     - **Subscriptions**:
@@ -221,6 +222,8 @@ Detailed guides for each component:
 - [10x - Security Implementation Plan](docs/10x-security-implementation-plan.md) - Detailed Terraform refactoring roadmap
 - [11 - Analytics Engineering (dbt)](docs/11-dbt-analytics-engineering.md) - Migration to dbt for data modeling and quality tests
 - [12 - IDFM Transit Disruptions](docs/12-idfm-transit-disruptions.md) - Second data source: real-time transit disruptions + cross-source analytics
+- [12I - IDFM Implementation Checkpoint](docs/12I-idfm-implementation-checkpoint.md) - Implementation progress tracker and known issues
+- [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md) - Spatial methodology for measuring disruption impact on Vélib
 
 ## Next milestone
 - **IDFM Transit Disruptions** — Second data source bringing real-time metro/RER/bus disruptions into the platform, enabling cross-source analytics with Vélib (see [doc 12](docs/12-idfm-transit-disruptions.md))

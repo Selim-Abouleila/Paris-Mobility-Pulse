@@ -135,40 +135,56 @@ curl -s -H "apikey: <YOUR_KEY>" \
 
 ### The Problem
 
-Disruption data gives `stop_area:IDFM:71370` (IDs) but **no lat/lon**. To cross-reference with Vélib stations, we need geographic coordinates for each transit stop.
+Disruption data gives `stop_area:IDFM:71973` (IDs) but **no lat/lon**. To cross-reference with Vélib stations, we need geographic coordinates for each transit stop.
 
-### The Solution: IDFM "Référentiel des arrêts — Arrêts" Dataset
+### The IDFM Stop Hierarchy
 
-- **Source**: PRIM portal → Dataset catalog → "Repository of stops: Stops"
-- **Format**: CSV (semicolon-separated)
-- **License**: Open License v2.0 (Etalab)
-- **Update frequency**: Daily (but stations rarely change)
-- **Size**: ~50,000+ rows
+IDFM organises stops in a three-tier hierarchy:
 
-### Key Columns
+```
+ArR (Arrêt de Référence)      ← individual physical stop point
+ └─ ZdA (Zone d'Arrêt)         ← monomodal stop area (one mode)
+     └─ ZdC (Zone de Correspondance)  ← interchange zone (multimodal)
+```
 
-| Column | Example | Description |
-|---|---|---|
-| `ArRId` | `427903` | Stop reference ID |
-| `ArRName` | `Château` | Stop name |
-| `ArRGeopoint` | `48.616, 2.303` | **GPS lat/lon (WGS84)** — ready to use |
-| `ArRTown` | `Paris 13e` | Municipality |
-| `ArRType` | `bus`, `metro`, `rail` | Transport type |
-| `ZdAId` | `427904` | **Stopping area ID** — join key to disruptions |
+The disruption API's `stop_area:IDFM:XXXXX` IDs are **ZdC IDs** (Zones de Correspondance), not ZdA IDs. The stops reference dataset is keyed by **ZdA IDs**. This means we cannot join disruptions directly to stops — we need a bridge table.
+
+### The Solution: Two Reference Datasets
+
+**1. Stops Reference** — `idfm_stops_reference.csv`
+
+- **Source**: PRIM portal → "Référentiel des arrêts — Arrêts"
+- **Key columns**: `zda_id`, `name`, `lat`, `lon`, `town`, `type`
+- **Size**: ~18,000 rows
+- **Coordinates**: WGS84 (ready to use)
+
+**2. Zones d'Arrêt Bridge** — `idfm_zones_darret.csv`
+
+- **Source**: PRIM portal → "Référentiel des arrêts — Zones d'arrêts"
+- **Key columns**: `ZdAId`, `ZdCId`
+- **Size**: ~18,000 rows
+- **Purpose**: Maps ZdC IDs (from disruptions) → ZdA IDs (for coordinate lookup)
 
 ### Join Key Mapping
 
-The disruption API returns `stop_area:IDFM:71370`. The numeric part (`71370`) maps to `ZdAId` in the stops reference dataset.
-
-### Loading Strategy: dbt Seed
-
-Trim the CSV to essential columns (`ZdAId`, `ArRName`, `ArRGeopoint`, `ArRTown`, `ArRType`) and commit as a dbt seed:
+The disruption API returns `stop_area:IDFM:71973`. The numeric part (`71973`) is a **ZdC ID**. To resolve coordinates:
 
 ```
-dbt/seeds/idfm_stops_reference.csv
+stop_area:IDFM:71973 → extract 71973 (ZdC ID)
+  → idfm_zones_darret: ZdCId 71973 → ZdAId 42391
+    → idfm_stops_reference: zda_id 42391 → lat 48.865, lon 2.187
 ```
 
-Loaded into BigQuery automatically during `make deploy` via `dbt seed`.
+Multiple ZdA rows may map to a single ZdC (a metro-bus interchange has separate ZdA entries per mode). The dbt model picks one ZdA per ZdC to derive a single coordinate.
+
+### Loading Strategy: dbt Seeds
+
+Both files are committed as dbt seeds and loaded into BigQuery automatically during `dbt seed`:
+
+```
+dbt/seeds/idfm_stops_reference.csv    # Stop coordinates (ZdA-level)
+dbt/seeds/idfm_zones_darret.csv       # Bridge table (ZdC → ZdA)
+```
 
 ---
 
@@ -257,12 +273,19 @@ Flattened, one row per impacted section per disruption.
 
 | Column | Type | Description |
 |---|---|---|
-| `ZdAId` | INTEGER | Stopping area ID (join key) |
+| `zda_id` | INTEGER | Zone d'Arrêt ID (join key from bridge) |
 | `name` | STRING | Stop name |
 | `lat` | FLOAT | Latitude (WGS84) |
 | `lon` | FLOAT | Longitude (WGS84) |
 | `town` | STRING | Municipality |
 | `type` | STRING | bus, metro, rail |
+
+### Bridge Table: `pmp_curated.idfm_zones_darret` (dbt seed)
+
+| Column | Type | Description |
+|---|---|---|
+| `ZdAId` | INTEGER | Zone d'Arrêt ID → joins to `idfm_stops_reference.zda_id` |
+| `ZdCId` | INTEGER | Zone de Correspondance ID → matches disruption `stop_area:IDFM:XXXXX` |
 
 ---
 
