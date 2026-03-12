@@ -20,6 +20,10 @@ SELECT
   AVG(stations_reporting) as avg_stations_reporting,
   AVG(empty_stations) as avg_empty_stations,
   MAX(empty_stations) as peak_empty_stations,
-  COUNT(*) as snapshot_samples
+  COUNT(*) as snapshot_samples,
+  MAX(AVG(stations_reporting)) OVER (
+    ORDER BY UNIX_SECONDS(hour_ts_paris)
+    RANGE BETWEEN 604800 PRECEDING AND CURRENT ROW
+  ) as total_stations_known
 FROM snapshots
 GROUP BY 1
