@@ -23,7 +23,7 @@ SELECT
   COUNT(*) as snapshot_samples,
   MAX(AVG(stations_reporting)) OVER (
     ORDER BY UNIX_SECONDS(hour_ts_paris)
-    RANGE BETWEEN 604800 PRECEDING AND CURRENT ROW
+    RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) as total_stations_known
 FROM snapshots
 GROUP BY 1
