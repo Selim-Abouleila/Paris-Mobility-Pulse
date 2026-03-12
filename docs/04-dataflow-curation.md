@@ -107,6 +107,7 @@ python3 -m pipelines.dataflow.pmp_streaming.main \
   --requirements_file pipelines/dataflow/pmp_streaming/requirements.txt \
   --num_workers 1 \
   --max_num_workers 1 \
+  --worker_machine_type "e2-standard-2" \
   --autoscaling_algorithm=NONE \
   --save_main_session
 ```

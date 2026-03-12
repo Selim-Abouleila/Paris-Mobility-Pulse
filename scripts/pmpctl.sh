@@ -34,7 +34,7 @@ OUT_TABLE="${OUT_TABLE:-${PROJECT_ID}:pmp_curated.velib_station_status}"
 DLQ_BQ_TABLE="${DLQ_BQ_TABLE-${PROJECT_ID}:pmp_ops.velib_station_status_curated_dlq}"
 DATAFLOW_SA="${DATAFLOW_SA:-pmp-dataflow-sa@${PROJECT_ID}.iam.gserviceaccount.com}"
 WORKER_ZONE="${WORKER_ZONE:-}"                 # empty means let Dataflow choose
-WORKER_MACHINE_TYPE="${WORKER_MACHINE_TYPE:-}" # empty means default
+WORKER_MACHINE_TYPE="${WORKER_MACHINE_TYPE:-e2-standard-2}" # default to e2 to avoid n1 stockouts
 
 # Scheduler jobs that control ingestion
 SCHED_JOBS=(
