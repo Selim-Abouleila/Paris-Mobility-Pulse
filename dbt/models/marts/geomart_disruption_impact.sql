@@ -24,18 +24,26 @@ WITH disruptions AS (
 ),
 
 velib_stations AS (
-    SELECT
-        station_id,
-        station_code,
-        name AS station_name,
-        lat,
-        lon,
-        capacity,
-        -- Create BigQuery Geography points safely
-        CASE WHEN lon IS NOT NULL AND lat IS NOT NULL 
-             THEN ST_GEOGPOINT(lon, lat) 
-             ELSE NULL END AS station_geo
-    FROM {{ ref('velib_station_information') }}
+    SELECT * EXCEPT(rn)
+    FROM (
+        SELECT
+            station_id,
+            station_code,
+            name AS station_name,
+            lat,
+            lon,
+            capacity,
+            -- Create BigQuery Geography points safely
+            CASE WHEN lon IS NOT NULL AND lat IS NOT NULL 
+                 THEN ST_GEOGPOINT(lon, lat) 
+                 ELSE NULL END AS station_geo,
+            ROW_NUMBER() OVER (
+                PARTITION BY station_id
+                ORDER BY event_ts DESC, ingest_ts DESC
+            ) AS rn
+        FROM {{ source('pmp_curated', 'velib_station_information') }}
+    )
+    WHERE rn = 1
 )
 
 SELECT
