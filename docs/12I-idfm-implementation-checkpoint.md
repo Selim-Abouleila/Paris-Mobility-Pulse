@@ -124,11 +124,24 @@ stop_area:IDFM:XXXXX (ZdC ID)
 **Table config**:
 - **Materialized**: `view`
 - **Dataset**: `pmp_dbt_dev_curated`
-- **Output**: Resolves `stop_area:IDFM:XXXX` ZdC IDs through the zones d'arrêt bridge table to pull `lat`, `lon`, and `name` for from/to stops. Only returns currently active disruptions (`BLOQUANTE` or `PERTURBEE`).
+- **Output**: Resolves `stop_area:IDFM:XXXX` ZdC IDs through the zones d'arrêt bridge table to pull `lat`, `lon`, and `name` for from/to stops. Only returns `BLOQUANTE` disruptions (complete service stops) — `PERTURBEE` (degraded service) is excluded as it rarely drives measurable Vélib demand spikes.
 
-### 2.4 Cross-Source Mart ⬜
+### 2.4 Cross-Source Geomart ✅
 
-`disruptions_near_velib.sql` — Geographic join between disrupted stops and nearby Vélib stations.
+**File**: `dbt/models/marts/geomart_disruption_impact.sql`
+
+Spatially joins **active IDFM BLOQUANTE disruptions** with **Vélib stations within 500 metres** using BigQuery geography functions.
+
+**How it works**:
+1. Converts the `from_lat/from_lon` and `to_lat/to_lon` columns from `idfm_disruptions` into BigQuery `GEOGRAPHY` points via `ST_GEOGPOINT`
+2. Selects the **latest** row per Vélib station from `velib_station_information` using `ROW_NUMBER()` (avoids scanning full history)
+3. Performs a `CROSS JOIN` filtered by `ST_DWITHIN(stop_geo, station_geo, 500)` to find all stations within 500 m of either the `from` or `to` disrupted stop
+4. Outputs the exact distances in metres (`distance_to_from_stop_meters`, `distance_to_to_stop_meters`)
+
+**Table config**:
+- **Materialized**: `view`
+- **Dataset**: `pmp_dbt_dev_pmp_marts`
+- **Key metric**: `MIN(distance_to_from_stop_meters, distance_to_to_stop_meters)` → nearest affected stop distance per Vélib station
 
 ---
 
@@ -196,3 +209,19 @@ LIMIT 10
 ```
 
 All rows should have non-null `from_lat`/`from_lon` values.
+
+### Confirm geomart spatial join is working
+
+```sql
+SELECT
+  title,
+  from_stop_name,
+  velib_station_name,
+  velib_station_capacity,
+  ROUND(LEAST(distance_to_from_stop_meters, distance_to_to_stop_meters)) AS nearest_stop_distance_m
+FROM `paris-mobility-pulse.pmp_dbt_dev_pmp_marts.geomart_disruption_impact`
+ORDER BY nearest_stop_distance_m ASC
+LIMIT 10
+```
+
+Should return Vélib stations within 500 m of active BLOQUANTE disruption stops, with real distances in metres.
