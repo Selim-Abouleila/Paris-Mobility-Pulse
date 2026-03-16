@@ -75,5 +75,6 @@ LEFT JOIN zdc_to_zda z_to
 LEFT JOIN {{ ref('idfm_stops_reference') }} r_to
   ON z_to.ZdAId = r_to.zda_id
 
--- 6. Only keep disruptions that are actively affecting traffic right now
-WHERE e.severity IN ('BLOQUANTE', 'PERTURBEE')
+-- 6. Only keep complete service stops (BLOQUANTE = traffic fully blocked)
+--    PERTURBEE (degraded service) excluded as it rarely drives Vélib demand spikes
+WHERE e.severity = 'BLOQUANTE'
