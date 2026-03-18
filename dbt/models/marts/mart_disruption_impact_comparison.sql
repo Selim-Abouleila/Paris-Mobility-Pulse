@@ -83,7 +83,7 @@ disruption_zone_stats AS (
         MIN(g.nearest_stop_distance_m)      AS closest_station_distance_m
     FROM geomart g
     LEFT JOIN stations s ON g.velib_station_id = s.station_id
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 )
 
 -- ─────────────────────────────────────────────────────────────────────────────
