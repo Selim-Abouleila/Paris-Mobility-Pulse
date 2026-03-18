@@ -52,8 +52,15 @@ SELECT
     d.severity,
     d.title,
     d.last_update,
+    -- From stop
     d.from_stop_name,
+    d.from_lat,
+    d.from_lon,
+    -- To stop
     d.to_stop_name,
+    d.to_lat,
+    d.to_lon,
+    -- Vélib station
     v.station_id AS velib_station_id,
     v.station_code AS velib_station_code,
     v.station_name AS velib_station_name,
