@@ -224,6 +224,7 @@ Detailed guides for each component:
 - [12 - IDFM Transit Disruptions](docs/12-idfm-transit-disruptions.md) - Second data source: real-time transit disruptions + cross-source analytics
 - [12I - IDFM Implementation Checkpoint](docs/12I-idfm-implementation-checkpoint.md) - Implementation progress tracker and known issues
 - [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md) - Spatial methodology for measuring disruption impact on Vélib
+- [13I - Disruption Impact Implementation Checkpoint](docs/13I-disruption-impact-implementation-checkpoint.md) - Implementation progress tracker: foundation views, spatial mart, and A/B comparison output
 
 ## Next milestone
 - **IDFM Transit Disruptions** — Second data source bringing real-time metro/RER/bus disruptions into the platform, enabling cross-source analytics with Vélib (see [doc 12](docs/12-idfm-transit-disruptions.md))

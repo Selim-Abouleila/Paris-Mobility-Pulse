@@ -24,6 +24,13 @@ WITH geomart AS (
         LEAST(g.distance_to_from_stop_meters, g.distance_to_to_stop_meters)
             AS nearest_stop_distance_m
     FROM {{ ref('geomart_disruption_impact') }} g
+    -- Deduplicate: IDFM sometimes re-notifies the same physical disruption
+    -- (same route + same stop pair) with a new disruption_id each day.
+    -- Keep only the most recent instance per unique (title, from_stop, to_stop).
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY g.title, g.from_stop_name, g.to_stop_name
+        ORDER BY g.last_update DESC
+    ) = 1
 ),
 
 -- ─────────────────────────────────────────────────────────────────────────────
