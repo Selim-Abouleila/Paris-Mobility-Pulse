@@ -107,7 +107,44 @@ Rather than a fixed radius exclusion (1–2km as in the theory doc), the control
 BigQuery native materialized views prohibit `CROSS JOIN`, `NOT IN (subquery)`, and top-level `ORDER BY` — all of which this model uses. It remains a regular view. To pre-compute results for dashboard performance, change to `materialized='table'` and schedule a `dbt run` every 15–30 minutes via Cloud Scheduler.
 
 ### Map Readiness
-The output includes `from_lat`, `from_lon`, `to_lat`, `to_lon` for every disruption. These can be used directly in Looker Studio geo charts or Kepler.gl to render the disrupted transit segment as a line and colour Vélib stations by their `fill_rate_delta_pct`.
+`mart_disruption_impact_comparison` carries `from_lat/lon` and `to_lat/lon` per row, but Looker Studio's Google Maps chart requires **one lat/lon pair per row**. A dedicated child view `mart_disruption_impact_map` unpivots the two stop points into separate rows (see Phase 4 below).
+
+---
+
+## Phase 4: Looker Studio Map View ✅
+
+### 4.1 `mart_disruption_impact_map`
+
+**File**: `dbt/models/marts/mart_disruption_impact_map.sql`
+**Materialization**: view
+**Parent**: `mart_disruption_impact_comparison`
+
+Unpivots each disruption's `from_stop` and `to_stop` into **two separate rows** using `UNION ALL`, each carrying a single `lat`/`lon` pair. This makes the view directly compatible with the **Looker Studio Google Maps chart** (which cannot render two coordinate pairs from a single row).
+
+**Output schema** (two rows per disruption):
+
+| Column | Description |
+|---|---|
+| `lat` / `lon` | Single coordinate point for this stop (Looker Studio compatible) |
+| `stop_role` | `'from'` or `'to'` — which end of the disrupted segment |
+| `stop_name` | Name of this specific stop |
+| `disruption_title` | Used as tooltip label |
+| `fill_rate_delta_pct` | Colour scale — red = bikes drained near this stop |
+| `stations_in_impact_zone` | Bubble size — more stations = bigger circle |
+| All other comparison columns | Inherited from parent view for tooltip richness |
+
+**Looker Studio Google Maps configuration**:
+
+| Field | Maps to |
+|---|---|
+| Latitude | `lat` |
+| Longitude | `lon` |
+| Bubble size | `stations_in_impact_zone` |
+| Color metric | `fill_rate_delta_pct` |
+| Tooltip | `disruption_title`, `stop_name`, `zone_fill_rate_pct`, `control_fill_rate_pct` |
+
+> [!NOTE]
+> Use the **Google Maps** chart type in Looker Studio, not the standard Geo chart. The standard Geo chart requires city/country names — it does not accept raw lat/lon columns.
 
 ---
 
@@ -137,3 +174,13 @@ LIMIT 10;
 ```
 
 Expected: at least one row per active BLOQUANTE disruption, with `fill_rate_delta_pct` in the range −40 to +10.
+
+```sql
+-- Check the map view emits two rows per disruption (from + to stop)
+SELECT disruption_id, stop_role, stop_name, lat, lon, fill_rate_delta_pct
+FROM `paris-mobility-pulse.pmp_dbt_dev_pmp_marts.mart_disruption_impact_map`
+ORDER BY disruption_id, stop_role
+LIMIT 20;
+```
+
+Expected: every `disruption_id` appears exactly twice — once with `stop_role = 'from'`, once with `stop_role = 'to'`.
