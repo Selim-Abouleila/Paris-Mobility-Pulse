@@ -30,9 +30,11 @@ WITH geomart AS (
     FROM {{ ref('geomart_disruption_impact') }} g
     -- Deduplicate: IDFM sometimes re-notifies the same physical disruption
     -- (same route + same stop pair) with a new disruption_id each day.
-    -- Keep only the most recent instance per unique (title, from_stop, to_stop).
+    -- Keep only the most recent instance per unique (title, from_stop, to_stop),
+    -- but we must partition by velib_station_id too so we don't throw away
+    -- the other stations in the impact zone!
     QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY g.title, g.from_stop_name, g.to_stop_name
+        PARTITION BY g.title, g.from_stop_name, g.to_stop_name, g.velib_station_id
         ORDER BY g.last_update DESC
     ) = 1
 ),
