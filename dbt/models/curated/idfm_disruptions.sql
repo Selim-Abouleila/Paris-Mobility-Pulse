@@ -46,6 +46,7 @@ zdc_to_zda AS (
 -- 5. Two-step join: ZdC → ZdA → stops reference (lat/lon)
 SELECT
   e.disruption_id,
+  e.ingest_ts,
   e.cause,
   e.severity,
   e.title,
