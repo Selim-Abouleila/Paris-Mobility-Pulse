@@ -1,11 +1,15 @@
 {{ config(materialized='view') }}
 
--- Compares Vélib bike availability inside active BLOQUANTE disruption zones
--- against a "far-away" control group (stations not impacted by any disruption).
--- One row per active disruption.
+-- Compares Vélib bike availability inside active disruption zones against a
+-- spatial control group (all stations NOT near any active disruption).
+-- One row per unique physical disruption (deduplicated by title + stop pair).
+--
+-- NOTE: A temporal baseline (same station, same hour, same weekday, no disruption)
+-- is architecturally superior but requires ≥4 weeks of continuous pipeline history.
+-- Revisit once sufficient history accumulates.
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Step 1: Enrich geomart with live station status
+-- Step 1: Active disruptions with nearby Vélib stations (from geomart)
 -- ─────────────────────────────────────────────────────────────────────────────
 WITH geomart AS (
     SELECT
@@ -42,7 +46,6 @@ stations AS (
         num_bikes_available,
         num_docks_available,
         capacity,
-        -- Fill rate: fraction of docks that currently have a bike
         SAFE_DIVIDE(num_bikes_available, NULLIF(capacity, 0)) AS fill_rate
     FROM {{ ref('velib_latest_state_enriched') }}
     WHERE capacity > 0
@@ -94,7 +97,7 @@ disruption_zone_stats AS (
 )
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Step 6: Final comparison — disruption zone vs control group
+-- Step 6: Final comparison — disruption zone vs spatial control group
 -- ─────────────────────────────────────────────────────────────────────────────
 SELECT
     d.disruption_id,
@@ -102,7 +105,6 @@ SELECT
     d.cause,
     d.severity,
     d.last_update,
-    -- Stop geography (for map display)
     d.from_stop_name,
     d.from_lat,
     d.from_lon,
@@ -111,20 +113,14 @@ SELECT
     d.to_lon,
     d.stations_in_impact_zone,
     d.closest_station_distance_m,
-
-    -- Impact zone metrics
     ROUND(d.zone_avg_fill_rate * 100, 1)         AS zone_fill_rate_pct,
     ROUND(d.zone_avg_bikes_available, 1)          AS zone_avg_bikes_available,
-
-    -- Control group metrics
     ROUND(c.control_avg_fill_rate * 100, 1)       AS control_fill_rate_pct,
-    ROUND(c.control_avg_bikes_available, 1)        AS control_avg_bikes_available,
+    ROUND(c.control_avg_bikes_available, 1)       AS control_avg_bikes_available,
     c.control_station_count,
-
-    -- Delta: negative = fewer bikes available near the disruption (demand spike)
     ROUND((d.zone_avg_fill_rate - c.control_avg_fill_rate) * 100, 1)
         AS fill_rate_delta_pct
 
 FROM disruption_zone_stats d
 CROSS JOIN control_stats c
-ORDER BY fill_rate_delta_pct ASC  -- most-impacted disruptions first
+ORDER BY fill_rate_delta_pct ASC
