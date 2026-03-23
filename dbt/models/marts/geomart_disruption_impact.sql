@@ -21,18 +21,14 @@ WITH disruptions AS (
              THEN ST_GEOGPOINT(to_lon, to_lat) 
              ELSE NULL END AS to_geo
     FROM {{ ref('idfm_disruptions') }}
-    -- Exclude bus lines ("Bus XXX :") — they rarely drive Vélib demand spikes.
-    -- All other line types (Métro, RER, Ligne, Tramway, SNCF, etc.) are kept.
-    WHERE NOT REGEXP_CONTAINS(title, r'^Bus ')
-      -- Only include disruptions from the most recent ingestion batch.
-      -- Using MAX(ingest_ts) rather than CURRENT_TIMESTAMP() means the view
-      -- stays populated even if the pipeline is paused for hours or days.
-      AND ingest_ts >= TIMESTAMP_SUB(
+    -- Only include disruptions from the most recent ingestion batch.
+    -- Using MAX(ingest_ts) rather than CURRENT_TIMESTAMP() means the view
+    -- stays populated even if the pipeline is paused for hours or days.
+    -- Restrict to inner Paris where Vélib density is high enough for analysis.
+    WHERE ingest_ts >= TIMESTAMP_SUB(
             (SELECT MAX(ingest_ts) FROM {{ ref('idfm_disruptions') }}),
             INTERVAL 30 MINUTE
           )
-      -- Restrict to inner Paris where Vélib density is high enough for analysis.
-      -- Disruptions outside this bounding box (suburbs) have too few nearby stations.
       AND from_lat BETWEEN 48.815 AND 48.910
       AND from_lon BETWEEN 2.250  AND 2.420
 ),
