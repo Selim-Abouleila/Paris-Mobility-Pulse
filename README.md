@@ -110,6 +110,18 @@ make demo-down   # Stops all cost-generating resources
 
 See [08 - Vélib Dashboard](./docs/08-velib-dashboard.md) for details on data sources and metrics.
 
+### Transit Disruption Impact
+
+The dashboard also includes **disruption impact analysis** pages that measure how transit outages (Métro, RER, Tramway) affect nearby Vélib bike availability in real time.
+
+<p align="center">
+  <img src="images/disruption_1.jpeg" alt="Transit Disruption Impact — KPIs & Delta" width="800">
+  <br>
+  <img src="images/disruption_2.jpeg" alt="Transit Disruption Impact — Geographic Map" width="800">
+</p>
+
+See [14 - Disruption Impact Dashboard](./docs/14-disruption-impact-dashboard.md) for details on KPIs, map interpretation, and methodology.
+
 ## Operations (Demo Mode)
 
 The project includes a control script to safely start/stop the pipeline and manage costs. This is the **most practical way** to run the pipeline for demos.
@@ -225,6 +237,7 @@ Detailed guides for each component:
 - [12I - IDFM Implementation Checkpoint](docs/12I-idfm-implementation-checkpoint.md) - Implementation progress tracker and known issues
 - [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md) - Spatial methodology for measuring disruption impact on Vélib
 - [13I - Disruption Impact Implementation Checkpoint](docs/13I-disruption-impact-implementation-checkpoint.md) - Implementation progress tracker: foundation views, spatial mart, and A/B comparison output
+- [14 - Disruption Impact Dashboard](docs/14-disruption-impact-dashboard.md) - Looker Studio pages for real-time disruption impact KPIs and geographic map
 
 ## Next milestone
 - **IDFM Transit Disruptions** — Second data source bringing real-time metro/RER/bus disruptions into the platform, enabling cross-source analytics with Vélib (see [doc 12](docs/12-idfm-transit-disruptions.md))

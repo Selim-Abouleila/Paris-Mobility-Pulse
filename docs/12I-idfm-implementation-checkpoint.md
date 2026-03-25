@@ -130,12 +130,12 @@ stop_area:IDFM:XXXXX (ZdC ID)
 
 **File**: `dbt/models/marts/geomart_disruption_impact.sql`
 
-Spatially joins **active IDFM BLOQUANTE disruptions** with **Vélib stations within 500 metres** using BigQuery geography functions.
+Spatially joins **active IDFM BLOQUANTE disruptions** with **Vélib stations within 750 metres** using BigQuery geography functions. Bus disruptions are excluded (`NOT REGEXP_CONTAINS(title, r'^Bus ')`) as they rarely generate enough stranded commuters to measurably impact Vélib.
 
 **How it works**:
 1. Converts the `from_lat/from_lon` and `to_lat/to_lon` columns from `idfm_disruptions` into BigQuery `GEOGRAPHY` points via `ST_GEOGPOINT`
 2. Selects the **latest** row per Vélib station from `velib_station_information` using `ROW_NUMBER()` (avoids scanning full history)
-3. Performs a `CROSS JOIN` filtered by `ST_DWITHIN(stop_geo, station_geo, 500)` to find all stations within 500 m of either the `from` or `to` disrupted stop
+3. Performs a `CROSS JOIN` filtered by `ST_DWITHIN(stop_geo, station_geo, 750)` to find all stations within 750 m of either the `from` or `to` disrupted stop
 4. Outputs the exact distances in metres (`distance_to_from_stop_meters`, `distance_to_to_stop_meters`)
 
 **Table config**:
@@ -224,4 +224,4 @@ ORDER BY nearest_stop_distance_m ASC
 LIMIT 10
 ```
 
-Should return Vélib stations within 500 m of active BLOQUANTE disruption stops, with real distances in metres.
+Should return Vélib stations within 750 m of active BLOQUANTE disruption stops (excluding bus lines), with real distances in metres.

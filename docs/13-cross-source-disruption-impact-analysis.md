@@ -31,20 +31,20 @@ The spatial approach wins because it requires **no historical baseline** — the
 
 ### Impact Zone (Treatment Group)
 
-Vélib stations within **500 meters** of any transit stop listed in the disruption's `impactedSections`.
+Vélib stations within **750 meters** of any transit stop listed in the disruption's `impactedSections`.
 
 ```
 Disruption: "Metro 7 — Opéra to Châtelet interrupted"
   → impacted stops: Opéra (48.87, 2.33), Châtelet (48.86, 2.35)
-  → Impact Zone: all Vélib stations within 500m of either stop
+  → Impact Zone: all Vélib stations within 750m of either stop
 ```
 
 ### Control Zone
 
-Vélib stations between **1,000m and 2,000m** from any impacted stop.
+All Vélib stations **not within 750m of any active disruption**. This produces the largest possible unaffected sample without needing to tune a second radius parameter.
 
-- **Why not > 2km?** Too far — different neighborhoods have different baseline usage patterns.
-- **Why not 500m–1km?** Buffer zone to avoid spillover effects.
+> [!NOTE]
+> The original design proposed a 1–2km ring. In practice, using all non-impacted stations as the control proved simpler and more robust.
 
 ### Metric
 
@@ -63,7 +63,7 @@ For each active disruption with severity `BLOQUANTE` or `PERTURBEE`:
 ┌─────────────────────────────────────────────────────────┐
 │  Disruption: Metro 7 — BLOQUANTE — 8:00–10:00          │
 │                                                         │
-│  Impact Zone (< 500m):     avg 15% bikes remaining      │
+│  Impact Zone (< 750m):     avg 15% bikes remaining      │
 │  Control Zone (1–2km):     avg 55% bikes remaining      │
 │  ─────────────────────────────────────────               │
 │  Δ = -40 percentage points                               │
@@ -85,7 +85,7 @@ WITH disrupted_stops AS (
 ),
 
 velib_near AS (
-  -- Vélib stations within 500m of any disrupted stop
+  -- Vélib stations within 750m of any disrupted stop
   SELECT v.station_id, v.num_bikes_available, v.capacity,
          'impact' AS zone
   FROM velib_latest_state_enriched v
@@ -93,7 +93,7 @@ velib_near AS (
   WHERE ST_DISTANCE(
     ST_GEOGPOINT(ds.lon, ds.lat),
     ST_GEOGPOINT(v.lon, v.lat)
-  ) < 500
+  ) < 750
 ),
 
 velib_far AS (
@@ -121,7 +121,7 @@ GROUP BY zone
 
 | Zone | Stations | Avg Availability |
 |---|---|---|
-| impact (< 500m) | 12 | 15.2% |
+| impact (< 750m) | 28 | 24.8% |
 | control (1–2km) | 34 | 54.8% |
 
 **Δ = -39.6 percentage points** → disruption signal confirmed.
@@ -154,6 +154,6 @@ GROUP BY zone
 ## 7. Limitations & Caveats
 
 - **Correlation ≠ causation** — low bike availability near a disrupted stop could also be caused by a nearby event, rain, or rush hour. The spatial control group mitigates this but doesn't eliminate it.
-- **500m radius is arbitrary** — could be tuned. Paris blocks are ~100m, so 500m ≈ 5 blocks.
-- **Not all disruptions divert to bikes** — a bus route disruption in the suburbs likely has no Vélib impact. Filtering to metro/RER `BLOQUANTE` disruptions in central Paris gives the strongest signal.
+- **750m radius is tunable** — Paris blocks are ~100m, so 750m ≈ 7.5 blocks. Increased from the original 500m design to capture a wider commuter walking radius.
+- **Bus lines are excluded** — Bus disruptions rarely generate enough stranded commuters to measurably impact Vélib. Only heavy transit (Métro, RER, Tramway, Train) is analyzed.
 - **Vélib coverage** — some disrupted stops may not have Vélib stations nearby (suburban areas). The analysis naturally filters these out (empty impact zones).

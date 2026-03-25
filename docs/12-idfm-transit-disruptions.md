@@ -198,7 +198,7 @@ dbt/seeds/idfm_zones_darret.csv       # Bridge table (ZdC → ZdA)
 ### Example Query
 
 ```sql
--- Find Vélib stations within 500m of disrupted metro/RER stops
+-- Find Vélib stations within 750m of disrupted metro/RER stops
 SELECT
   d.title            AS disruption,
   d.severity,
@@ -219,7 +219,7 @@ JOIN pmp_marts.velib_station_information_latest v
   ON ST_DISTANCE(
     ST_GEOGPOINT(s.lon, s.lat),
     ST_GEOGPOINT(v.lon, v.lat)
-  ) < 500
+  ) < 750
 WHERE d.severity IN ('BLOQUANTE', 'PERTURBEE')
 ORDER BY distance_meters
 ```

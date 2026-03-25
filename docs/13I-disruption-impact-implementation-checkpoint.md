@@ -39,7 +39,7 @@ Joins `velib_latest_state` with `velib_station_information_latest` on `station_i
 **File**: `dbt/models/marts/geomart_disruption_impact.sql`
 **Materialization**: view
 
-Spatial cross join between active BLOQUANTE disruptions and all Vélib stations. Uses `ST_DWITHIN` to retain only stations within **500 metres** of a disrupted transit stop. One row per **(disruption × Vélib station)** pair.
+Spatial cross join between active BLOQUANTE disruptions (excluding bus lines) and all Vélib stations. Uses `ST_DWITHIN` to retain only stations within **750 metres** of a disrupted transit stop. One row per **(disruption × Vélib station)** pair.
 
 **Key columns**:
 
@@ -61,7 +61,7 @@ Spatial cross join between active BLOQUANTE disruptions and all Vélib stations.
 **File**: `dbt/models/marts/mart_disruption_impact_comparison.sql`
 **Materialization**: view
 
-The primary analytical output. For each active BLOQUANTE disruption, compares the **average Vélib fill rate** inside the 500m impact zone against a **control group** of stations unaffected by any active disruption.
+The primary analytical output. For each active BLOQUANTE disruption (excluding bus lines), compares the **average Vélib fill rate** inside the 750m impact zone against a **control group** of stations unaffected by any active disruption.
 
 **Logic (5 CTEs)**:
 
@@ -85,7 +85,7 @@ Final SELECT     → CROSS JOIN (one control row × all disruptions) to compare 
 | `last_update` | When the disruption became active |
 | `from_stop_name` / `from_lat` / `from_lon` | Origin stop + coordinates (map-ready) |
 | `to_stop_name` / `to_lat` / `to_lon` | Destination stop + coordinates (map-ready) |
-| `stations_in_impact_zone` | Count of Vélib stations within 500m |
+| `stations_in_impact_zone` | Count of Vélib stations within 750m |
 | `closest_station_distance_m` | Distance to the nearest affected Vélib station |
 | `zone_fill_rate_pct` | Avg fill rate (%) inside the impact zone |
 | `zone_avg_bikes_available` | Avg bikes available inside the zone |
@@ -101,7 +101,7 @@ Final SELECT     → CROSS JOIN (one control row × all disruptions) to compare 
 ## Design Decisions
 
 ### Control Group Definition
-Rather than a fixed radius exclusion (1–2km as in the theory doc), the control group is defined as **all stations not within 500m of any active disruption**. This avoids the need to tune a second radius parameter and naturally produces the largest possible unaffected sample.
+Rather than a fixed radius exclusion (1–2km as in the theory doc), the control group is defined as **all stations not within 750m of any active disruption**. This avoids the need to tune a second radius parameter and naturally produces the largest possible unaffected sample.
 
 ### Why `materialized='view'` (not BigQuery materialized view)
 BigQuery native materialized views prohibit `CROSS JOIN`, `NOT IN (subquery)`, and top-level `ORDER BY` — all of which this model uses. It remains a regular view. To pre-compute results for dashboard performance, change to `materialized='table'` and schedule a `dbt run` every 15–30 minutes via Cloud Scheduler.
