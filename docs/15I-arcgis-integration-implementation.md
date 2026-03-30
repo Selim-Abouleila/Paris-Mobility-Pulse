@@ -63,3 +63,33 @@ The dbt project runs under `dbt-runner`, a service account strictly provisioned 
 2. The read-only ArcGIS Pro account no longer initiates expensive geography logic.
 3. The ArcGIS ODBC driver sees a simple projection request (`SELECT *`), circumventing the need for a temp staging table.
 4. The integration performs perfectly seamlessly.
+
+---
+
+## ArcGIS Pro Query Layer Configuration Challenges
+
+Even with pre-computed geometries, the ArcGIS Pro "New Query Layer" wizard presented several protocol and parsing challenges when connecting to BigQuery.
+
+### Challenge 4: Multi-Geometry Silent Failures
+The refactored `mart_disruption_impact_map` contained two geography columns: `geom_point` and `geom_polygon_750m`. Executing `SELECT *` in the Query Layer caused ArcGIS Pro to silently fail to render any features on the map, as it strict-limits layers to a single geometry field.
+**Fix 4:** We utilized BigQuery's `EXCEPT` syntax to explicitly drop the conflicting point geometry during the ODBC fetch:
+```sql
+SELECT * EXCEPT (geom_point)
+FROM `paris-mobility-pulse`.`pmp_dbt_dev_pmp_marts`.`mart_disruption_impact_map`
+```
+
+### Challenge 5: SRID Auto-Discovery Failure
+BigQuery `GEOGRAPHY` types do not consistently expose their underlying Spatial Reference ID (SRID) through the Simba ODBC driver in a way ArcGIS can auto-discover, leaving the Finish button grayed out.
+**Fix 5:** We altered the configuration from "Let ArcGIS Pro discover spatial properties" to "Define spatial properties for the layer", manually selecting the `objectid` primary key and explicitly assigning `GCS WGS 1984` (SRID `4326`) as the coordinate system.
+
+### Challenge 6: Bounding Box Calculation
+Because the `GEOGRAPHY` data lacks a pre-calculated index typically found in Enterprise Geodatabases, ArcGIS Pro could not automatically determine the layer extent, presenting completely blank boundary boxes.
+**Fix 6:** We retained the "Input Extent" setting or manually inputted the physical bounding box bounds for the Île-de-France region (Top: 49.2, Bottom: 48.5, Left: 2.0, Right: 2.7) to ensure "Zoom to Layer" functionality performed correctly without defaulting to a global extent.
+
+## Final Visual Composition
+
+To build the final analytical dashboard:
+1. **Disruption Zones:** The polygon layer was styled using **Graduated Colors** on the `fill_rate_delta_pct` metric (Red/Yellow/Green to represent severity) with a **50% Layer Transparency**.
+2. **Vélib Stations Overlay:** We injected the live station status using a secondary Query Layer on `velib_latest_state_enriched`, converting the floating coordinates on the fly (`ST_GEOGPOINT(lon, lat)`). 
+3. **Heatmap Formatting:** The stations were scaled down to 2-3pt markers and styled with Graduated Colors based on bike availability. 
+4. **Basemap:** The underlying Esri Topographic map was swapped to a **Dark Gray Canvas**, causing the brightly colored impact zones and empty (Red) stations clustering within them to stand out sharply, visually proving the cross-entity data pipeline's thesis.
