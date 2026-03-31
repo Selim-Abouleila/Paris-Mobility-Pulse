@@ -93,3 +93,5 @@ To build the final analytical dashboard:
 2. **Vélib Stations Overlay:** We injected the live station status using a secondary Query Layer on `velib_latest_state_enriched`, converting the floating coordinates on the fly (`ST_GEOGPOINT(lon, lat)`). 
 3. **Heatmap Formatting:** The stations were scaled down to 2-3pt markers and styled with Graduated Colors based on bike availability. 
 4. **Basemap:** The underlying Esri Topographic map was swapped to a **Dark Gray Canvas**, causing the brightly colored impact zones and empty (Red) stations clustering within them to stand out sharply, visually proving the cross-entity data pipeline's thesis.
+
+![ArcGIS Pro Integration Dashboard](images/arc_gis_integration_1.png)
