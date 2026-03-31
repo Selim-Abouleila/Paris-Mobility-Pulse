@@ -86,12 +86,12 @@ BigQuery `GEOGRAPHY` types do not consistently expose their underlying Spatial R
 Because the `GEOGRAPHY` data lacks a pre-calculated index typically found in Enterprise Geodatabases, ArcGIS Pro could not automatically determine the layer extent, presenting completely blank boundary boxes.
 **Fix 6:** We retained the "Input Extent" setting or manually inputted the physical bounding box bounds for the Île-de-France region (Top: 49.2, Bottom: 48.5, Left: 2.0, Right: 2.7) to ensure "Zoom to Layer" functionality performed correctly without defaulting to a global extent.
 
-## Final Visual Composition
+## Beta Visual Composition
 
-To build the final analytical dashboard:
+To build the beta analytical dashboard:
 1. **Disruption Zones:** The polygon layer was styled using **Graduated Colors** on the `fill_rate_delta_pct` metric (Red/Yellow/Green to represent severity) with a **50% Layer Transparency**.
 2. **Vélib Stations Overlay:** We injected the live station status using a secondary Query Layer on `velib_latest_state_enriched`, converting the floating coordinates on the fly (`ST_GEOGPOINT(lon, lat)`). 
 3. **Heatmap Formatting:** The stations were scaled down to 2-3pt markers and styled with Graduated Colors based on bike availability. 
 4. **Basemap:** The underlying Esri Topographic map was swapped to a **Dark Gray Canvas**, causing the brightly colored impact zones and empty (Red) stations clustering within them to stand out sharply, visually proving the cross-entity data pipeline's thesis.
 
-![ArcGIS Pro Integration Dashboard](images/arc_gis_integration_1.png)
+![ArcGIS Pro Beta Integration Dashboard](../images/arc_gis_integration_1.png)
