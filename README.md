@@ -42,13 +42,16 @@ make demo-down   # Stops all cost-generating resources
 
 ## What’s implemented
 - **Cloud Run collector** (`pmp-velib-collector`) polls Vélib station_status and publishes JSON events to Pub/Sub.
+- **Cloud Run collector** (`pmp-idfm-collector`) polls real-time IDFM transit disruptions (Métro, RER, Tramway) from the Île-de-France Mobilités API.
 - **Cloud Run writer** (`pmp-bq-writer`) receives Pub/Sub push messages and inserts into BigQuery raw table.
 - **Dataflow Streaming** (`pmp-velib-curated`) reads from Pub/Sub, validates formats, and writes curated rows to `pmp_curated.velib_station_status`.
 - **Reliability (DLQ)**: Robust Dead Letter Queue (DLQ) implementations for both Metadata (Pub/Sub Push) and Status (Dataflow) paths.
 - **DLQ Replay Worker** (`pmp-station-info-dlq-replayer`) is a Cloud Run Job that safely republishes failed metadata events from the hold subscription back to the original topic.
 - **BigQuery Marts** layer (`pmp_marts`) provides dashboard-ready views (e.g., `velib_latest_state`).
-- **Looker Studio Dashboard** for real-time visualization and trends.
+- **Looker Studio Dashboards** for real-time visualization, trends, and transit disruption impact analysis.
 - **Analytics Engineering (dbt)**: Marts layer managed by dbt with `ref()`/`source()` lineage, dynamic BigQuery location detection, and 8 schema tests (`unique`, `not_null`) enforced on every `make deploy`.
+- **Cross-Source Disruption Impact Analysis**: Advanced dbt spatial joins (`ST_BUFFER`, `ST_DISTANCE`) calculating the real-time effect of transit outages on nearby Vélib station fill rates, featuring A/B control group temporal/spatial comparisons.
+- **ArcGIS Pro GIS Integration**: Native `GEOGRAPHY` support and dynamic ODBC connections enabling live 750m impact zone polygon rendering directly inside Enterprise GIS interfaces.
 - **Reproducible Deployment**: Complete golden path with `make bootstrap`, `make adopt-prod` (adopts existing resources into Terraform state), `make deploy` for zero-trust project-portable infrastructure, and `make clean-cloud` for emergency cleanup of "Already Exists" conflicts.
 
 
@@ -69,6 +72,8 @@ make demo-down   # Stops all cost-generating resources
         - `velib_totals_hourly_aggregate`: Hourly station snapshots.
         - `velib_totals_hourly`: Clean dashboard view.
         - `velib_totals_hourly_paris`: Filtered view for high-coverage stations.
+        - `mart_disruption_impact_comparison`: Combines Vélib fill rates with IDFM disruptions (A/B control group test).
+        - `mart_disruption_impact_map`: Pre-computes native GIS geometries (`ST_BUFFER`) and identifiers for ArcGIS Pro.
     - **Reference Data** (`pmp_dbt_dev_curated`):
         - `idfm_stops_reference`: IDFM transit stop coordinates keyed by ZdA ID (dbt seed, 18K rows).
         - `idfm_zones_darret`: Bridge table mapping ZdC IDs (from disruptions API) → ZdA IDs (dbt seed, 18K rows).
@@ -89,6 +94,7 @@ make demo-down   # Stops all cost-generating resources
     - `pmp-velib-station-info-writer`: Ingests metadata into BigQuery.
     - `pmp-station-info-dlq-replayer`: Cloud Run Job to replay failed metadata events.
     - `pmp-idfm-collector`: Polls IDFM transit disruptions (every 10 min).
+    - `pmp-dbt-runner`: Cloud Run Job to execute dbt models and spatial transformations natively in the cloud.
 - **Cloud Scheduler**:
     - `velib-poll-every-minute` (Every minute): Triggers status collection.
     - `pmp-velib-station-info-daily` (Daily at 03:10): Triggers daily metadata refresh.
