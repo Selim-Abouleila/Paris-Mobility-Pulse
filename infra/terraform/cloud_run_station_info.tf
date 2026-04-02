@@ -1,7 +1,4 @@
 # Cloud Run Services for Station Information Pipeline
-# Note: Following the existing pattern (docs/03-terraform-iac.md), these Cloud Run
-# services should be deployed via `gcloud run deploy` and excluded from Terraform state
-# to avoid drift. This file documents the infrastructure but should not be in state.
 
 resource "google_cloud_run_v2_service" "station_info_collector" {
   name     = "pmp-velib-station-info-collector"

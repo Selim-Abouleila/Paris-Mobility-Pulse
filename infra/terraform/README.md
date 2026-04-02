@@ -51,8 +51,8 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp-velib-station-info-writer` | `cloud_run_station_info.tf` | Receives push from Pub/Sub → writes to BigQuery |
 | `pmp-bq-writer` | `cloud_run_bq.tf` | Receives push from `pmp-events-to-bq-sub` → writes raw events to BigQuery |
 | `pmp-idfm-collector` | `cloud_run_idfm_collector.tf` | Collects IDFM transit disruptions → publishes to `pmp-events` |
+| `pmp-dbt-runner` | `cloud_run_dbt_runner.tf` | Cloud Run Job executing dbt analytics natively in GCP |
 
-> **Deployment note**: Cloud Run services are deployed via `gcloud run deploy` (see Makefile). Terraform defines their configuration for reference and IAM bindings, but actual images are pushed separately. See [docs/03-terraform-iac.md](../../docs/03-terraform-iac.md).
 
 ### Cloud Scheduler (`cloud_scheduler_*.tf`)
 
@@ -61,6 +61,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp-velib-poll-every-minute` | `* * * * *` (every minute) | `pmp-velib-collector` `/collect` |
 | `pmp-velib-station-info-daily` | `10 3 * * *` (daily 3:10 AM) | `pmp-velib-station-info-collector` `/collect` |
 | `idfm-poll-every-10min` | `*/10 * * * *` (every 10 min) | `pmp-idfm-collector` `/` |
+| `dbt-run-every-hour` | `0 * * * *` (Top of every hour) | `pmp-dbt-runner` Job trigger |
 
 ### IAM & Service Accounts (`iam.tf`)
 
@@ -72,6 +73,7 @@ Dataflow, Pub/Sub, BigQuery, Storage, IAM, Cloud Resource Manager, Cloud Run, Cl
 | `pmp-pubsub-push-sa` | Pub/Sub push invoker | Cloud Run Invoker (writer + bq-writer services), BigQuery DataEditor (raw) |
 | `pmp-scheduler-sa` | Cloud Scheduler trigger | Cloud Run Invoker (collector services) |
 | `pmp-idfm-collector-sa` | IDFM collector | Pub/Sub Publisher (`pmp-events`), Secret Manager Accessor (`pmp-idfm-api-key`) |
+| `pmp-dbt-runner-sa` | dbt runner | BigQuery DataEditor & JobUser (project-level), BigQuery DataViewer (raw) |
 
 > **Least Privilege**: All BigQuery permissions are scoped to dataset-level, not project-level. Storage permissions are scoped to the specific Dataflow bucket.
 
@@ -217,6 +219,7 @@ infra/terraform/
 ├── backend.tf                         # State backend config
 ├── bigquery.tf                        # Datasets, tables, views (raw/curated/marts/ops)
 ├── cloud_run_bq.tf                    # BQ writer service (raw ingestion)
+├── cloud_run_dbt_runner.tf            # dbt runner Cloud Run Job + Cloud Scheduler
 ├── cloud_run_idfm_collector.tf        # IDFM disruptions collector service
 ├── cloud_run_station_info.tf          # Station info collector + writer services
 ├── cloud_run_velib_collector.tf       # Vélib status collector service
