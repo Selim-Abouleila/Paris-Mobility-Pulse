@@ -244,6 +244,8 @@ Detailed guides for each component:
 - [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md) - Spatial methodology for measuring disruption impact on Vélib
 - [13I - Disruption Impact Implementation Checkpoint](docs/13I-disruption-impact-implementation-checkpoint.md) - Implementation progress tracker: foundation views, spatial mart, and A/B comparison output
 - [14 - Disruption Impact Dashboard](docs/14-disruption-impact-dashboard.md) - Looker Studio pages for real-time disruption impact KPIs and geographic map
+- [15 - ArcGIS Pro Integration](docs/15-arcgis-integration.md) - Native Enterprise GIS integration via BigQuery ODBC for live spatial mapping
+- [15I - ArcGIS Implementation Runbook](docs/15I-arcgis-integration-implementation.md) - Technical configuration, ODBC troubleshooting, and layout composition
 
 ## Next milestone
 - **IDFM Transit Disruptions** — Second data source bringing real-time metro/RER/bus disruptions into the platform, enabling cross-source analytics with Vélib (see [doc 12](docs/12-idfm-transit-disruptions.md))
