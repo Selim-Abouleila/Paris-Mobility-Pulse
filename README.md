@@ -224,29 +224,50 @@ See [docs/10-security-posture.md](docs/10-security-posture.md) for the full secu
 
 ## Documentation
 
-Detailed guides for each component:
-- [00 - Bootstrap](docs/00-bootstrap.md) - Initial project setup
-- [01 - MVP Pipeline](docs/01-mvp-pipeline.md) - Cloud Run ingestion setup
-- [02 - Ops & Troubleshooting](docs/02-ops-troubleshooting.md) - Operational procedures
-- [03 - Terraform IAC](docs/03-terraform-iac.md) - Infrastructure as Code setup
-  - [Terraform Resource Reference](infra/terraform/README.md) - Complete managed resource inventory
-- [04 - Dataflow Curation](docs/04-dataflow-curation.md) - Streaming processing pipeline
-- [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md) - Analytics layer and latest state views
-- [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md) - Static station metadata collection
-- [07 - Operations: Demo Control](docs/07-operations-demo-control.md) - Automated demo lifecycle management
-- [08 - Vélib Dashboard](docs/08-velib-dashboard.md) - Looker Studio report and metrics
-- [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md) - Dead Letter Queue and Replay strategy
-- [10 - Security Posture](docs/10-security-posture.md) - Security architecture and hardening plan
-- [10x - Security Implementation Plan](docs/10x-security-implementation-plan.md) - Detailed Terraform refactoring roadmap
-- [11 - Analytics Engineering (dbt)](docs/11-dbt-analytics-engineering.md) - Migration to dbt for data modeling and quality tests
-- [12 - IDFM Transit Disruptions](docs/12-idfm-transit-disruptions.md) - Second data source: real-time transit disruptions + cross-source analytics
-- [12I - IDFM Implementation Checkpoint](docs/12I-idfm-implementation-checkpoint.md) - Implementation progress tracker and known issues
-- [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md) - Spatial methodology for measuring disruption impact on Vélib
-- [13I - Disruption Impact Implementation Checkpoint](docs/13I-disruption-impact-implementation-checkpoint.md) - Implementation progress tracker: foundation views, spatial mart, and A/B comparison output
-- [14 - Disruption Impact Dashboard](docs/14-disruption-impact-dashboard.md) - Looker Studio pages for real-time disruption impact KPIs and geographic map
-- [15 - ArcGIS Pro Integration](docs/15-arcgis-integration.md) - Native Enterprise GIS integration via BigQuery ODBC for live spatial mapping
-- [15I - ArcGIS Implementation Runbook](docs/15I-arcgis-integration-implementation.md) - Technical configuration, ODBC troubleshooting, and layout composition
+<details>
+<summary>Setup</summary>
+
+- [00 - Bootstrap](docs/00-bootstrap.md)
+- [03 - Terraform IAC](docs/03-terraform-iac.md)
+
+</details>
+<details>
+<summary>Architecture and Data</summary>
+
+- [01 - MVP Pipeline](docs/01-mvp-pipeline.md)
+- [04 - Dataflow Curation](docs/04-dataflow-curation.md)
+- [05 - BigQuery Marts](docs/05-bigquery-marts-latest-state.md)
+- [06 - Vélib Station Information Pipeline](docs/06-velib-station-information-pipeline.md)
+- [12 - IDFM Transit Disruptions](docs/12-idfm-transit-disruptions.md)
+
+</details>
+<details>
+<summary>Operations and Reliability</summary>
+
+- [02 - Ops & Troubleshooting](docs/02-ops-troubleshooting.md)
+- [07 - Operations: Demo Control](docs/07-operations-demo-control.md)
+- [09 - Reliability: DLQ + Replay](docs/09-reliability-dlq-replay.md)
+- [10 - Security Posture](docs/10-security-posture.md)
+
+</details>
+<details>
+<summary>Analytics</summary>
+
+- [08 - Vélib Dashboard](docs/08-velib-dashboard.md)
+- [11 - Analytics Engineering (dbt)](docs/11-dbt-analytics-engineering.md)
+- [13 - Cross-Source Disruption Impact Analysis](docs/13-cross-source-disruption-impact-analysis.md)
+- [14 - Disruption Impact Dashboard](docs/14-disruption-impact-dashboard.md)
+
+</details>
+<details>
+<summary>GIS</summary>
+
+- [15 - ArcGIS Pro Integration](docs/15-arcgis-integration.md)
+- [15I - ArcGIS Implementation Runbook](docs/15I-arcgis-integration-implementation.md)
+
+</details>
+
+For all implementation checklists and historical documentation, see the [docs/ directory](docs/).
 
 ## Next milestone
-- **IDFM Transit Disruptions** — Second data source bringing real-time metro/RER/bus disruptions into the platform, enabling cross-source analytics with Vélib (see [doc 12](docs/12-idfm-transit-disruptions.md))
 - (Optional) Move windowed aggregations from BigQuery MVs to Dataflow.
