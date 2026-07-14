@@ -5,6 +5,9 @@
 
 Real-time pipeline that ingests Paris mobility signals (starting with Vélib station_status), processes events in near real-time, and stores them in BigQuery for analytics.
 
+## Business Problem & Results
+This project addresses the challenge of understanding how urban transit disruptions affect alternative mobility networks. By combining near-real-time Vélib (bike-sharing) status with live Île-de-France Mobilités (IDFM) transit outages, it builds a spatial cohort comparison to measure the localized impact of metro and RER disruptions on bike availability. The resulting spatial marts are consumed by Looker Studio and ArcGIS Pro for real-time visualization and operational insights.
+
 ## Quickstart (The Golden Path)
 
 Deploy this entire project to your own Google Cloud project in < 10 minutes.
@@ -32,7 +35,7 @@ make deploy      # Builds Containers, Deploys Infrastructure
 
 ### 3. Run Demo
 ```bash
-make demo-up     # Starts pipelines & simulated traffic
+make demo-up     # Starts pipelines & live public feeds
 make demo-down   # Stops all cost-generating resources
 ```
 
@@ -133,6 +136,9 @@ See [14 - Disruption Impact Dashboard](./docs/14-disruption-impact-dashboard.md)
 ## Budget Alert (Cost Guardrail)
 
 A monthly budget alert is configured at **$40/month** to provide a safety guardrail for demo activities and prevent accidental spend. This budget alert complements the project's operational stop controls; see [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for instructions on pausing or stopping cost-generating resources.
+
+> [!WARNING]
+> **Disclaimer**: The budget alert warns about spending; it does not prevent or cap spending.
 
 ![Budget alert screenshot](images/budget_alert.png)
 
