@@ -128,17 +128,7 @@ The dashboard also includes **disruption impact analysis** pages that measure ho
 
 See [14 - Disruption Impact Dashboard](./docs/14-disruption-impact-dashboard.md) for details on KPIs, map interpretation, and methodology.
 
-## Operations (Demo Mode)
 
-The project includes a control script to safely start/stop the pipeline and manage costs. This is the **most practical way** to run the pipeline for demos.
-
-```bash
-./scripts/pmpctl.sh status   # Show current state
-./scripts/pmpctl.sh up       # Start ingestion + Dataflow
-./scripts/pmpctl.sh collect  # Trigger collectors once
-./scripts/pmpctl.sh down     # Stop all cost-generating resources
-```
-See [07 - Operations: Demo Control](./docs/07-operations-demo-control.md) for details.
 
 ## Budget Alert (Cost Guardrail)
 
